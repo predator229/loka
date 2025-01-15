@@ -1,7 +1,13 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:loka/models/auth.class.dart';
+import 'package:loka/models/country.class.dart';
+import 'package:loka/models/user.register.class.dart';
 
 class RegisterValidateView extends StatefulWidget {
-  static const routeName = '/register-validate';
+  static const routeName = '/register-phonenumber';
   const RegisterValidateView({super.key});
 
   @override
@@ -11,6 +17,29 @@ class RegisterValidateView extends StatefulWidget {
 class _RegisterValidateViewState extends State<RegisterValidateView> {
   final TextEditingController _phoneNumber = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  late UserRegisterClass user;
+
+  List<Country> _countries = [];
+  Country? _selectedCountry;
+  String? myCountrieCode;
+
+  @override
+  void initState() {
+    super.initState();
+    _getMyCode();
+    _loadCountries();
+  }
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args = ModalRoute.of(context)?.settings.arguments;
+    if (args != null && args is UserRegisterClass) {
+      user = args;
+    } else {
+      Navigator.of(context).pop();
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -38,16 +67,10 @@ class _RegisterValidateViewState extends State<RegisterValidateView> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          height: 5,
-                          decoration: BoxDecoration(
-                            color: Colors.green,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
+                        _buildProgressIndicator(),
                         const SizedBox(height: 30),
                         const Text(
-                          "Phone Number",
+                          "Phone Number (3/3)",
                           style: TextStyle(fontSize: 34, fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 10),
@@ -63,51 +86,10 @@ class _RegisterValidateViewState extends State<RegisterValidateView> {
                         SizedBox(
                           height: 150,
                           width: double.infinity,
-                          child: Image.asset("images/icons/phone_number.avif", fit: BoxFit.cover),
+                          child: Image.asset("images/icons/phone_number.png", fit: BoxFit.cover),
                         ),
                         const SizedBox(height: 30),
-                        Row(
-                          children: [
-                            Container(
-                              height: 50,
-                              width: MediaQuery.of(context).size.width * 0.3,
-                              decoration: BoxDecoration(
-                                color: Colors.white12,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                children: [
-                                  Image.asset(
-                                    "images/flags/benin.png",
-                                    width: 30,
-                                  ),
-                                  const Text("+229", style: TextStyle(fontWeight: FontWeight.bold)),
-                                  const Icon(Icons.arrow_drop_down),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: TextFormField(
-                                controller: _phoneNumber,
-                                keyboardType: TextInputType.phone,
-                                decoration: InputDecoration(
-                                  hintText: 'Phone number',
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                ),
-                                validator: (value) {
-                                  if (value!.isEmpty) {
-                                    return 'Please enter your phone number';
-                                  }
-                                  return null;
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
+                        _buildComboNumber(),
                       ],
                     ),
                   ),
@@ -141,10 +123,113 @@ class _RegisterValidateViewState extends State<RegisterValidateView> {
     );
   }
 
+  Widget _buildProgressIndicator() {
+    return Row(
+      children: [
+        Expanded(
+          child: Container(
+            height: 5,
+            decoration: BoxDecoration(
+              color: Colors.green,
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        ),
+        Expanded(
+          child: Container(
+            height: 5,
+            decoration: BoxDecoration(
+              color: Colors.green,
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        ),
+        Expanded(
+          child: Container(
+            height: 5,
+            decoration: BoxDecoration(
+              color: Colors.green,
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+Widget _buildComboNumber() {
+  return Row(
+    children: [
+      // Conteneur pour le DropdownButton
+      SizedBox(
+        width: MediaQuery.of(context).size.width * 0.3,
+        child: Center(
+          child: _countries.isEmpty
+              ? CircularProgressIndicator()
+              : DropdownButton<Country>(
+                  value: _selectedCountry,
+                  onChanged: (Country? newValue) {
+                    setState(() {
+                      _selectedCountry = newValue;
+                    });
+                  },
+                  isExpanded: true,
+                  iconSize: 24, // Ajuste la taille de l'icône si nécessaire
+                  items: _countries.map((Country country) {
+                    return DropdownMenuItem<Country>(
+                      value: country,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            country.emoji,
+                            style: TextStyle(fontSize: 24),
+                          ),
+                          SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              country.dial_code,
+                              style: TextStyle(fontSize: 16),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                ),
+        ),
+      ),
+      SizedBox(width: 10),
+      Expanded(
+        child: IntrinsicHeight(
+          child: TextFormField(
+            controller: _phoneNumber,
+            keyboardType: TextInputType.phone,
+            decoration: InputDecoration(
+              hintText: 'Phone number',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            validator: (value) {
+              if (value!.isEmpty) {
+                return 'Please enter your phone number';
+              }
+              return null;
+            },
+          ),
+        ),
+      ),
+    ],
+  );
+}
+
   void _registerNext() {
     final phone = _phoneNumber.text;
     if (_formKey.currentState!.validate() && phone.isNotEmpty) {
       // Navigator.pushNamed(context, '/register/next');
+      Auth().registerWithEmailAndPassword(userToCreate:  user, context: context);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -152,5 +237,31 @@ class _RegisterValidateViewState extends State<RegisterValidateView> {
         ),
       );
     }
+  }
+
+  Future<void> _loadCountries() async {
+    final String response = await rootBundle.loadString('assets/countries.json');
+    final List<dynamic> data = json.decode(response);
+    final results = data.map((countryData) => Country.fromJson(countryData)).toList();
+    setState(() {
+      _countries = results;
+      if (myCountrieCode == null) {
+        _getMyCode();
+      }
+      _selectedCountry = results.isNotEmpty && myCountrieCode != null && myCountrieCode != '' ? results.firstWhere((country) => country.id == myCountrieCode) : null;
+   });
+  }
+  Future <void> _getMyCode () async{
+    setState(() { myCountrieCode = "BJ"; });
+
+  //   LocationPermission permission = await Geolocator.requestPermission();
+  //   if (permission == LocationPermission.denied) {
+  //     throw Exception('Permission denied');
+  //   }
+  //   Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+
+  //   List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
+  //   String countryCode = placemarks[0].isoCountryCode ?? '';
+  //   setState(() { myCountrieCode = countryCode; });
   }
 }

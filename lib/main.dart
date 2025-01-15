@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:loka/views/home.view.dart';
 import 'package:loka/views/login.view.dart';
+import 'package:loka/views/registers/register.password.view.dart';
 import 'package:loka/views/registers/register.validate.view.dart';
 import 'package:loka/views/registers/register.view.dart';
 import 'package:loka/views/welcome.view.dart';
@@ -34,6 +36,8 @@ class _EntryAppState extends State<EntryApp> {
         RegisterView.routeName : (context) => const RegisterView(),
         RegisterValidateView.routeName : (context) => const RegisterValidateView(),
         LoginView.routeName : (context) => const LoginView(),
+        RegisterPasswordView.routeName :  (context) => const RegisterPasswordView(),
+        HomeView.routeName :  (context) => const HomeView(),
       },
       initialRoute: WelcomeView.routeName,
     );

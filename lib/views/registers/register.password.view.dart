@@ -1,29 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:loka/models/user.register.class.dart';
 import 'package:loka/views/login.view.dart';
-import 'package:loka/views/registers/register.password.view.dart';
 import 'package:loka/views/registers/register.validate.view.dart';
 
-class RegisterView extends StatefulWidget {
-  static const routeName = '/register';
-  const RegisterView({super.key});
+class RegisterPasswordView extends StatefulWidget {
+  static const routeName = '/register-password';
+  const RegisterPasswordView({super.key});
 
   @override
-  State<RegisterView> createState() => _RegisterViewState();
+  State<RegisterPasswordView> createState() => _RegisterPasswordViewState();
 }
 
-class _RegisterViewState extends State<RegisterView> {
-  final TextEditingController _firstName = TextEditingController();
-  final TextEditingController _lastName = TextEditingController();
-  final TextEditingController _email = TextEditingController();
+class _RegisterPasswordViewState extends State<RegisterPasswordView> {
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _passwordConfirmController = TextEditingController();
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  late UserRegisterClass user;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args = ModalRoute.of(context)?.settings.arguments;
+    if (args != null && args is UserRegisterClass) {
+      user = args;
+    } else {
+      Navigator.of(context).pop();
+    }
+  }
 
   @override
   void dispose() {
-    _firstName.dispose();
-    _lastName.dispose();
-    _email.dispose();
+    _passwordController.dispose();
+    _passwordConfirmController.dispose();
     super.dispose();
   }
 
@@ -37,7 +51,7 @@ class _RegisterViewState extends State<RegisterView> {
             Navigator.pop(context);
           },
         ),
-        title: const Text('Register'), // Inscription
+        title: const Text('Register'),
       ),
       body: SafeArea(
         child: Padding(
@@ -55,49 +69,58 @@ class _RegisterViewState extends State<RegisterView> {
                         _buildProgressIndicator(),
                         const SizedBox(height: 30),
                         const Text(
-                          "Your information (1/3)",
+                          "Set Up password (2/3)",
                           style: TextStyle(fontSize: 34, fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 10),
                         const Text(
-                          "How can we call you?",
+                          "Enter a strong password to secure your account",
                           style: TextStyle(fontWeight: FontWeight.w100),
                         ),
                         const SizedBox(height: 30),
                         _buildTextField(
-                          controller: _firstName,
-                          label: 'First name',
-                          hint: 'John',
-                          validator: (value) =>
-                              value == null || value.isEmpty ? 'Please enter your first name' : null,
-                        ),
-                        const SizedBox(height: 10),
-                        _buildTextField(
-                          controller: _lastName,
-                          label: 'Last name',
-                          hint: 'Doe',
-                          validator: (value) =>
-                              value == null || value.isEmpty ? 'Please enter your last name' : null,
-                        ),
-                        const SizedBox(height: 10),
-                        _buildTextField(
-                          controller: _email,
-                          label: 'Email',
-                          hint: 'example@example.com',
+                          controller: _passwordController,
+                          label: 'Enter your password',
+                          hint: 'Enter password',
+                          obscureText: true,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Please enter your email';
+                              return 'Please enter your password';
                             }
-                            if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                              return 'Please enter a valid email address';
+                            if (value.length < 8) {
+                              return 'Password must be at least 8 characters long';
+                            }
+                            if (!RegExp(r'(?=.*[A-Z])').hasMatch(value)) {
+                              return 'Password must contain at least one uppercase letter';
+                            }
+                            if (!RegExp(r'(?=.*[a-z])').hasMatch(value)) {
+                              return 'Password must contain at least one lowercase letter';
+                            }
+                            if (!RegExp(r'(?=.*\d)').hasMatch(value)) {
+                              return 'Password must contain at least one number';
+                            }
+                            if (!RegExp(r'(?=.*[@$!%*?&])').hasMatch(value)) {
+                              return 'Password must contain at least one special character';
                             }
                             return null;
                           },
                         ),
-                        const SizedBox(height: 30),
-                        _buildDividerWithOr(),
-                        const SizedBox(height: 30),
-                        _buildSocialButtons(),
+                        const SizedBox(height: 10),
+                        _buildTextField(
+                          controller: _passwordConfirmController,
+                          label: 'Confirm your password',
+                          hint: '',
+                          obscureText: true,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please confirm your password';
+                            }
+                            if (value != _passwordController.text) {
+                              return 'The passwords do not match';
+                            }
+                            return null;
+                          },
+                        ),
                       ],
                     ),
                   ),
@@ -106,7 +129,7 @@ class _RegisterViewState extends State<RegisterView> {
               Column(
                 children: [
                   ElevatedButton(
-                    onPressed: _register_next,
+                    onPressed: _registerNext,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
                       foregroundColor: Colors.white,
@@ -153,12 +176,12 @@ class _RegisterViewState extends State<RegisterView> {
           child: Container(
             height: 5,
             decoration: BoxDecoration(
-              color: Colors.grey,
+              color: Colors.green,
               borderRadius: BorderRadius.circular(10),
             ),
           ),
         ),
-                Expanded(
+        Expanded(
           child: Container(
             height: 5,
             decoration: BoxDecoration(
@@ -176,9 +199,11 @@ class _RegisterViewState extends State<RegisterView> {
     required String label,
     required String hint,
     required String? Function(String?) validator,
+    bool obscureText = false,
   }) {
     return TextFormField(
       controller: controller,
+      obscureText: obscureText,
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
@@ -190,59 +215,10 @@ class _RegisterViewState extends State<RegisterView> {
     );
   }
 
-  Widget _buildDividerWithOr() {
-    return Row(
-      children: [
-        Expanded(
-          child: Container(height: 1, color: Colors.grey),
-        ),
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8.0),
-          child: Text('OR'),
-        ),
-        Expanded(
-          child: Container(height: 1, color: Colors.grey),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSocialButtons() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        _buildSocialButton('images/icons/google.png'),
-        _buildSocialButtonWithIcon(Icons.facebook_rounded, Colors.blue),
-        _buildSocialButtonWithIcon(Icons.apple_outlined, Colors.grey),
-      ],
-    );
-  }
-
-  Widget _buildSocialButton(String assetPath) {
-    return ElevatedButton(
-      onPressed: () {},
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.white,
-        minimumSize: const Size(50, 50),
-      ),
-      child: Image.asset(assetPath, width: 20),
-    );
-  }
-
-  Widget _buildSocialButtonWithIcon(IconData icon, Color color) {
-    return ElevatedButton(
-      onPressed: () {},
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.white,
-        minimumSize: const Size(50, 50),
-      ),
-      child: Icon(icon, color: color),
-    );
-  }
-
-  void _register_next() {
+  void _registerNext() {
     if (_formKey.currentState!.validate()) {
-      Navigator.pushNamed(context, RegisterPasswordView.routeName, arguments: UserRegisterClass(firstName: _firstName.text, lastName: _lastName.text, email: _email.text));
+      user.password = _passwordController.text;
+      Navigator.pushNamed(context, RegisterValidateView.routeName, arguments: user);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill the form correctly')),

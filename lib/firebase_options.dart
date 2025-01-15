@@ -54,10 +54,11 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyAZnwJFn_O1RoV4yPLR-P9z2mi7HF-aDN4',
-    appId: '1:276214371952:ios:1e3159603d1ada0c1506b5',
+    appId: '1:276214371952:ios:5e580ce9b9c263e31506b5',
     messagingSenderId: '276214371952',
     projectId: 'loka-damien',
     storageBucket: 'loka-damien.firebasestorage.app',
-    iosBundleId: 'com.damien.loka',
+    iosBundleId: 'com.damienpadonou.loka',
   );
+
 }
