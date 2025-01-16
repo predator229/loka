@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:loka/models/settings.class.dart';
 import 'package:loka/views/login.view.dart';
+import 'package:loka/controllers/tools.controller.dart';
 
 class WelcomePageView{
   int index;
@@ -87,7 +89,7 @@ class WelcomeView extends StatelessWidget {
                         Navigator.pushNamed(context, LoginView.routeName);
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
+                        backgroundColor: SettingsClass().bottunColor,
                         foregroundColor: Colors.white,
                         minimumSize: Size(double.infinity, 50),
                       ),
@@ -104,31 +106,26 @@ class WelcomeView extends StatelessWidget {
     );
   }
 
-  Widget _oneProgressContainer ({required Color color}){
-    return Expanded(
-      child: Container(
-        height: 5,
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(10),
-        ),
-      )
-    );
-  }
-
-  Widget _buildProgressIndicator({required int nbr}) {
-    List<Widget> toReturn = [];
-    for (int i = 0; i < nbr; i++) { toReturn.add(_oneProgressContainer(color : Colors.green)); }
-    if (nbr < 3) {
-      for (int i=0; i<3-nbr; i++) { toReturn.add(_oneProgressContainer(color : Colors.grey)); }
-    }
-    return Row( children:  toReturn );
-  }
+  // Widget _oneProgressContainer ({required Color color}){
+  //   return Expanded(
+  //     child: Padding(
+  //       padding: const EdgeInsets.all(3.0),
+  //       child: Container(
+  //         height: 5,
+  //         decoration: BoxDecoration(
+  //           color: color,
+  //           borderRadius: BorderRadius.circular(10),
+            
+  //         ),
+  //       ),
+  //     )
+  //   );
+  // }
 
   Widget _buildPageViewContent({ required WelcomePageView pageDetails}){
     return Column(
       children: [
-        _buildProgressIndicator(nbr: pageDetails.index),
+        ToolsController().buildProgressIndicator(nbr: pageDetails.index),
         SizedBox(height: 20,),
         Image.asset(pageDetails.image, fit: BoxFit.cover),
         SizedBox(height: 20,),
@@ -147,7 +144,7 @@ class WelcomeView extends StatelessWidget {
   }
 
   Widget _buildTitleContent({required WelcomeTitle titleDetail }){
-    return titleDetail.isGreen ? Text(titleDetail.text, style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.green),) : Text(titleDetail.text, style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold,),);
+    return titleDetail.isGreen ? Text(titleDetail.text, style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: SettingsClass().color),) : Text(titleDetail.text, style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold,),);
   }
 
 }

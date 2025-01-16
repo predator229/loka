@@ -2,8 +2,10 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:loka/controllers/tools.controller.dart';
 import 'package:loka/models/auth.class.dart';
 import 'package:loka/models/country.class.dart';
+import 'package:loka/models/settings.class.dart';
 import 'package:loka/views/home.view.dart';
 import 'package:loka/views/registers/register.view.dart';
 
@@ -23,17 +25,6 @@ class _LoginViewState extends State<LoginView> {
   int? selectedOption = 1;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  List<Country> _countries = [];
-  Country? _selectedCountry;
-  String? myCountrieCode;
-  
-  @override
-  void initState() {
-    super.initState();
-    _getMyCode();
-    _loadCountries();
-
-  }
   @override
   void dispose() {
     _phoneNumber.dispose();
@@ -117,7 +108,7 @@ class _LoginViewState extends State<LoginView> {
                           ElevatedButton(
                             onPressed: _lauchPhoneCodeAuthentification,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green,
+                              backgroundColor: SettingsClass().bottunColor,
                               foregroundColor: Colors.white,
                               minimumSize: const Size(double.infinity, 50),
                             ),
@@ -127,7 +118,7 @@ class _LoginViewState extends State<LoginView> {
                           _buildDividerWithOr(),
                           const SizedBox(height: 30),
                           const SizedBox(height: 30),
-                          _buildSocialButtons(),
+                          ToolsController().buildSocialButtons(),
                         ],
                       ),
                     ),
@@ -141,12 +132,12 @@ class _LoginViewState extends State<LoginView> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       mainAxisSize: MainAxisSize.max,
                       children: [
-                        Text('Pas de compte ? ', style: TextStyle(color: Colors.grey),),
+                        Text('Pas de compte ? ',),
                         TextButton(
                           onPressed: () {
                             Navigator.pushNamed(context, RegisterView.routeName);
                           },
-                          child: const Text(' Inscrivez vous ici ', style: TextStyle(color: Colors.green)),
+                          child: Text('Inscrivez vous ici ', style: TextStyle(color: SettingsClass().color )),
                         ),
                       ],
                     ),
@@ -160,122 +151,6 @@ class _LoginViewState extends State<LoginView> {
   }
 
   // Helper Methods
-Widget _buildComboNumber() {
-  return Row(
-    children: [
-      // Conteneur pour le DropdownButton
-      SizedBox(
-        width: MediaQuery.of(context).size.width * 0.3,
-        child: Center(
-          child: _countries.isEmpty
-              ? CircularProgressIndicator()
-              : DropdownButton<Country>(
-                  value: _selectedCountry,
-                  onChanged: (Country? newValue) {
-                    setState(() {
-                      _selectedCountry = newValue;
-                    });
-                  },
-                  isExpanded: true,
-                  iconSize: 24,
-                  items: _countries.map((Country country) {
-                    return DropdownMenuItem<Country>(
-                      value: country,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            country.emoji,
-                            style: TextStyle(fontSize: 24),
-                          ),
-                          SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              '${country.name}(${country.dial_code})',
-                              // '${country.dial_code}(${country.name})',
-                              style: TextStyle(fontSize: 16),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }).toList(),
-                ),
-        ),
-      ),
-      SizedBox(width: 10),
-      // Conteneur pour le TextFormField
-      Expanded(
-        child: IntrinsicHeight(
-          child: TextFormField(
-            controller: _phoneNumber,
-            keyboardType: TextInputType.phone,
-            decoration: InputDecoration(
-              labelText: "Telephone",
-              hintText: '7000000',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            validator: (value) {
-              if (value!.isEmpty) {
-                return 'Entrer votre numero de telephone';
-              }
-              return null;
-            },
-          ),
-        ),
-      ),
-    ],
-  );
-}
-
-  Widget _buildDividerWithOr() {
-    return Row(
-      children: [
-        Expanded(
-          child: Container(height: 1, color: Colors.grey),
-        ),
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8.0),
-          child: Text('OR'),
-        ),
-        Expanded(
-          child: Container(height: 1, color: Colors.grey),
-        ),
-      ],
-    );
-  }
-  Widget _buildSocialButtons() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        _buildSocialButton('images/icons/google.png'),
-      ],
-    );
-  }
-  Widget _buildSocialButton(String assetPath) {
-    return Expanded(
-      child: ElevatedButton(
-            onPressed: (){},
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: Colors.black,
-              minimumSize: const Size(50, 50),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Image.asset(assetPath, width: 20),
-                Text("Se connecter par Google"),
-              ],
-            ),
-          ),
-      
-    );
-
-  }
 
   Widget _buildTextField({
     required TextEditingController controller,
@@ -364,36 +239,4 @@ Widget _buildComboNumber() {
     }
   }
 
-    Future<void> _loadCountries() async {
-    final String response = await rootBundle.loadString('assets/countries.json');
-    final List<dynamic> data = json.decode(response);
-    final results = data.map((countryData) => Country.fromJson(countryData)).toList();
-    setState(() {
-      _countries = results;
-      if (myCountrieCode == null) {
-        _getMyCode();
-      }
-      if (myCountrieCode != null && myCountrieCode != '') {
-      _selectedCountry = results.firstWhere(
-        (country) => country.id == myCountrieCode,
-        orElse: () => results[0],
-      );
-    } else {
-      _selectedCountry = results.isNotEmpty ? results[0] : null;
-    }
-   });
-  }
-  Future <void> _getMyCode () async{
-    setState(() { myCountrieCode = "BJ"; });
-
-    // LocationPermission permission = await Geolocator.requestPermission();
-    // if (permission == LocationPermission.denied) {
-    //   throw Exception('Permission denied');
-    // }
-    // Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-
-    // List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
-    // String countryCode = placemarks[0].isoCountryCode ?? '';
-    // setState(() { myCountrieCode = countryCode; print(countryCode); });
-  }
 }

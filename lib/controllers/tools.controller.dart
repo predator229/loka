@@ -1,0 +1,199 @@
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:loka/models/country.class.dart';
+import 'package:loka/models/settings.class.dart';
+
+class ToolsController {
+
+  Widget buildProgressIndicator({required int nbr, withPadding=true}) {
+    List<Widget> toReturn = [];
+    for (int i = 0; i < nbr; i++) { toReturn.add(_oneProgressContainer(color : SettingsClass().progressBGC, withPadding : withPadding)); }
+    if (nbr < 3) {
+      for (int i=0; i<3-nbr; i++) { toReturn.add(_oneProgressContainer(color : SettingsClass().noProgressBGC, withPadding : withPadding)); }
+    }
+    return Row( children:  toReturn );
+  }
+
+  Widget _oneProgressContainer({required Color color, withPadding=true}) {
+   return Expanded(
+    child: withPadding ? Padding(
+      padding: const EdgeInsets.all(3.0),
+      child: Container(
+       height: 5,
+       decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(10),
+       ),
+      ),
+    ) : 
+    Container(
+       height: 5,
+       decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(10),
+       ),
+      ),
+   );
+  }
+  Widget buildSocialButtons() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        _buildSocialButton('images/icons/google.png'),
+      ],
+    );
+  }
+  Widget _buildSocialButton(String assetPath) {
+    return Expanded(
+      child: ElevatedButton(
+            onPressed: (){},
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.black,
+              minimumSize: const Size(50, 50),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Image.asset(assetPath, width: 20),
+                Text("Se connecter par Google"),
+              ],
+            ),
+          ),
+      
+    );
+  }
+    Widget buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    required String? Function(String?) validator,
+    obscureText = false,
+  }) {
+    return TextFormField(
+      controller: controller,
+      obscureText: obscureText,
+      decoration: InputDecoration(
+        labelText: label,
+        hintText: hint,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+      validator: validator,
+    );
+  }
+
+  Widget buildDividerWithOr() {
+    return Row(
+      children: [
+        Expanded(
+          child: Container(height: 1, color: Colors.grey),
+        ),
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8.0),
+          child: Text('OR'),
+        ),
+        Expanded(
+          child: Container(height: 1, color: Colors.grey),
+        ),
+      ],
+    );
+  }
+
+Future<Widget> buildComboNumber({required witdh, required TextEditingController phoneNumber}) async {  
+  
+  final String response = await rootBundle.loadString('assets/countries.json');
+  final List<dynamic> data = json.decode(response);
+  List<Country> countries = data.map((countryData) => Country.fromJson(countryData)).toList();
+
+  String? myCountrieCode = _getMyCode();
+
+  Country? selectedCountry = myCountrieCode != '' ? countries.firstWhere(
+      (country) => country.id == myCountrieCode,
+      orElse: () => countries[0],
+    ) : null;
+
+  return 
+  Row(
+    children: [
+      Container(
+        width: witdh, // MediaQuery.of(context).size.width * 0.3,
+        child: Center(
+          child: countries.isEmpty
+              ? CircularProgressIndicator()
+              : DropdownButton<Country>(
+                  value: selectedCountry,
+                  onChanged: (Country? newValue) {
+                    selectedCountry = newValue;
+                  },
+                  isExpanded: true,
+                  iconSize: 24,
+                  items: countries.map((Country country) {
+                    return DropdownMenuItem<Country>(
+                      value: country,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            country.emoji,
+                            style: TextStyle(fontSize: 24),
+                          ),
+                          SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              '${country.name}(${country.dial_code})',
+                              style: TextStyle(fontSize: 16),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                ),
+        ),
+      ),
+      SizedBox(width: 10),
+      Expanded(
+        child: IntrinsicHeight(
+          child: TextFormField(
+            controller: _phoneNumber,
+            keyboardType: TextInputType.phone,
+            decoration: InputDecoration(
+              labelText: "Telephone",
+              hintText: '7000000',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            validator: (value) {
+              if (value!.isEmpty) {
+                return 'Entrer votre numero de telephone';
+              }
+              return null;
+            },
+          ),
+        ),
+      ),
+    ],
+  );
+}
+
+   String _getMyCode () {
+     return "BJ";
+
+    // LocationPermission permission = await Geolocator.requestPermission();
+    // if (permission == LocationPermission.denied) {
+    //   throw Exception('Permission denied');
+    // }
+    // Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+
+    // List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
+    // String countryCode = placemarks[0].isoCountryCode ?? '';
+    //  myCountrieCode = countryCode; print(countryCode); });
+  }
+
+}
