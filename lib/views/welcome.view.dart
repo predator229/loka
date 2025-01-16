@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:loka/models/settings.class.dart';
-import 'package:loka/views/login.view.dart';
+import 'package:loka/views/authentifications/login.view.dart';
 import 'package:loka/controllers/tools.controller.dart';
 
 class WelcomePageView{
@@ -15,13 +16,18 @@ class WelcomeTitle {
   bool isGreen;
   WelcomeTitle({required this.text, required this.isGreen});
 }
-class WelcomeView extends StatelessWidget {
+
+class WelcomeView extends StatefulWidget {
   static const routeName = '/welcome';
   const WelcomeView({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final List<WelcomePageView> pageViews = [
+  State<WelcomeView> createState() => WelcomeViewState();
+}
+
+class WelcomeViewState extends State<WelcomeView> {
+
+final List<WelcomePageView> pageViews = [
       WelcomePageView(
         index: 1,
         titles: [
@@ -51,34 +57,53 @@ class WelcomeView extends StatelessWidget {
         image : "images/wlc_/welcome3.png",
       ),
   ];
+  @override
+  void initState() {
+    super.initState();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+  }
+  @override
+  void dispose() {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+    ]);    super.dispose();
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.max,
             children: [
-              SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    SizedBox (
-                      height: MediaQuery.of(context).size.height * 0.75,
-                      child: Flexible(
-                        child: PageView(
-                          children: [
-                            for (int i = 0; i < pageViews.length; i++)
-                            _buildPageViewContent(pageDetails: pageViews[i]),
-                          ],
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      SizedBox (
+                        height: MediaQuery.of(context).size.height * 0.75,
+                        child: Flexible(
+                          child: PageView(
+                            children: [
+                              for (int i = 0; i < pageViews.length; i++)
+                              _buildPageViewContent(pageDetails: pageViews[i]),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
               Row(
@@ -92,13 +117,13 @@ class WelcomeView extends StatelessWidget {
                         backgroundColor: SettingsClass().bottunColor,
                         foregroundColor: Colors.white,
                         minimumSize: Size(double.infinity, 50),
+                        shape: RoundedRectangleBorder( borderRadius: BorderRadius.circular(10), ), 
                       ),
                       child: const Text('Demarrer'),
                     ),
                   ),
                 ],
               ),
-
             ],
           ),
         ),
@@ -106,24 +131,10 @@ class WelcomeView extends StatelessWidget {
     );
   }
 
-  // Widget _oneProgressContainer ({required Color color}){
-  //   return Expanded(
-  //     child: Padding(
-  //       padding: const EdgeInsets.all(3.0),
-  //       child: Container(
-  //         height: 5,
-  //         decoration: BoxDecoration(
-  //           color: color,
-  //           borderRadius: BorderRadius.circular(10),
-            
-  //         ),
-  //       ),
-  //     )
-  //   );
-  // }
-
   Widget _buildPageViewContent({ required WelcomePageView pageDetails}){
     return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisSize: MainAxisSize.max,
       children: [
         ToolsController().buildProgressIndicator(nbr: pageDetails.index),
         SizedBox(height: 20,),
@@ -146,5 +157,4 @@ class WelcomeView extends StatelessWidget {
   Widget _buildTitleContent({required WelcomeTitle titleDetail }){
     return titleDetail.isGreen ? Text(titleDetail.text, style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: SettingsClass().color),) : Text(titleDetail.text, style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold,),);
   }
-
 }

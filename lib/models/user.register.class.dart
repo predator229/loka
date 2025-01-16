@@ -2,14 +2,14 @@ class UserRegisterClass {
   String firstName;
   String lastName;
   String email;
-  String? password;
-  String? phoneNumber;
+  String password;
+  String phoneNumber;
 
   UserRegisterClass({
     required this.firstName,
     required this.lastName,
     required this.email,
-    this.password,
-    this.phoneNumber,
+    required this.password,
+    required this.phoneNumber,
 });
 }

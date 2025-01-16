@@ -53,6 +53,7 @@ class ToolsController {
               backgroundColor: Colors.white,
               foregroundColor: Colors.black,
               minimumSize: const Size(50, 50),
+              shape: RoundedRectangleBorder( borderRadius: BorderRadius.circular(10), ), 
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -103,7 +104,7 @@ class ToolsController {
     );
   }
 
-Future<Widget> buildComboNumber({required witdh, required TextEditingController phoneNumber}) async {  
+Future<Widget> buildComboNumber({required TextEditingController phoneNumber, required Country? selectedCountry}) async {  
   
   final String response = await rootBundle.loadString('assets/countries.json');
   final List<dynamic> data = json.decode(response);
@@ -111,16 +112,18 @@ Future<Widget> buildComboNumber({required witdh, required TextEditingController 
 
   String? myCountrieCode = _getMyCode();
 
-  Country? selectedCountry = myCountrieCode != '' ? countries.firstWhere(
+  selectedCountry = myCountrieCode != '' ? countries.firstWhere(
       (country) => country.id == myCountrieCode,
       orElse: () => countries[0],
     ) : null;
 
   return 
   Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    mainAxisSize: MainAxisSize.max,
     children: [
-      Container(
-        width: witdh, // MediaQuery.of(context).size.width * 0.3,
+      Expanded(
+        flex: 1,
         child: Center(
           child: countries.isEmpty
               ? CircularProgressIndicator()
@@ -144,7 +147,7 @@ Future<Widget> buildComboNumber({required witdh, required TextEditingController 
                           SizedBox(width: 8),
                           Expanded(
                             child: Text(
-                              '${country.name}(${country.dial_code})',
+                              '${country.name}(${country.dialcode})',
                               style: TextStyle(fontSize: 16),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -156,11 +159,11 @@ Future<Widget> buildComboNumber({required witdh, required TextEditingController 
                 ),
         ),
       ),
-      SizedBox(width: 10),
       Expanded(
+        flex: 2,
         child: IntrinsicHeight(
           child: TextFormField(
-            controller: _phoneNumber,
+            controller: phoneNumber,
             keyboardType: TextInputType.phone,
             decoration: InputDecoration(
               labelText: "Telephone",

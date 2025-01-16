@@ -20,29 +20,15 @@ class Auth {
     required String phoneNumber,
     required Country? country,
   }) async {
-    await _firebase.signInWithPhoneNumber(country != null ? country.dial_code+phoneNumber : phoneNumber);
+    await _firebase.signInWithPhoneNumber(country != null ? country.dialcode+phoneNumber : phoneNumber);
   }
 
 // REGISTER
 //email and  password
-  Future <void> registerWithEmailAndPassword ({
+  Future <UserCredential> registerWithEmailAndPassword ({
     required UserRegisterClass userToCreate,
-    required BuildContext context,
   }) async {
-    if (userToCreate.password == null || userToCreate.password == '') { 
-        ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please fill all the fields'),
-        ),
-      );
-      return;
-     }
-    await _firebase.createUserWithEmailAndPassword(email: userToCreate.email, password: userToCreate.password ?? '');
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Yep created'),
-      ),
-    );
+    return await _firebase.createUserWithEmailAndPassword(email: userToCreate.email, password: userToCreate.password);
   }
 
   //verification phoneNumber

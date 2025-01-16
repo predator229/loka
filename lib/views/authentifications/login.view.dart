@@ -1,13 +1,10 @@
-import 'dart:convert';
-
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:loka/controllers/tools.controller.dart';
-import 'package:loka/models/auth.class.dart';
 import 'package:loka/models/country.class.dart';
 import 'package:loka/models/settings.class.dart';
 import 'package:loka/views/home.view.dart';
-import 'package:loka/views/registers/register.view.dart';
+import 'package:loka/views/authentifications/register.view.dart';
 
 class LoginView extends StatefulWidget {
   static const routeName = '/login';
@@ -25,6 +22,15 @@ class _LoginViewState extends State<LoginView> {
   int? selectedOption = 1;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
+  late Future<Widget> _countryPicker;
+  late UserCredential _userCredential;
+  Country selectedCountry = Country(id: "BJ", name: "Benin", dialcode: "229", emoji: "🇧🇯", code: "BJ");
+
+  @override
+  void initState() {
+    super.initState();
+    _countryPicker = ToolsController().buildComboNumber(phoneNumber: _phoneNumber, selectedCountry: selectedCountry);
+  }
   @override
   void dispose() {
     _phoneNumber.dispose();
@@ -34,6 +40,7 @@ class _LoginViewState extends State<LoginView> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -103,7 +110,18 @@ class _LoginViewState extends State<LoginView> {
                           if (selectedOption == 1)
                           _buildEmailPassword(),
                           if (selectedOption == 2)
-                          _buildComboNumber(),
+                          FutureBuilder<Widget>(
+                            future: _countryPicker,
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                return CircularProgressIndicator();
+                              } else if (snapshot.hasError) {
+                                return Text('Error: ${snapshot.error}');
+                              } else {
+                                return snapshot.data!;
+                              }
+                            },
+                          ),
                           const SizedBox(height: 30),
                           ElevatedButton(
                             onPressed: _lauchPhoneCodeAuthentification,
@@ -111,11 +129,12 @@ class _LoginViewState extends State<LoginView> {
                               backgroundColor: SettingsClass().bottunColor,
                               foregroundColor: Colors.white,
                               minimumSize: const Size(double.infinity, 50),
+                              shape: RoundedRectangleBorder( borderRadius: BorderRadius.circular(10), ), 
                             ),
                             child: const Text('Je me connecte'),
                           ),
                           const SizedBox(height: 30),
-                          _buildDividerWithOr(),
+                          ToolsController().buildDividerWithOr(),
                           const SizedBox(height: 30),
                           const SizedBox(height: 30),
                           ToolsController().buildSocialButtons(),
@@ -127,7 +146,6 @@ class _LoginViewState extends State<LoginView> {
               ),
               Column(
                 children: [
-                  
                   Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       mainAxisSize: MainAxisSize.max,
