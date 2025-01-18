@@ -1,11 +1,12 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:loka/controllers/auth.provider.controller.dart';
 import 'package:loka/controllers/tools.controller.dart';
 import 'package:loka/models/auth.class.dart';
 import 'package:loka/models/country.class.dart';
 import 'package:loka/models/settings.class.dart';
-import 'package:loka/models/user.register.class.dart';
-import 'package:loka/views/home.view.dart';
 
 class RegisterView extends StatefulWidget {
   static const String routeName = '/register';
@@ -20,27 +21,26 @@ class _RegisterViewState extends State<RegisterView> {
   final TextEditingController _firstName = TextEditingController();
   final TextEditingController _lastName = TextEditingController();
   final TextEditingController _email = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _passwordConfirmController = TextEditingController();
   final TextEditingController _phoneNumber = TextEditingController();
+  late BaseAuth auth;
 
   final List<TextEditingController> _codes = List<TextEditingController>.generate(6, (index) => TextEditingController());
   final List<bool> isField = List<bool>.filled(6, false);
 
   late Future<Widget> _countryPicker;
-  late UserCredential _userCredential;
-  Country selectedCountry = Country(id: "BJ", name: "Benin", dialcode: "229", emoji: "🇧🇯", code: "BJ");
+  late Country selectedCountry; //Country(id: "BJ", name: "Benin", dialcode: "+229", emoji: "🇧🇯", code: "BJ");
+  List<Country> countries = [];
 
   var step = 1;
-  var steps = [1,2,3,4];
+  var verificationId = "";
+  var steps = [1,2,3];
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
 
   @override
   void initState() {
     super.initState();
-    _countryPicker = ToolsController().buildComboNumber(phoneNumber: _phoneNumber, selectedCountry: selectedCountry);
+    loadComboBoc();
   }
 
   @override
@@ -48,9 +48,16 @@ class _RegisterViewState extends State<RegisterView> {
     _firstName.dispose();
     _lastName.dispose();
     _email.dispose();
+    _phoneNumber.dispose();
     super.dispose();
   }
+@override
+  void didChangeDependencies() {
+    auth = AuthProviders.of(context).auth;
+    super.didChangeDependencies();
+  }
 
+  @override
   Widget build(BuildContext context) {
     return _buildRegisterForm1();
   }
@@ -79,7 +86,7 @@ class _RegisterViewState extends State<RegisterView> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            ToolsController().buildProgressIndicator(nbr: step, withPadding: false),
+                            ToolsController().buildProgressIndicator(nbr: step, max_:2, withPadding: false),
                             const SizedBox(height: 30),
                             const Text(
                               "Vos informations",
@@ -124,7 +131,7 @@ class _RegisterViewState extends State<RegisterView> {
                             const SizedBox(height: 30),
                             ToolsController().buildDividerWithOr(),
                             const SizedBox(height: 30),
-                            ToolsController().buildSocialButtons(),
+                            buildSocialButtons(),
                             const SizedBox(height: 30),
                           ],
                         ),
@@ -163,119 +170,6 @@ class _RegisterViewState extends State<RegisterView> {
         );
         break;
       case 2 : toReturn = Scaffold(
-          appBar: AppBar(
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: decreaseStep,
-            ),
-            title: const Text('Inscription'),
-          ),
-          body: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Form(
-                        key: _formKey,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                              ToolsController().buildProgressIndicator(nbr: step, withPadding: false),
-                            const SizedBox(height: 30),
-                            const Text(
-                              "Mot de passe",
-                              style: TextStyle(fontSize: 34, fontWeight: FontWeight.bold),
-                            ),
-                            const SizedBox(height: 10),
-                            const Text(
-                              "Entrer un mot de passe solide pour renforcer la sécurité de votre compte",
-                              style: TextStyle(fontWeight: FontWeight.w100),
-                            ),
-                            const SizedBox(height: 30),
-                            ToolsController().buildTextField(
-                              controller: _passwordController,
-                              label: 'Mot de passe',
-                              hint: 'Entrer votre mot de passe',
-                              obscureText: true,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Entrer votre mot de passe';
-                                }
-                                if (value.length < 8) {
-                                  return 'Votre mot de passe doit contenir au moins 8 caractères';
-                                }
-                                if (!RegExp(r'(?=.*[A-Z])').hasMatch(value)) {
-                                  return 'Votre mot de passe doit contenir au moins une majuscule';
-                                }
-                                if (!RegExp(r'(?=.*[a-z])').hasMatch(value)) {
-                                  return 'Votre mot de passe doit contenir au moins une minuscule';
-                                }
-                                if (!RegExp(r'(?=.*\d)').hasMatch(value)) {
-                                  return 'Votre mot de passe doit contenir au moins un chiffre';
-                                }
-                                if (!RegExp(r'(?=.*[@$!%*?&])').hasMatch(value)) {
-                                  return 'Votre mot de passe doit conternir au moins un caractere special';
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: 10),
-                            ToolsController().buildTextField(
-                              controller: _passwordConfirmController,
-                              label: 'Confirmer votre mot de passe',
-                              hint: '',
-                              obscureText: true,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Entrer le meme mot de passe';
-                                }
-                                if (value != _passwordController.text) {
-                                  return 'Les mots de passe ne sont pas identiques';
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: 30,)
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  Column(
-                    children: [
-                      ElevatedButton(
-                        onPressed: _registerNext,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: SettingsClass().color,
-                          foregroundColor: Colors.white,
-                          minimumSize: const Size(double.infinity, 50),
-                          shape: RoundedRectangleBorder( borderRadius: BorderRadius.circular(10), ), 
-                        ),
-                        child: const Text('Continuer'),
-                      ),
-                      Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.max,
-                          children: [
-                            Text('Vous avez deja un compte ?'),
-                            TextButton(
-                              onPressed: (){ Navigator.of(context).pop(); }, //damien
-                              child: Text(' Connectez-vous ici ', style: TextStyle(color: SettingsClass().color)),
-                            ),
-                          ],
-                        ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-        break;
-      case 3 : toReturn = Scaffold(
         appBar: AppBar(
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
@@ -297,7 +191,7 @@ class _RegisterViewState extends State<RegisterView> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          ToolsController().buildProgressIndicator(nbr: 3),
+                          ToolsController().buildProgressIndicator(nbr: step, max_:2, withPadding: false),
                           const SizedBox(height: 30),
                           const Text(
                             "Numéro de téléphone",
@@ -316,7 +210,7 @@ class _RegisterViewState extends State<RegisterView> {
                           ),
                           const SizedBox(height: 30),
                           FutureBuilder<Widget>(
-                            future: _countryPicker,
+                            future: _buildFuturePhoneNumber(),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState == ConnectionState.waiting) {
                                 return CircularProgressIndicator();
@@ -359,8 +253,7 @@ class _RegisterViewState extends State<RegisterView> {
         ),
       );
       break;
-
-      case 4: toReturn = Scaffold(
+      case 3: toReturn = Scaffold(
           appBar: AppBar(
             leading: IconButton(
               icon: const Icon(Icons.arrow_back),
@@ -486,32 +379,52 @@ class _RegisterViewState extends State<RegisterView> {
       break;
     }
     return toReturn;
-    
   }
 
-  // Helper Methods
+  Widget buildSocialButtons() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        _buildSocialButton('images/icons/google.png'),
+      ],
+    );
+  }
+  Widget _buildSocialButton(String assetPath) {
+    return Expanded(
+      child: ElevatedButton(
+          onPressed: (){ auth.signInWithGoogle(context); },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.white,
+            foregroundColor: Colors.black,
+            minimumSize: const Size(50, 50),
+            shape: RoundedRectangleBorder( borderRadius: BorderRadius.circular(10), ), 
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Image.asset(assetPath, width: 20),
+              Text("Se connecter par Google"),
+            ],
+          ),
+        ),
+    );
+  }
 
   void _registerNext() async {
     if (_formKey.currentState!.validate()) {
-      if (step < 3 ){ setState(() { step +=1; }); }
+      if (step < 2 ){ setState(() { step +=1; }); }
       else{ 
-        if (step == 3){
+        if (step == 2){
           if (selectedCountry == null){
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Veuillez sélectionner votre pays')),
             );
             return;
           }
-          _userCredential = await Auth().registerWithEmailAndPassword(userToCreate:  UserRegisterClass(email: _email.text, firstName: _firstName.text, lastName: _lastName.text, password: _passwordConfirmController.text, phoneNumber: selectedCountry!.dialcode+_phoneNumber.text));
-          if (_userCredential != null) {
-            setState(() { step = 4; });
-          }else{
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Erreur de connexion')),
-            );
-          }
+          await auth.sendCodeAndWaitResponse(context, _phoneNumber.text, selectedCountry!, isCodeSentUserFromFireBase);
         }
-        if (step == 4){
+        if (step == 3){
+          var fullcode = '';
           for (var i = 0; i < _codes.length; i++){
             var _codeController = _codes[i].text;
             if (_codeController.isEmpty){
@@ -520,30 +433,14 @@ class _RegisterViewState extends State<RegisterView> {
               );
               return;
             }
+            fullcode = fullcode + _codeController;
           }
-            _userCredential = await Auth().registerWithEmailAndPassword(userToCreate:  UserRegisterClass(email: _email.text, firstName: _firstName.text, lastName: _lastName.text, password: _passwordConfirmController.text, phoneNumber: selectedCountry!.dialcode+_phoneNumber.text));
-          // if (_userCredential != null){
-          //   Navigator.of(context).pushReplacementNamed(HomeView.routeName);
-          // }
-
-          // if (selectedCountry == null){
-          //   ScaffoldMessenger.of(context).showSnackBar(
-          //     const SnackBar(content: Text('Veuillez sélectionner votre pays')),
-          //   );
-          //   return;
-          // }
-          // _userCredential = await Auth().registerWithEmailAndPassword(userToCreate:  UserRegisterClass(email: _email.text, firstName: _firstName.text, lastName: _lastName.text, password: _passwordConfirmController.text, phoneNumber: selectedCountry!.dialcode+_phoneNumber.text));
-          // if (_userCredential != null){
-          //   Navigator.of(context).pushReplacementNamed(HomeView.routeName);
-          // }
+          await auth.loginWithPhoneAndCode(context, verificationId, fullcode);
         }
-        // Navigate to SMS verification after successful registration
-        // Navigator.pushNamed(context, RegisterValidateView.routeName, arguments: user);
-        // here we just create the auth object with everything and send it to firebase and ....
        }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill the form correctly')),
+        const SnackBar(content: Text('Remplisser tous les champs correctement')),
       );
     }
   }
@@ -556,5 +453,96 @@ class _RegisterViewState extends State<RegisterView> {
     }
   }
 
+  void isCodeSentUserFromFireBase (String code){
+    setState(() { 
+      verificationId = code;
+      step = 3;
+    });
+  }
 
+  void loadComboBoc() async {
+  final String response = await rootBundle.loadString('assets/countries.json');
+  final List<dynamic> data = json.decode(response);
+  setState(() {
+    countries = data.map((countryData) => Country.fromJson(countryData)).toList();
+    selectedCountry = countries.firstWhere(
+      (country) => country.id == "BJ",
+      orElse: () => countries[0],
+    );
+  });
+}
+Future<Widget> _buildFuturePhoneNumber() async {  
+  if (countries.isEmpty) {
+    return const Center(
+      child: CircularProgressIndicator(),
+    );
+  }
+
+  return 
+    Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisSize: MainAxisSize.max,
+      children: [
+        Expanded(
+          flex: 1,
+          child: Center(
+            child: DropdownButton<Country>(
+              value: selectedCountry,
+              onChanged: (Country? newValue) {
+                setState(() {
+                  selectedCountry = newValue!;
+                });
+              },
+              isExpanded: true,
+              iconSize: 24,
+              items: countries.map((Country country) {
+                return DropdownMenuItem<Country>(
+                  value: country,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        country.emoji,
+                        style: TextStyle(fontSize: 24),
+                      ),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          '${country.name}(${country.dialcode})',
+                          style: TextStyle(fontSize: 16),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ),
+        Expanded(
+          flex: 2,
+          child: IntrinsicHeight(
+            child: TextFormField(
+              controller: _phoneNumber,
+              keyboardType: TextInputType.phone,
+              decoration: InputDecoration(
+                labelText: "Telephone",
+                hintText: '7000000',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return 'Entrer votre numero de telephone';
+                }
+                return null;
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }

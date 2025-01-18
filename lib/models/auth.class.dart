@@ -1,51 +1,107 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:loka/models/country.class.dart';
-import 'package:loka/models/user.register.class.dart';
+import 'package:loka/views/home.view.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
-class Auth {
-  final FirebaseAuth  _firebase = FirebaseAuth.instance;
+abstract class BaseAuth {
+  Stream<User?> get onAuthStatusChanged;
+  Future<void> sendCodeAndWaitResponse(BuildContext context, String phoneNumber, Country? country, void Function(String) isCodeSentUserFromFireBase);
+  Future<void> loginWithPhoneAndCode(BuildContext context, String verificationId, String userCode);
+  Future<void> signInWithGoogle(BuildContext context);
+  Future<void> attemptLoginAndSendBackErrorMessage(BuildContext context, dynamic credential);
+  Future<User?> currentUser();
+  Future<void> signOut();
+  bool get isNewUser ;
+}
 
-//LOGIN
-//email and  password
-  Future <void> loginWithEmailAndPassword ({
-    required String email,
-    required String password,
-  }) async {
-    await _firebase.signInWithEmailAndPassword(email: email, password: password);
+class Auth implements BaseAuth {
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+
+  @override
+  bool get isNewUser {
+    return true; //ici a retourner avec l'api
   }
 
-//phone number
-  Future <void> signInWithPhoneNumber ({
-    required String phoneNumber,
-    required Country? country,
-  }) async {
-    await _firebase.signInWithPhoneNumber(country != null ? country.dialcode+phoneNumber : phoneNumber);
+    @override
+  Stream<User?> get onAuthStatusChanged {
+    return _firebaseAuth.authStateChanges();
   }
 
-// REGISTER
-//email and  password
-  Future <UserCredential> registerWithEmailAndPassword ({
-    required UserRegisterClass userToCreate,
-  }) async {
-    return await _firebase.createUserWithEmailAndPassword(email: userToCreate.email, password: userToCreate.password);
-  }
 
-  //verification phoneNumber
-  Future <void> loginPhoneNumber ({
-    required String phoneNumber,
-  }) async {
-    await _firebase.verifyPhoneNumber(
-      phoneNumber: phoneNumber,
-      verificationCompleted: (PhoneAuthCredential phoneAuthCredential) { },
-      verificationFailed: (FirebaseAuthException authException) { },
-      codeSent: (String verificationId, int? resendToken) { },
-      codeAutoRetrievalTimeout: (String verificationId) { },
+  @override
+  Future<void> sendCodeAndWaitResponse(BuildContext context, String phoneNumber, Country? country, void Function(String) isCodeSentUserFromFireBase) async {
+    String fullPhoneNumber = '${country?.dialcode ?? ''}$phoneNumber';
+    await FirebaseAuth.instance.verifyPhoneNumber(
+      phoneNumber:  '+40 736 141 740',//fullPhoneNumber,
+      verificationCompleted: (PhoneAuthCredential credential) async {
+        attemptLoginAndSendBackErrorMessage(context, credential);
+      },
+      verificationFailed: (FirebaseAuthException e) {
+        if (e.code == 'invalid-phone-number') {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Le numero de telephone est incorrect')),
+          );
+        }
+      },
+      codeSent: (String verificationId, int? resendToken) {
+        isCodeSentUserFromFireBase(verificationId);
+      },
+      codeAutoRetrievalTimeout: (String verificationId) {},
     );
   }
 
-  //SIGN OUT
-  Future <void> signOut () async {
-    await _firebase.signOut();
+  @override
+  Future<void> loginWithPhoneAndCode(BuildContext context, String verificationId, String userCode) async {
+    PhoneAuthCredential credential = PhoneAuthProvider.credential(verificationId: verificationId, smsCode: userCode);
+    attemptLoginAndSendBackErrorMessage(context, credential);
+  }
+
+  @override
+  Future<User?> currentUser() async {
+    return _firebaseAuth.currentUser;
+  }
+
+  @override
+    Future<void> signOut() async {
+    await _firebaseAuth.signOut();
+  }
+
+  @override
+  Future<void> signInWithGoogle(BuildContext context) async {
+  // Trigger the authentication flow
+  final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+  final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
+  final credential = GoogleAuthProvider.credential(
+    accessToken: googleAuth?.accessToken,
+    idToken: googleAuth?.idToken,
+  );
+
+  attemptLoginAndSendBackErrorMessage(context, credential);
+}
+
+  Future<void> attemptLoginAndSendBackErrorMessage(BuildContext context, dynamic credential) async {
+    try {
+      UserCredential userCredential = await _firebaseAuth.signInWithCredential(credential);
+      if (userCredential.user!=null){
+            Navigator.pushReplacementNamed(context, HomeView.routeName);
+        }else{
+          ScaffoldMessenger.of(context).showSnackBar( const SnackBar(content: Text('Erreur de connexion ! Veuillliez réessayer')),
+          );
+        }
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'invalid-verification-code') {
+      ScaffoldMessenger.of(context).showSnackBar( const SnackBar(content: Text('The verification code is invalid. Please try again.')));
+      } else if (e.code == 'user-disabled') {
+      ScaffoldMessenger.of(context).showSnackBar( const SnackBar(content: Text('This user has been disabled. Please contact support.')));
+      } else if (e.code == 'operation-not-allowed') {
+      ScaffoldMessenger.of(context).showSnackBar( const SnackBar(content: Text('This operation is not allowed. Please enable it in the Firebase console.')));
+      } else if (e.code == 'too-many-requests') {
+      ScaffoldMessenger.of(context).showSnackBar( const SnackBar(content: Text('Too many requests. Please try again later.')));
+      } else { if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('An error occurred during sign-in: ${e.message}')));
+        }
+      }
+    }
   }
 }

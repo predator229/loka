@@ -9,4 +9,30 @@ class SettingsClass {
 
   // FontP titlePrimaryFS = FontStyle.normal
   FontWeight titlePrimaryFW = FontWeight.w700;
+
+  // Widget ApartmentCardItem;
+}
+
+class ApartmentCard {
+  final String imageUrl;
+  final String title;
+  final String description;
+  final String location;
+  final String date;
+  final String price;
+  final double rating;
+  final int reviews;
+  final int crownPoints;
+
+  ApartmentCard({
+    required this.imageUrl,
+    required this.title,
+    required this.description,
+    required this.location,
+    required this.date,
+    required this.price,
+    required this.rating,
+    required this.reviews,
+    required this.crownPoints,
+  });
 }

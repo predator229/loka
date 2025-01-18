@@ -1,5 +1,5 @@
 name: loka
-description: "A new Flutter project."
+description: "Economiser temps et argent tout en trouvant un logement de qualité qui correspond à vos besoins."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -37,6 +37,7 @@ dependencies:
   firebase_auth: ^5.4.0	
   geolocator: ^9.0.2
   geocoding: ^2.0.5
+  google_sign_in: ^6.2.2
 
 dev_dependencies:
   flutter_test:
@@ -70,6 +71,9 @@ flutter:
     - images/flags/benin.png
     - assets/countries.json
     - images/loka.png
+    - images/pound.gif
+    - images/icon_loka_white.png
+    - images/coin.png
 
   #   - images/a_dot_ham.jpeg
 

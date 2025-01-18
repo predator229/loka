@@ -6,12 +6,13 @@ import 'package:loka/models/country.class.dart';
 import 'package:loka/models/settings.class.dart';
 
 class ToolsController {
+  
 
-  Widget buildProgressIndicator({required int nbr, withPadding=true}) {
+  Widget buildProgressIndicator({required int nbr, int max_=3, withPadding=true}) {
     List<Widget> toReturn = [];
     for (int i = 0; i < nbr; i++) { toReturn.add(_oneProgressContainer(color : SettingsClass().progressBGC, withPadding : withPadding)); }
-    if (nbr < 3) {
-      for (int i=0; i<3-nbr; i++) { toReturn.add(_oneProgressContainer(color : SettingsClass().noProgressBGC, withPadding : withPadding)); }
+    if (nbr < max_) {
+      for (int i=0; i<max_-nbr; i++) { toReturn.add(_oneProgressContainer(color : SettingsClass().noProgressBGC, withPadding : withPadding)); }
     }
     return Row( children:  toReturn );
   }
@@ -105,7 +106,6 @@ class ToolsController {
   }
 
 Future<Widget> buildComboNumber({required TextEditingController phoneNumber, required Country? selectedCountry}) async {  
-  
   final String response = await rootBundle.loadString('assets/countries.json');
   final List<dynamic> data = json.decode(response);
   List<Country> countries = data.map((countryData) => Country.fromJson(countryData)).toList();

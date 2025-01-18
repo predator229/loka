@@ -1,8 +1,12 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:loka/controllers/root.page.controller.dart';
+import 'package:loka/models/auth.class.dart';
 import 'package:loka/views/home.view.dart';
 import 'package:loka/views/authentifications/login.view.dart';
 import 'package:loka/views/authentifications/register.view.dart';
+import 'package:loka/controllers/auth.provider.controller.dart';
 import 'package:loka/views/welcome.view.dart';
 import 'firebase_options.dart';
 
@@ -14,28 +18,28 @@ Future<void> main() async {
   runApp(const EntryApp());
 }
 
-class EntryApp extends StatefulWidget {
+class EntryApp extends StatelessWidget {
   const EntryApp({super.key});
 
   @override
-  State<EntryApp> createState() => _EntryAppState();
-}
-
-class _EntryAppState extends State<EntryApp> {
-  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Loka',
-      theme: ThemeData.light(),
-      darkTheme: ThemeData.dark(),
-      themeMode: ThemeMode.system,
-      routes: {
-        WelcomeView.routeName : (context) => const WelcomeView(),
-        RegisterView.routeName : (context) => const RegisterView(),
-        LoginView.routeName : (context) => const LoginView(),
-        HomeView.routeName :  (context) => const HomeView(),
-      },
-      initialRoute: WelcomeView.routeName,
+    return AuthProviders(
+      key: Key("autht_provifrt_kjesbfnjlv"),
+      auth: Auth(),
+      child: MaterialApp(
+        title: 'Loka',
+        theme: ThemeData.light(),
+        darkTheme: ThemeData.dark(),
+        themeMode: ThemeMode.system,
+        routes: {
+          WelcomeView.routeName : (context) => const WelcomeView(),
+          RegisterView.routeName : (context) => const RegisterView(),
+          LoginView.routeName : (context) => const LoginView(),
+          HomeView.routeName :  (context) => const HomeView(),
+          RoutePage.routeName : (context) => const RoutePage(),
+        },
+        initialRoute: RoutePage.routeName,
+      ),
     );
   }
 }
