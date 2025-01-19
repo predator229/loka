@@ -6,25 +6,34 @@ class SettingsClass {
   Color bottunColor =  Color.fromARGB(255,8,131,120);
   Color progressBGC =  Color.fromARGB(255,8,131,120);
   Color noProgressBGC =  Color.fromARGB(255,245,243,240);
-
-  // FontP titlePrimaryFS = FontStyle.normal
   FontWeight titlePrimaryFW = FontWeight.w700;
-
-  // Widget ApartmentCardItem;
+  List<TypeApartment> typesApartments = [
+    TypeApartment(id: 0, icone: Icons.view_comfortable_outlined, name: "Tous les logements"),
+    TypeApartment(id: 1, icone: Icons.home_filled, name: "Chambre salon"),
+    TypeApartment(id: 2, icone: Icons.home_work, name: "Appartement meublé"),
+    TypeApartment(id: 3, icone: Icons.blinds_closed_outlined, name: "Imeubles a vendre"),
+    TypeApartment(id: 4, icone: Icons.local_offer_rounded, name: "Imeubles a vendre"),
+  ];
 }
 
 class ApartmentCard {
-  final String imageUrl;
-  final String title;
-  final String description;
-  final String location;
-  final String date;
-  final String price;
-  final double rating;
-  final int reviews;
-  final int crownPoints;
+  int index;
+  String imageUrl;
+  String title;
+  String description;
+  String location;
+  String date;
+  double price;
+  double rating;
+  int reviews;
+  int crownPoints;
+  String devise;
+  String perPeriod;
+  bool isFavourite;
+  List<int> typeApartment;
 
   ApartmentCard({
+    required this.index,
     required this.imageUrl,
     required this.title,
     required this.description,
@@ -34,5 +43,21 @@ class ApartmentCard {
     required this.rating,
     required this.reviews,
     required this.crownPoints,
+    required this.devise,
+    required this.perPeriod,
+    required this.isFavourite,
+    required this.typeApartment,
+  });
+}
+
+class TypeApartment {
+  int id;
+  String name;
+  IconData icone;
+
+  TypeApartment({
+    required this.id,
+    required this.name,
+    required this.icone,
   });
 }

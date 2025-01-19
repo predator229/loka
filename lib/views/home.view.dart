@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:loka/controllers/auth.provider.controller.dart';
 import 'package:loka/models/auth.class.dart';
 import 'package:loka/models/settings.class.dart';
+import 'package:intl/intl.dart';
 
 class HomeView extends StatefulWidget {
   static const routeName = '/home';
@@ -12,31 +13,54 @@ class HomeView extends StatefulWidget {
   State<HomeView> createState() => _HomeViewState();
 }
 
-class _HomeViewState extends State<HomeView> {
+class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin {
   late double evoluatingWidth;
   late bool homePageSee = true;
   late Timer _timer;
   late BaseAuth auth;
 
   TextEditingController _searchController = TextEditingController();
-  List<ApartmentCard> apartments = List<ApartmentCard>.generate(20, (index) {
-    return ApartmentCard(
-      crownPoints: (1 + (5 - 1) * (index / 20)).toInt(),
+  List<TypeApartment> typesApartments = SettingsClass().typesApartments;
+
+  TypeApartment _selectedType = SettingsClass().typesApartments[0];
+
+  List<ApartmentCard> apartments = List<ApartmentCard>.generate(
+    20,
+    (index) => ApartmentCard( index:index,
+      isFavourite: index % 2 == 0,
+      crownPoints: (60 + (5 - 1) * (index / 20)).toInt(),
       reviews: 50,
       rating: (1 + (5 - 1) * (index / 20)).toDouble(),
-      price: "${(30000 + (2000 - 3456) * (index / 20)).toInt()} 30 000 FCFA",
-      date: DateTimeRange(start: DateTime.now().add(Duration(days: -2000)), end: DateTime.now().add(Duration(days: 2000))).toString(),
+      price: (30000 + (2000 - 3456) * (index / 20)).toDouble(),
+      devise: "FCFA",
+      perPeriod: "mois",
+      date: DateFormat('dd MMM yyyy', 'fr_FR').format(DateTime.now().add(Duration(days: (1 + (200 - 11) * (index / 20)).toInt()))),
       location: "Cotonou, Benin",
-      title: 'Apartment $index',
-      description: 'Description for Apartment $index',
-      imageUrl: 'https://example.com/image_$index.jpg',
-    );
-  });
+      title: 'Appartement meublé $index',
+      description: 'At nos hinc posthac, sitientis piros Afros. Phasellus laoreet lorem vel dolor tempus vehicula. Salutantibus vitae elit libero, a pharetra augue. Ullamco laboris nisi ut aliquid ex ea commodi consequat.',
+      imageUrl: 'https://s3-alpha-sig.figma.com/img/d8b2/19a0/f3ea601deefee2be41c6c1c37fd681d3?Expires=1737936000&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=ADhAFqG0UCmKz06d4fZOoO7tvCf1Uw76hFMatZ9L9~xg8yWGbSokC2I0IVn-8GmaAsAKV40LxE0V1dZHyjTxYnlpNz4IOEFAvoHCGY2XaJyD1KN7Soq5QPaxNIKKvyXonmDNdJe7b70q4WqIiTpWKxTPicUdwSN8A5HphQlivAM-lbez4WzAXLtE1FGfzvyYELAapq2tWrNjQ37EdC~cyQLgU0YyS5VtvagfQIMlBr4yDFjFJKkiAjz2ygDPnWk3K5bFXVy6UL060Myl8wYNp2a7b9j~fJV12XN9SReNA5suY1Xm4kiiZLhOHVMOKi9uK95S6NGPNRFb4sfWdPb32g__',
+      // typeApartment: List<int>.generate(5, (index) => index + 1),
+      typeApartment: List<int>.generate(
+        (index % 5) + 1,
+        (i) => (i + 1) + (index % 5),
+      ),
+    )
+  );
+
+  late List<ApartmentCard> apartmentsFiltered;
+  late List<ApartmentCard> apartmentsFoavorite;
+  late TabController _tabController = TabController(length: 3, vsync: this);
+
+  int _currentIndex = 0;
+
   @override
   void initState() {
     super.initState();
     evoluatingWidth = 0.0;
+    apartmentsFiltered = apartments;
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      
+      letFavoriteTheApartments();
       _startProgressAnimation();
     });
   }
@@ -64,14 +88,16 @@ class _HomeViewState extends State<HomeView> {
   @override
   void dispose() {
     _timer.cancel();
+    _tabController.dispose();
     super.dispose();
   }
 
   @override
   void didChangeDependencies() {
+    super.didChangeDependencies();
     auth = AuthProviders.of(context).auth;
     homePageSee = auth.isNewUser;
-    super.didChangeDependencies();
+    _tabController = TabController(length: 3, vsync: this);
   }
 
   @override
@@ -189,38 +215,168 @@ class _HomeViewState extends State<HomeView> {
               icon: Icon(Icons.supervised_user_circle_outlined),
               label: 'Profil'),
         ],
-        currentIndex: 0,
+        currentIndex: _currentIndex,
         selectedItemColor: SettingsClass().bottunColor,
-        onTap: (index) {
-          // Handle navigation logic here
-        },
+        onTap: (index) { setState(() { _currentIndex = index; });},
       ),
-      body: Column(
+      body: _buildCurrentPage(),
+    );
+  }
+
+  _buildCurrentPage (){
+    Widget toReturn = Container();
+    switch (_currentIndex) {
+      case 0: toReturn = _buildHomePage(); break;
+      case 1: toReturn = _buildFavoritePage(); break;
+      case 2: toReturn = _buildJournal(); break;
+      case 3: toReturn = _buildProfile(); break;
+    }
+    return toReturn;
+  }
+
+  // Wifgets
+   Widget _buildHomePage (){
+    return Column(
+        mainAxisSize: MainAxisSize.max,
         children: [
           _buildHead (),
           Padding(
             padding: const EdgeInsets.all(20.0),
-            child: Expanded(
+            child: SizedBox(
+              height: 40, // Hauteur fixe pour le ListView si nécessaire
+              width: MediaQuery.of(context).size.width,
               child: ListView.builder(
-                itemCount: apartments.length,
+                scrollDirection: Axis.horizontal,
+                itemCount: typesApartments.length,
                 itemBuilder: (context, index) {
-                  return Container(); //_buildApartmentItem(apartments[index]);
+                  return _buildFilter(typesApartments[index]);
                 },
-                ),
+              ),
             ),
           ),
-          // Center(
-          //   child: ElevatedButton(
-          //     onPressed: () => Auth().signOut(),
-          //     child: const Text("Se déconnecter"),
-          //   ),
-          // ),
+          Expanded(
+            child: ListView.builder(
+              padding: EdgeInsets.zero,
+              shrinkWrap: true, 
+              itemCount: apartmentsFiltered.length,
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20.0),
+                  child: _buildApartmentItem(apartmentsFiltered[index]),
+                );
+              },
+            ),
+          ),
+        ],
+      );
+  }
+
+  Widget _buildFavoritePage (){
+    return SafeArea(
+      child: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              padding: EdgeInsets.zero,
+              shrinkWrap: true, 
+              itemCount: apartmentsFoavorite.length,
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20.0),
+                  child: _buildApartmentItem(apartmentsFoavorite[index]),
+                );
+              },
+            ),
+          ),
         ],
       ),
     );
   }
+  Widget _buildJournal() {
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal:10.0),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 30.0, horizontal: 10.00),
+              child: Row(
+                children: [
+                  Text(
+                    "Journal",
+                    style: TextStyle(
+                      fontSize: 36,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              decoration: BoxDecoration(border: Border.all(color: Colors.transparent)),
+              child: TabBar(
+                controller: _tabController,
+                indicator: BoxDecoration(
+                  borderRadius: BorderRadius.circular(30),
+                  color: SettingsClass().bottunColor,
+                ),
+                padding: EdgeInsets.symmetric(vertical: 10),
+                automaticIndicatorColorAdjustment: false,
+                indicatorSize: TabBarIndicatorSize.tab,
+                indicatorWeight: 0,
+                tabs: [
+                  Tab(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal:10.0),
+                      child: Text(
+                        "En attentes",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Tab(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal:10.0),
+                      child: Text(
+                        "Acceptées",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Tab(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal:10.0),
+                      child: Text(
+                        "Validées",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+                labelColor: Colors.white,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-  // Wifgets
+  Widget _buildProfile() {
+    return SafeArea(
+      child: Center(
+        child: ElevatedButton(
+          onPressed: (){ auth.signOut(); }, child: 
+          Text('Se deconnecter', style: TextStyle(color: Colors.white),)),));
+  }
 
   Stack _buildHead (){
     return Stack(
@@ -260,7 +416,7 @@ class _HomeViewState extends State<HomeView> {
                           height: 40,
                           decoration: BoxDecoration(
                             color:
-                                const Color.fromARGB(39, 222, 222, 222),
+                                const Color.fromARGB(39, 255, 255, 255),
                             borderRadius: BorderRadius.circular(50),
                           ),
                           child: IconButton(
@@ -280,7 +436,7 @@ class _HomeViewState extends State<HomeView> {
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(
                               colors: [
-                                Color(0xFFF6CC),
+                                Color.fromARGB(255, 255, 246, 204),
                                 Color(0xFFF6CCA3)
                               ],
                               begin: Alignment.topLeft,
@@ -366,8 +522,7 @@ class _HomeViewState extends State<HomeView> {
                                 color: Colors.white,
                                 size: 25,
                               ),
-                              SizedBox(width: 5),
-                              Text("Filter",
+                              Text("Filtrer",
                                   style: TextStyle(color: Colors.white)),
                             ],
                           ),
@@ -380,147 +535,191 @@ class _HomeViewState extends State<HomeView> {
             ),
           ),
         ),
-      ],
+    ],
     );
   }
   Widget _buildApartmentItem (ApartmentCard itemApartment){ 
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('voyins voir'),
-          Stack(
-            children: [
-              ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(16),
-                  topRight: Radius.circular(16),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Stack(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(15),
+              child: Image.network(
+                itemApartment.imageUrl,
+                height: 267,
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
+            ),
+            Positioned(
+              top: 8,
+              left: 8,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 5),
+                height: 33,
+                width: 57,
+                decoration: BoxDecoration(
+                  color: Color.fromARGB(255, 244, 247, 226),
+                  borderRadius: BorderRadius.circular(50),
                 ),
-                child: Image.network(
-                  itemApartment.imageUrl,
-                  height: 200,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Image.asset("images/coin.png", width: 15),
+                    Text(
+                      itemApartment.crownPoints.toString(),
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Color.fromARGB(255, 0, 0, 0),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              Positioned(
-                top: 8,
-                left: 8,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
+            ),
+            Positioned(
+              top: 8,
+              right: 8,
+              child: CircleAvatar(
+                backgroundColor: !itemApartment.isFavourite ? Colors.black : Colors.white,
+                child: IconButton(
+                  icon: Icon(Icons.favorite, color: !itemApartment.isFavourite ? Colors.white : Colors.red,),
+                  onPressed: () {
+                    setState(() { apartments[itemApartment.index].isFavourite = !itemApartment.isFavourite; letFavoriteTheApartments(); });
+                  },
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 15),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 1),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                itemApartment.title,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                itemApartment.description,
+                style: TextStyle(
+                  color: Colors.grey[600],
+                  fontSize: 14,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    itemApartment.location,
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 12,
+                    ),
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  child: Row(
+                  Text(
+                    "Jusqu'au ${itemApartment.date}",
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "${itemApartment.price.toString()} ${itemApartment.devise} / ${itemApartment.perPeriod}",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  Row(
                     children: [
-                      const Icon(
-                        Icons.emoji_events,
-                        color: Colors.amber,
-                        size: 16,
-                      ),
+                      Icon(Icons.star, color: SettingsClass().color, size: 16),
                       const SizedBox(width: 4),
                       Text(
-                        '$itemApartment.crownPoints',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
+                        itemApartment.rating.toString(),
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                      Text(
+                        ' (${itemApartment.reviews.toString()} avis)',
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                          fontSize: 12,
                         ),
                       ),
                     ],
                   ),
-                ),
-              ),
-              Positioned(
-                top: 8,
-                right: 8,
-                child: CircleAvatar(
-                  backgroundColor: Colors.white,
-                  child: IconButton(
-                    icon: const Icon(Icons.favorite_border),
-                    onPressed: () {},
-                  ),
-                ),
+                ],
               ),
             ],
           ),
-          Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+        ),
+        const SizedBox(height: 36),
+      ],
+    );
+  }
+  Widget _buildFilter (TypeApartment typeArp){
+    return Row(
+      children: [
+        Container(
+          height: 40,
+          padding:
+              const EdgeInsets.symmetric(horizontal: 10.0),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(30),
+            border: Border.all( color: _selectedType.id == typeArp.id ?  Colors.transparent : Colors.grey,),
+            color: _selectedType.id == typeArp.id ?  SettingsClass().bottunColor : Colors.transparent,
+          ),
+          child: TextButton(
+            onPressed: (){
+              setState(() { _selectedType = typeArp;letFilterTheApartments();});
+            },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.max,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(
-                  itemApartment.title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
+                Icon(
+                  typeArp.icone,
+                  color: _selectedType.id == typeArp.id ?  Colors.white : Colors.grey,
+                  size: 25,
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  itemApartment.description,
-                  style: TextStyle(
-                    color: Colors.grey[600],
-                    fontSize: 14,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      itemApartment.location,
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 12,
-                      ),
-                    ),
-                    Text(
-                      itemApartment.date,
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      itemApartment.price,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        const Icon(Icons.star, color: Colors.green, size: 16),
-                        const SizedBox(width: 4),
-                        Text(
-                          '$itemApartment.rating',
-                          style: const TextStyle(fontSize: 14),
-                        ),
-                        Text(
-                          ' ($itemApartment.reviews avis)',
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                const SizedBox(width: 5),
+                Text(typeArp.name,style: TextStyle(color: _selectedType.id == typeArp.id ?  Colors.white : Colors.grey)),
               ],
             ),
           ),
-        ],
-      ),
+        ),
+        SizedBox(width: 10,),
+      ],
     );
+  }
+
+  letFilterTheApartments () {
+    setState(() {
+      apartmentsFiltered = _selectedType.id == 0 ? apartments 
+      : apartments.where((element) => element.typeApartment.contains(_selectedType.id)).toList();
+    });
+  }
+  letFavoriteTheApartments () {
+    setState(() {
+      apartmentsFoavorite = apartments.where((element) => element.isFavourite).toList();
+    });
   }
 }

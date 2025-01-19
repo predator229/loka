@@ -9,12 +9,16 @@ import 'package:loka/views/authentifications/register.view.dart';
 import 'package:loka/controllers/auth.provider.controller.dart';
 import 'package:loka/views/welcome.view.dart';
 import 'firebase_options.dart';
+// import 'package:intl/intl_standalone.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
-);
+  );
+  WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('fr_FR', null);
   runApp(const EntryApp());
 }
 
