@@ -33,14 +33,14 @@ class Auth implements BaseAuth {
   Future<void> sendCodeAndWaitResponse(BuildContext context, String phoneNumber, Country? country, void Function(String) isCodeSentUserFromFireBase) async {
     String fullPhoneNumber = '${country?.dialcode ?? ''}$phoneNumber';
     await FirebaseAuth.instance.verifyPhoneNumber(
-      phoneNumber:  '+40 736 141 740',//fullPhoneNumber,
+      phoneNumber:  fullPhoneNumber,
       verificationCompleted: (PhoneAuthCredential credential) async {
         attemptLoginAndSendBackErrorMessage(context, credential);
       },
       verificationFailed: (FirebaseAuthException e) {
         if (e.code == 'invalid-phone-number') {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Le numero de telephone est incorrect')),
+            SnackBar(content: Text('Le numero de telephone est incorrect $fullPhoneNumber')),
           );
         }
       },

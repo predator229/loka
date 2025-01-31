@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:loka/controllers/auth.provider.controller.dart';
 import 'package:loka/models/auth.class.dart';
@@ -19,6 +20,24 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
   late Timer _timer;
   late BaseAuth auth;
 
+  List journals = [
+    {
+      'id': 1,
+      'title': 'En attente',
+      'selected' : true,
+    },
+    {
+      'id': 2,
+      'title': 'Acceptees',
+      'selected' : false,
+    },
+    {
+      'id': 3,
+      'title': 'Validees',
+      'selected' : false,
+    }
+  ];
+
   TextEditingController _searchController = TextEditingController();
   List<TypeApartment> typesApartments = SettingsClass().typesApartments;
 
@@ -38,13 +57,22 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
       location: "Cotonou, Benin",
       title: 'Appartement meublé $index',
       description: 'At nos hinc posthac, sitientis piros Afros. Phasellus laoreet lorem vel dolor tempus vehicula. Salutantibus vitae elit libero, a pharetra augue. Ullamco laboris nisi ut aliquid ex ea commodi consequat.',
-      imageUrl: 'https://s3-alpha-sig.figma.com/img/d8b2/19a0/f3ea601deefee2be41c6c1c37fd681d3?Expires=1737936000&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=ADhAFqG0UCmKz06d4fZOoO7tvCf1Uw76hFMatZ9L9~xg8yWGbSokC2I0IVn-8GmaAsAKV40LxE0V1dZHyjTxYnlpNz4IOEFAvoHCGY2XaJyD1KN7Soq5QPaxNIKKvyXonmDNdJe7b70q4WqIiTpWKxTPicUdwSN8A5HphQlivAM-lbez4WzAXLtE1FGfzvyYELAapq2tWrNjQ37EdC~cyQLgU0YyS5VtvagfQIMlBr4yDFjFJKkiAjz2ygDPnWk3K5bFXVy6UL060Myl8wYNp2a7b9j~fJV12XN9SReNA5suY1Xm4kiiZLhOHVMOKi9uK95S6NGPNRFb4sfWdPb32g__',
+      imageUrl: 'https://s3-alpha-sig.figma.com/img/d8b2/19a0/f3ea601deefee2be41c6c1c37fd681d3?Expires=1739145600&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=f-~xJqt7EfbLYmoGLmSuNUB-S4l6MBREKYFKFvPiyiijoq5ufyXQuA7rxNHuY4ZOYrW6X9S3D67UjE-4KZsotL23wDi96XHYELb1FMlEIen7JxLA-GZCZQuP8PO~aSgooWzFEIH64rJ2t4Bf8lnk24HXD6Ee9WHEZ25nxHeFE9EJtjkFzJlV9TWsZbj9~0OxwZU96AWdilYPPttC-5V2q01kApUvWkXx6AczarE3ciGYwIkYGc-aoyasYiJ8UoDv3dLh3XSVXlXmSgRY0i8eC9~r27ebC92miA8u3RakddDw95sdi4rv8ruILCS15f-Jt6Px4pPyirn8rPVIvfQPcw__',
       // typeApartment: List<int>.generate(5, (index) => index + 1),
       typeApartment: List<int>.generate(
         (index % 5) + 1,
         (i) => (i + 1) + (index % 5),
       ),
     )
+  );
+
+  List<JournalCard> journalCards = List<JournalCard>.generate(
+    4,
+    (index) => JournalCard(
+      index: index + 1,
+      date: DateFormat('dd MMM yyyy', 'fr_FR').format(DateTime.now().add(Duration(days: (1 + (200 - 11) * (index / 20)).toInt()))),
+      apartmentCard: apartments[20-index],
+    );
   );
 
   late List<ApartmentCard> apartmentsFiltered;
@@ -292,76 +320,136 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
       ),
     );
   }
-  Widget _buildJournal() {
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal:10.0),
+  // Widget _buildJournal() {
+  //   return SafeArea(
+  //     child: Padding(
+  //       padding: const EdgeInsets.symmetric(horizontal:10.0),
+  //       child: Column(
+  //         children: [
+  //           Padding(
+  //             padding: const EdgeInsets.symmetric(vertical: 30.0, horizontal: 10.00),
+  //             child: Row(
+  //               children: [
+  //                 Text(
+  //                   "Journal",
+  //                   style: TextStyle(
+  //                     fontSize: 36,
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+  //           ),
+  //           Container(
+  //             decoration: BoxDecoration(border: Border.all(color: Colors.transparent)),
+  //             child: TabBar(
+  //               controller: _tabController,
+  //               indicator: BoxDecoration(
+  //                 borderRadius: BorderRadius.circular(30),
+  //                 color: SettingsClass().bottunColor,
+  //               ),
+  //               padding: EdgeInsets.symmetric(vertical: 25),
+  //               automaticIndicatorColorAdjustment: false,
+  //               indicatorSize: TabBarIndicatorSize.tab,
+  //               tabs: [
+  //                 Tab(
+  //                   child: Container(
+  //                     padding: const EdgeInsets.symmetric(horizontal:10.0),
+  //                     child: Text(
+  //                       "En attentes",
+  //                       style: TextStyle(
+  //                         fontSize: 14,
+  //                         fontWeight: FontWeight.bold,
+  //                       ),
+  //                     ),
+  //                   ),
+  //                 ),
+  //                 Tab(
+  //                   child: Container(
+  //                     padding: const EdgeInsets.symmetric(horizontal:10.0),
+  //                     child: Text(
+  //                       "Acceptées",
+  //                       style: TextStyle(
+  //                         fontSize: 14,
+  //                         fontWeight: FontWeight.bold,
+  //                       ),
+  //                     ),
+  //                   ),
+  //                 ),
+  //                 Tab(
+  //                   child: Container(
+  //                     padding: const EdgeInsets.symmetric(horizontal:10.0),
+  //                     child: Text(
+  //                       "Validées",
+  //                       style: TextStyle(
+  //                         fontSize: 14,
+  //                         fontWeight: FontWeight.bold,
+  //                       ),
+  //                     ),
+  //                   ),
+  //                 ),
+  //               ],
+  //               labelColor: Colors.white,
+  //               indicatorPadding: EdgeInsets.zero, // Si nécessaire, s'assurer qu'il n'y a pas d'espace supplémentaire
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
+
+Widget _buildJournal() {
+    return Scaffold(
+      body: SafeArea(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 30.0, horizontal: 10.00),
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 15.0),
               child: Row(
-                children: [
-                  Text(
-                    "Journal",
-                    style: TextStyle(
-                      fontSize: 36,
-                    ),
-                  ),
-                ],
+                children: [ Text( "Journal", style: TextStyle( fontSize: 36, fontWeight: FontWeight.bold ),), ],
               ),
             ),
-            Container(
-              decoration: BoxDecoration(border: Border.all(color: Colors.transparent)),
-              child: TabBar(
-                controller: _tabController,
-                indicator: BoxDecoration(
-                  borderRadius: BorderRadius.circular(30),
-                  color: SettingsClass().bottunColor,
-                ),
-                padding: EdgeInsets.symmetric(vertical: 10),
-                automaticIndicatorColorAdjustment: false,
-                indicatorSize: TabBarIndicatorSize.tab,
-                indicatorWeight: 0,
-                tabs: [
-                  Tab(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal:10.0),
-                      child: Text(
-                        "En attentes",
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 15.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: journals.map((journal) {
+                  return ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                      backgroundColor: journal['selected'] ? SettingsClass().bottunColor : Colors.white,
+                      foregroundColor: journal['selected'] ? Colors.white : Colors.black,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                        side: BorderSide.none,
                       ),
-                    ),
-                  ),
-                  Tab(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal:10.0),
-                      child: Text(
-                        "Acceptées",
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
                       ),
+                    onPressed: (){
+                      setState(() {
+                        journals.forEach((element) {
+                          element['selected'] = false;
+                          if (element['id'] == journal['id']) {element['selected'] = true;}
+                        });
+                      });
+                    },
+                    child: Text( journal['title'], ),
+                  );
+                }).toList(),
+              ),
+            ),
+            Expanded(
+              child: ListView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 15.0),
+                itemCount: 89,
+                itemBuilder: (context, index) {
+                  return  Container(
+                    height: 100,
+                    decoration: BoxDecoration(
+                      border: Border.all(width: 20.0),
                     ),
-                  ),
-                  Tab(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal:10.0),
-                      child: Text(
-                        "Validées",
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-                labelColor: Colors.white,
+                  );
+                },
               ),
             ),
           ],
@@ -369,6 +457,8 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
       ),
     );
   }
+
+
 
   Widget _buildProfile() {
     return SafeArea(
@@ -674,6 +764,144 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
       ],
     );
   }
+  
+  Widget _buildJournalItem (ApartmentCard itemApartment){ 
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Stack(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(15),
+              child: Image.network(
+                itemApartment.imageUrl,
+                height: 267,
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
+            ),
+            Positioned(
+              top: 8,
+              left: 8,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 5),
+                height: 33,
+                width: 57,
+                decoration: BoxDecoration(
+                  color: Color.fromARGB(255, 244, 247, 226),
+                  borderRadius: BorderRadius.circular(50),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Image.asset("images/coin.png", width: 15),
+                    Text(
+                      itemApartment.crownPoints.toString(),
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Color.fromARGB(255, 0, 0, 0),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Positioned(
+              top: 8,
+              right: 8,
+              child: CircleAvatar(
+                backgroundColor: !itemApartment.isFavourite ? Colors.black : Colors.white,
+                child: IconButton(
+                  icon: Icon(Icons.favorite, color: !itemApartment.isFavourite ? Colors.white : Colors.red,),
+                  onPressed: () {
+                    setState(() { apartments[itemApartment.index].isFavourite = !itemApartment.isFavourite; letFavoriteTheApartments(); });
+                  },
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 15),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 1),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                itemApartment.title,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                itemApartment.description,
+                style: TextStyle(
+                  color: Colors.grey[600],
+                  fontSize: 14,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    itemApartment.location,
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 12,
+                    ),
+                  ),
+                  Text(
+                    "Jusqu'au ${itemApartment.date}",
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "${itemApartment.price.toString()} ${itemApartment.devise} / ${itemApartment.perPeriod}",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      Icon(Icons.star, color: SettingsClass().color, size: 16),
+                      const SizedBox(width: 4),
+                      Text(
+                        itemApartment.rating.toString(),
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                      Text(
+                        ' (${itemApartment.reviews.toString()} avis)',
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 36),
+      ],
+    );
+  }
+  
   Widget _buildFilter (TypeApartment typeArp){
     return Row(
       children: [

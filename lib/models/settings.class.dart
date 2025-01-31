@@ -16,6 +16,13 @@ class SettingsClass {
   ];
 }
 
+class JournalCard {
+  int index;
+  String date;
+  ApartmentCard apartmentCard;
+  JournalCard({ required this.index, required this.date, required this.apartmentCard});
+}
+
 class ApartmentCard {
   int index;
   String imageUrl;
