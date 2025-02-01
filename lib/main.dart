@@ -1,15 +1,15 @@
-// import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:loka/controllers/root.page.controller.dart';
 import 'package:loka/models/auth.class.dart';
+import 'package:loka/views/apartement.view.dart';
 import 'package:loka/views/home.view.dart';
 import 'package:loka/views/authentifications/login.view.dart';
 import 'package:loka/views/authentifications/register.view.dart';
 import 'package:loka/controllers/auth.provider.controller.dart';
+import 'package:loka/views/journals/journal.item.view.dart';
 import 'package:loka/views/welcome.view.dart';
 import 'firebase_options.dart';
-// import 'package:intl/intl_standalone.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 Future<void> main() async {
@@ -41,6 +41,8 @@ class EntryApp extends StatelessWidget {
           LoginView.routeName : (context) => const LoginView(),
           HomeView.routeName :  (context) => const HomeView(),
           RoutePage.routeName : (context) => const RoutePage(),
+          JournalItem.routeName : (context) => const JournalItem(),
+          ApartementView.routeName : (content) => const ApartementView(),
         },
         initialRoute: RoutePage.routeName,
       ),
