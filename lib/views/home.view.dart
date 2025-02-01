@@ -54,7 +54,7 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
   int _selectedTypeJournal = 0;
   late dynamic activJournal;
 
-  List<ApartmentCard> apartments = List<ApartmentCard>.generate(
+  late List<ApartmentCard> apartments = List<ApartmentCard>.generate(
     20,
     (index) => ApartmentCard( index:index,
       isFavourite: index % 2 == 0,
@@ -67,12 +67,34 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
       date: DateFormat('dd MMM yyyy', 'fr_FR').format(DateTime.now().add(Duration(days: (1 + (200 - 11) * (index / 20)).toInt()))),
       location: "Cotonou, Benin",
       title: 'Appartement meublé $index',
-      description: 'At nos hinc posthac, sitientis piros Afros. Phasellus laoreet lorem vel dolor tempus vehicula. Salutantibus vitae elit libero, a pharetra augue. Ullamco laboris nisi ut aliquid ex ea commodi consequat.',
-      imageUrl: 'https://s3-alpha-sig.figma.com/img/d8b2/19a0/f3ea601deefee2be41c6c1c37fd681d3?Expires=1739145600&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=f-~xJqt7EfbLYmoGLmSuNUB-S4l6MBREKYFKFvPiyiijoq5ufyXQuA7rxNHuY4ZOYrW6X9S3D67UjE-4KZsotL23wDi96XHYELb1FMlEIen7JxLA-GZCZQuP8PO~aSgooWzFEIH64rJ2t4Bf8lnk24HXD6Ee9WHEZ25nxHeFE9EJtjkFzJlV9TWsZbj9~0OxwZU96AWdilYPPttC-5V2q01kApUvWkXx6AczarE3ciGYwIkYGc-aoyasYiJ8UoDv3dLh3XSVXlXmSgRY0i8eC9~r27ebC92miA8u3RakddDw95sdi4rv8ruILCS15f-Jt6Px4pPyirn8rPVIvfQPcw__',
+      description: """Bienvenue dans ce charmant appartement idéalement situé à Cotonou, où le confort moderne rencontre l'authenticité africaine. Aménagées, cet espace offre une retraite paisible au cœur de la ville dynamique. Dès que vous franchirez la porte, vous serez accueilli par une atmosphère chaleureuse et une décoration soignée, mêlant harmonieusement des éléments contemporains à des touches locales. La cuisine entièrement équipée vous invite à préparer des repas délicieux, tandis que le salon spacieux offre un espace dédié à la détente et aux moments conviviaux. La vue depuis le balcon donne sur [mentionnez les points d'intérêt locaux ou le paysage environnant], créant ainsi une ambiance apaisante et pittoresque. L'emplacement central de l'appartement permet un accès facile aux marchés animés, aux restaurants locaux et aux attractions culturelles..""",
+      nrColoc: ((60 + (5 - 1) * (index / 20)).toInt())%20,
+      imageUrl: [
+        'https://s3-alpha-sig.figma.com/img/d8b2/19a0/f3ea601deefee2be41c6c1c37fd681d3?Expires=1739145600&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=f-~xJqt7EfbLYmoGLmSuNUB-S4l6MBREKYFKFvPiyiijoq5ufyXQuA7rxNHuY4ZOYrW6X9S3D67UjE-4KZsotL23wDi96XHYELb1FMlEIen7JxLA-GZCZQuP8PO~aSgooWzFEIH64rJ2t4Bf8lnk24HXD6Ee9WHEZ25nxHeFE9EJtjkFzJlV9TWsZbj9~0OxwZU96AWdilYPPttC-5V2q01kApUvWkXx6AczarE3ciGYwIkYGc-aoyasYiJ8UoDv3dLh3XSVXlXmSgRY0i8eC9~r27ebC92miA8u3RakddDw95sdi4rv8ruILCS15f-Jt6Px4pPyirn8rPVIvfQPcw__',
+        'https://s3-alpha-sig.figma.com/img/e2fd/1235/8d6b32664382b6457007c370ec10114c?Expires=1739145600&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=ms87qVETG2mpitAlZ6pV7l3H5gnz~YQzVyINt161wd3NuH1R5J1ScnU4jIJIsJ9Ew6GT6jIrbU2UFS36RAEGOJZZQ2hX3Q55kPK7MGahMf60N0wEXZmRD2SJxHEvtTYUvcOGRfRnYrhu2lTzz7nbZ5DyJ7wbt0doI91eokKYyOQv~qsRaPRvzQzNPMDMVeAUQKBcnTznh21tL1p7tdcP6APIb3qreLQCqutRdWyKOf-12aUDRyPbHFOYdyQRKry1TmKugtHoZw-C~tDd-cKj~hZwXz1M3o-rA6avL105LgwHhJsPim7yrqENG5CqGikDUIHAZ6jIZuMh4QQsieUGqA__',
+        'https://s3-alpha-sig.figma.com/img/d8b2/19a0/f3ea601deefee2be41c6c1c37fd681d3?Expires=1739145600&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=f-~xJqt7EfbLYmoGLmSuNUB-S4l6MBREKYFKFvPiyiijoq5ufyXQuA7rxNHuY4ZOYrW6X9S3D67UjE-4KZsotL23wDi96XHYELb1FMlEIen7JxLA-GZCZQuP8PO~aSgooWzFEIH64rJ2t4Bf8lnk24HXD6Ee9WHEZ25nxHeFE9EJtjkFzJlV9TWsZbj9~0OxwZU96AWdilYPPttC-5V2q01kApUvWkXx6AczarE3ciGYwIkYGc-aoyasYiJ8UoDv3dLh3XSVXlXmSgRY0i8eC9~r27ebC92miA8u3RakddDw95sdi4rv8ruILCS15f-Jt6Px4pPyirn8rPVIvfQPcw__',
+        'https://s3-alpha-sig.figma.com/img/e2fd/1235/8d6b32664382b6457007c370ec10114c?Expires=1739145600&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=ms87qVETG2mpitAlZ6pV7l3H5gnz~YQzVyINt161wd3NuH1R5J1ScnU4jIJIsJ9Ew6GT6jIrbU2UFS36RAEGOJZZQ2hX3Q55kPK7MGahMf60N0wEXZmRD2SJxHEvtTYUvcOGRfRnYrhu2lTzz7nbZ5DyJ7wbt0doI91eokKYyOQv~qsRaPRvzQzNPMDMVeAUQKBcnTznh21tL1p7tdcP6APIb3qreLQCqutRdWyKOf-12aUDRyPbHFOYdyQRKry1TmKugtHoZw-C~tDd-cKj~hZwXz1M3o-rA6avL105LgwHhJsPim7yrqENG5CqGikDUIHAZ6jIZuMh4QQsieUGqA__',
+        'https://s3-alpha-sig.figma.com/img/d8b2/19a0/f3ea601deefee2be41c6c1c37fd681d3?Expires=1739145600&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=f-~xJqt7EfbLYmoGLmSuNUB-S4l6MBREKYFKFvPiyiijoq5ufyXQuA7rxNHuY4ZOYrW6X9S3D67UjE-4KZsotL23wDi96XHYELb1FMlEIen7JxLA-GZCZQuP8PO~aSgooWzFEIH64rJ2t4Bf8lnk24HXD6Ee9WHEZ25nxHeFE9EJtjkFzJlV9TWsZbj9~0OxwZU96AWdilYPPttC-5V2q01kApUvWkXx6AczarE3ciGYwIkYGc-aoyasYiJ8UoDv3dLh3XSVXlXmSgRY0i8eC9~r27ebC92miA8u3RakddDw95sdi4rv8ruILCS15f-Jt6Px4pPyirn8rPVIvfQPcw__',
+        'https://s3-alpha-sig.figma.com/img/d8b2/19a0/f3ea601deefee2be41c6c1c37fd681d3?Expires=1739145600&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=f-~xJqt7EfbLYmoGLmSuNUB-S4l6MBREKYFKFvPiyiijoq5ufyXQuA7rxNHuY4ZOYrW6X9S3D67UjE-4KZsotL23wDi96XHYELb1FMlEIen7JxLA-GZCZQuP8PO~aSgooWzFEIH64rJ2t4Bf8lnk24HXD6Ee9WHEZ25nxHeFE9EJtjkFzJlV9TWsZbj9~0OxwZU96AWdilYPPttC-5V2q01kApUvWkXx6AczarE3ciGYwIkYGc-aoyasYiJ8UoDv3dLh3XSVXlXmSgRY0i8eC9~r27ebC92miA8u3RakddDw95sdi4rv8ruILCS15f-Jt6Px4pPyirn8rPVIvfQPcw__',
+        'https://s3-alpha-sig.figma.com/img/e2fd/1235/8d6b32664382b6457007c370ec10114c?Expires=1739145600&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=ms87qVETG2mpitAlZ6pV7l3H5gnz~YQzVyINt161wd3NuH1R5J1ScnU4jIJIsJ9Ew6GT6jIrbU2UFS36RAEGOJZZQ2hX3Q55kPK7MGahMf60N0wEXZmRD2SJxHEvtTYUvcOGRfRnYrhu2lTzz7nbZ5DyJ7wbt0doI91eokKYyOQv~qsRaPRvzQzNPMDMVeAUQKBcnTznh21tL1p7tdcP6APIb3qreLQCqutRdWyKOf-12aUDRyPbHFOYdyQRKry1TmKugtHoZw-C~tDd-cKj~hZwXz1M3o-rA6avL105LgwHhJsPim7yrqENG5CqGikDUIHAZ6jIZuMh4QQsieUGqA__',
+        ],
       // typeApartment: List<int>.generate(5, (index) => index + 1),
       typeApartment: List<int>.generate(
         (index % 5) + 1,
         (i) => (i - 1 + index) % SettingsClass().typesApartments.length,
+      ),
+      caracteristiques:ApartmentCaracteristique(
+        id: index, 
+        superficie: "${(60 + (5 - 1)/(40-index) * (index / 20)).toDouble()} cm2", 
+        rooms: [
+        Room(id: index, superficie: "${(60 + (5 - 1) * (index / 20)).toDouble()} cm2", type: SettingsClass().roomTypes[1]),
+        // Room(id: index+1, superficie: "${(60 + (5)/20 * (index / 20)).toDouble()} cm2", type: SettingsClass().roomTypes[0]),
+        // Room(id: index+2, superficie: "${(60 + (5 - 1)/(40-index) * (index / 20)).toDouble()} cm2", type: SettingsClass().roomTypes[0]),
+        ...List<Room>.generate(
+          (index + 20) % 5 == 0 ? 1 : (index + 20) % 5,
+          (indextype) => Room(id: indextype, superficie: "${(60 + (5 - 1) * (index / 20)).toDouble()} cm2", type: SettingsClass().roomTypes[0])
+        )
+      ],
       ),
     )
   );
@@ -414,7 +436,7 @@ Widget _buildJournal() {
                               key: ValueKey("${journal.index}-${journal.date}"),
                                 borderRadius: BorderRadius.circular(25),
                                 child: Image.network(
-                                  journal.apartmentCard.imageUrl,
+                                  journal.apartmentCard.imageUrl[0],
                                   height: 93,
                                   width: 93,
                                   fit: BoxFit.cover,
@@ -668,7 +690,7 @@ Widget _buildJournal() {
             ClipRRect(
               borderRadius: BorderRadius.circular(25),
               child: Image.network(
-                itemApartment.imageUrl,
+                itemApartment.imageUrl[0],
                 height: 267,
                 width: double.infinity,
                 fit: BoxFit.cover,

@@ -14,6 +14,13 @@ class SettingsClass {
     TypeApartment(id: 3, icone: Icons.blinds_closed_outlined, name: "Imeubles a vendre"),
     TypeApartment(id: 4, icone: Icons.local_offer_rounded, name: "Imeubles a vendre"),
   ];
+  List<RoomType> roomTypes = [
+    RoomType(id: 1, name: 'Chambre', description: "Chambre a couche", icon: Icons.bed_rounded),
+    RoomType(id: 2, name: 'Salon', description: "Salon", icon: Icons.chair),
+                          
+    // RoomType(id: 3, name: 'Jardin', description: "Jardin inclus"),
+    // RoomType(id: 3, name: 'Cuisine', description: "Jardin inclus"),
+  ];
 }
 
 class JournalCard {
@@ -26,7 +33,7 @@ class JournalCard {
 
 class ApartmentCard {
   int index;
-  String imageUrl;
+  List<String> imageUrl;
   String title;
   String description;
   String location;
@@ -39,6 +46,8 @@ class ApartmentCard {
   String perPeriod;
   bool isFavourite;
   List<int> typeApartment;
+  int nrColoc;
+  ApartmentCaracteristique caracteristiques;
 
   ApartmentCard({
     required this.index,
@@ -55,6 +64,8 @@ class ApartmentCard {
     required this.perPeriod,
     required this.isFavourite,
     required this.typeApartment,
+    required this.nrColoc,
+    required this.caracteristiques,
   });
 }
 
@@ -68,4 +79,44 @@ class TypeApartment {
     required this.name,
     required this.icone,
   });
+}
+
+class Room {
+  int id;
+  String? moreinformation;
+  String superficie;
+  RoomType type;
+  Room({required this.id, this.moreinformation, required this.superficie, required this.type});
+}
+
+class RoomType {
+  int id;
+  String name;
+  String? description;
+  IconData? icon;
+  RoomType({required this.id, this.description, required this.name, this.icon});
+}
+
+class ApartmentCaracteristique {
+  int id;
+  List<Room> rooms;
+  String superficie;
+  ApartmentCaracteristique ({ required this.id, required this.rooms, required this.superficie});
+}
+
+class ApartementEquipement{
+  int id;
+  String? moreinformation;
+  String superficie;
+  EquimentType type;
+  ApartementEquipement({required this.id, this.moreinformation, required this.superficie, required this.type});
+
+}
+class EquimentType {
+  int id;
+  String name;
+  String? description;
+  IconData? icon;
+  EquimentType({this.description, required this.id, this.icon, required this.name});
+
 }

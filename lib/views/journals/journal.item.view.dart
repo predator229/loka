@@ -49,7 +49,7 @@ class _JournalItemState extends State<JournalItem> {
                     key: ValueKey("${journalCard.index}-${journalCard.date}"),
                     borderRadius: BorderRadius.circular(15),
                     child: Image.network(
-                      journalCard.apartmentCard.imageUrl,
+                      journalCard.apartmentCard.imageUrl[0],
                       height: 267,
                       width: double.infinity,
                       fit: BoxFit.cover,
@@ -99,7 +99,7 @@ class _JournalItemState extends State<JournalItem> {
                         color: const Color.fromARGB(150, 23, 23, 23),
                       ),
                       child: Text(
-                        "1/8",
+                        "1/${journalCard.apartmentCard.imageUrl.length}",
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.white,
