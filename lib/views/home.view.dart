@@ -68,8 +68,9 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
       location: "Cotonou, Benin",
       title: 'Appartement meublé $index',
       description: """Bienvenue dans ce charmant appartement idéalement situé à Cotonou, où le confort moderne rencontre l'authenticité africaine. Aménagées, cet espace offre une retraite paisible au cœur de la ville dynamique. Dès que vous franchirez la porte, vous serez accueilli par une atmosphère chaleureuse et une décoration soignée, mêlant harmonieusement des éléments contemporains à des touches locales. La cuisine entièrement équipée vous invite à préparer des repas délicieux, tandis que le salon spacieux offre un espace dédié à la détente et aux moments conviviaux. La vue depuis le balcon donne sur [mentionnez les points d'intérêt locaux ou le paysage environnant], créant ainsi une ambiance apaisante et pittoresque. L'emplacement central de l'appartement permet un accès facile aux marchés animés, aux restaurants locaux et aux attractions culturelles..""",
+      descriptionLocation: "Situé dans le quartier animé de Gbegamey Boa, à Cotonou, en venant de l'aéroport international de Cotonou, notre emplacement stratégique permet un trajet rapide d'environ 20 minutes. De plus, la proximité avec les principales artères routières facilite les déplacements vers d'autres quartiers de la ville.",
       nrColoc: ((60 + (5 - 1) * (index / 20)).toInt())%20,
-      imageUrl: [
+      imageUrl: index %2 ==0 ? [
         'https://s3-alpha-sig.figma.com/img/d8b2/19a0/f3ea601deefee2be41c6c1c37fd681d3?Expires=1739145600&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=f-~xJqt7EfbLYmoGLmSuNUB-S4l6MBREKYFKFvPiyiijoq5ufyXQuA7rxNHuY4ZOYrW6X9S3D67UjE-4KZsotL23wDi96XHYELb1FMlEIen7JxLA-GZCZQuP8PO~aSgooWzFEIH64rJ2t4Bf8lnk24HXD6Ee9WHEZ25nxHeFE9EJtjkFzJlV9TWsZbj9~0OxwZU96AWdilYPPttC-5V2q01kApUvWkXx6AczarE3ciGYwIkYGc-aoyasYiJ8UoDv3dLh3XSVXlXmSgRY0i8eC9~r27ebC92miA8u3RakddDw95sdi4rv8ruILCS15f-Jt6Px4pPyirn8rPVIvfQPcw__',
         'https://s3-alpha-sig.figma.com/img/e2fd/1235/8d6b32664382b6457007c370ec10114c?Expires=1739145600&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=ms87qVETG2mpitAlZ6pV7l3H5gnz~YQzVyINt161wd3NuH1R5J1ScnU4jIJIsJ9Ew6GT6jIrbU2UFS36RAEGOJZZQ2hX3Q55kPK7MGahMf60N0wEXZmRD2SJxHEvtTYUvcOGRfRnYrhu2lTzz7nbZ5DyJ7wbt0doI91eokKYyOQv~qsRaPRvzQzNPMDMVeAUQKBcnTznh21tL1p7tdcP6APIb3qreLQCqutRdWyKOf-12aUDRyPbHFOYdyQRKry1TmKugtHoZw-C~tDd-cKj~hZwXz1M3o-rA6avL105LgwHhJsPim7yrqENG5CqGikDUIHAZ6jIZuMh4QQsieUGqA__',
         'https://s3-alpha-sig.figma.com/img/d8b2/19a0/f3ea601deefee2be41c6c1c37fd681d3?Expires=1739145600&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=f-~xJqt7EfbLYmoGLmSuNUB-S4l6MBREKYFKFvPiyiijoq5ufyXQuA7rxNHuY4ZOYrW6X9S3D67UjE-4KZsotL23wDi96XHYELb1FMlEIen7JxLA-GZCZQuP8PO~aSgooWzFEIH64rJ2t4Bf8lnk24HXD6Ee9WHEZ25nxHeFE9EJtjkFzJlV9TWsZbj9~0OxwZU96AWdilYPPttC-5V2q01kApUvWkXx6AczarE3ciGYwIkYGc-aoyasYiJ8UoDv3dLh3XSVXlXmSgRY0i8eC9~r27ebC92miA8u3RakddDw95sdi4rv8ruILCS15f-Jt6Px4pPyirn8rPVIvfQPcw__',
@@ -77,15 +78,35 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
         'https://s3-alpha-sig.figma.com/img/d8b2/19a0/f3ea601deefee2be41c6c1c37fd681d3?Expires=1739145600&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=f-~xJqt7EfbLYmoGLmSuNUB-S4l6MBREKYFKFvPiyiijoq5ufyXQuA7rxNHuY4ZOYrW6X9S3D67UjE-4KZsotL23wDi96XHYELb1FMlEIen7JxLA-GZCZQuP8PO~aSgooWzFEIH64rJ2t4Bf8lnk24HXD6Ee9WHEZ25nxHeFE9EJtjkFzJlV9TWsZbj9~0OxwZU96AWdilYPPttC-5V2q01kApUvWkXx6AczarE3ciGYwIkYGc-aoyasYiJ8UoDv3dLh3XSVXlXmSgRY0i8eC9~r27ebC92miA8u3RakddDw95sdi4rv8ruILCS15f-Jt6Px4pPyirn8rPVIvfQPcw__',
         'https://s3-alpha-sig.figma.com/img/d8b2/19a0/f3ea601deefee2be41c6c1c37fd681d3?Expires=1739145600&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=f-~xJqt7EfbLYmoGLmSuNUB-S4l6MBREKYFKFvPiyiijoq5ufyXQuA7rxNHuY4ZOYrW6X9S3D67UjE-4KZsotL23wDi96XHYELb1FMlEIen7JxLA-GZCZQuP8PO~aSgooWzFEIH64rJ2t4Bf8lnk24HXD6Ee9WHEZ25nxHeFE9EJtjkFzJlV9TWsZbj9~0OxwZU96AWdilYPPttC-5V2q01kApUvWkXx6AczarE3ciGYwIkYGc-aoyasYiJ8UoDv3dLh3XSVXlXmSgRY0i8eC9~r27ebC92miA8u3RakddDw95sdi4rv8ruILCS15f-Jt6Px4pPyirn8rPVIvfQPcw__',
         'https://s3-alpha-sig.figma.com/img/e2fd/1235/8d6b32664382b6457007c370ec10114c?Expires=1739145600&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=ms87qVETG2mpitAlZ6pV7l3H5gnz~YQzVyINt161wd3NuH1R5J1ScnU4jIJIsJ9Ew6GT6jIrbU2UFS36RAEGOJZZQ2hX3Q55kPK7MGahMf60N0wEXZmRD2SJxHEvtTYUvcOGRfRnYrhu2lTzz7nbZ5DyJ7wbt0doI91eokKYyOQv~qsRaPRvzQzNPMDMVeAUQKBcnTznh21tL1p7tdcP6APIb3qreLQCqutRdWyKOf-12aUDRyPbHFOYdyQRKry1TmKugtHoZw-C~tDd-cKj~hZwXz1M3o-rA6avL105LgwHhJsPim7yrqENG5CqGikDUIHAZ6jIZuMh4QQsieUGqA__',
-        ],
+        ] : [
+        'https://s3-alpha-sig.figma.com/img/e2fd/1235/8d6b32664382b6457007c370ec10114c?Expires=1739145600&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=ms87qVETG2mpitAlZ6pV7l3H5gnz~YQzVyINt161wd3NuH1R5J1ScnU4jIJIsJ9Ew6GT6jIrbU2UFS36RAEGOJZZQ2hX3Q55kPK7MGahMf60N0wEXZmRD2SJxHEvtTYUvcOGRfRnYrhu2lTzz7nbZ5DyJ7wbt0doI91eokKYyOQv~qsRaPRvzQzNPMDMVeAUQKBcnTznh21tL1p7tdcP6APIb3qreLQCqutRdWyKOf-12aUDRyPbHFOYdyQRKry1TmKugtHoZw-C~tDd-cKj~hZwXz1M3o-rA6avL105LgwHhJsPim7yrqENG5CqGikDUIHAZ6jIZuMh4QQsieUGqA__',
+        'https://s3-alpha-sig.figma.com/img/d8b2/19a0/f3ea601deefee2be41c6c1c37fd681d3?Expires=1739145600&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=f-~xJqt7EfbLYmoGLmSuNUB-S4l6MBREKYFKFvPiyiijoq5ufyXQuA7rxNHuY4ZOYrW6X9S3D67UjE-4KZsotL23wDi96XHYELb1FMlEIen7JxLA-GZCZQuP8PO~aSgooWzFEIH64rJ2t4Bf8lnk24HXD6Ee9WHEZ25nxHeFE9EJtjkFzJlV9TWsZbj9~0OxwZU96AWdilYPPttC-5V2q01kApUvWkXx6AczarE3ciGYwIkYGc-aoyasYiJ8UoDv3dLh3XSVXlXmSgRY0i8eC9~r27ebC92miA8u3RakddDw95sdi4rv8ruILCS15f-Jt6Px4pPyirn8rPVIvfQPcw__',
+        'https://s3-alpha-sig.figma.com/img/e2fd/1235/8d6b32664382b6457007c370ec10114c?Expires=1739145600&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=ms87qVETG2mpitAlZ6pV7l3H5gnz~YQzVyINt161wd3NuH1R5J1ScnU4jIJIsJ9Ew6GT6jIrbU2UFS36RAEGOJZZQ2hX3Q55kPK7MGahMf60N0wEXZmRD2SJxHEvtTYUvcOGRfRnYrhu2lTzz7nbZ5DyJ7wbt0doI91eokKYyOQv~qsRaPRvzQzNPMDMVeAUQKBcnTznh21tL1p7tdcP6APIb3qreLQCqutRdWyKOf-12aUDRyPbHFOYdyQRKry1TmKugtHoZw-C~tDd-cKj~hZwXz1M3o-rA6avL105LgwHhJsPim7yrqENG5CqGikDUIHAZ6jIZuMh4QQsieUGqA__',
+        'https://s3-alpha-sig.figma.com/img/d8b2/19a0/f3ea601deefee2be41c6c1c37fd681d3?Expires=1739145600&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=f-~xJqt7EfbLYmoGLmSuNUB-S4l6MBREKYFKFvPiyiijoq5ufyXQuA7rxNHuY4ZOYrW6X9S3D67UjE-4KZsotL23wDi96XHYELb1FMlEIen7JxLA-GZCZQuP8PO~aSgooWzFEIH64rJ2t4Bf8lnk24HXD6Ee9WHEZ25nxHeFE9EJtjkFzJlV9TWsZbj9~0OxwZU96AWdilYPPttC-5V2q01kApUvWkXx6AczarE3ciGYwIkYGc-aoyasYiJ8UoDv3dLh3XSVXlXmSgRY0i8eC9~r27ebC92miA8u3RakddDw95sdi4rv8ruILCS15f-Jt6Px4pPyirn8rPVIvfQPcw__',
+        'https://s3-alpha-sig.figma.com/img/d8b2/19a0/f3ea601deefee2be41c6c1c37fd681d3?Expires=1739145600&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=f-~xJqt7EfbLYmoGLmSuNUB-S4l6MBREKYFKFvPiyiijoq5ufyXQuA7rxNHuY4ZOYrW6X9S3D67UjE-4KZsotL23wDi96XHYELb1FMlEIen7JxLA-GZCZQuP8PO~aSgooWzFEIH64rJ2t4Bf8lnk24HXD6Ee9WHEZ25nxHeFE9EJtjkFzJlV9TWsZbj9~0OxwZU96AWdilYPPttC-5V2q01kApUvWkXx6AczarE3ciGYwIkYGc-aoyasYiJ8UoDv3dLh3XSVXlXmSgRY0i8eC9~r27ebC92miA8u3RakddDw95sdi4rv8ruILCS15f-Jt6Px4pPyirn8rPVIvfQPcw__',
+        'https://s3-alpha-sig.figma.com/img/e2fd/1235/8d6b32664382b6457007c370ec10114c?Expires=1739145600&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=ms87qVETG2mpitAlZ6pV7l3H5gnz~YQzVyINt161wd3NuH1R5J1ScnU4jIJIsJ9Ew6GT6jIrbU2UFS36RAEGOJZZQ2hX3Q55kPK7MGahMf60N0wEXZmRD2SJxHEvtTYUvcOGRfRnYrhu2lTzz7nbZ5DyJ7wbt0doI91eokKYyOQv~qsRaPRvzQzNPMDMVeAUQKBcnTznh21tL1p7tdcP6APIb3qreLQCqutRdWyKOf-12aUDRyPbHFOYdyQRKry1TmKugtHoZw-C~tDd-cKj~hZwXz1M3o-rA6avL105LgwHhJsPim7yrqENG5CqGikDUIHAZ6jIZuMh4QQsieUGqA__',
+        'https://s3-alpha-sig.figma.com/img/d8b2/19a0/f3ea601deefee2be41c6c1c37fd681d3?Expires=1739145600&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=f-~xJqt7EfbLYmoGLmSuNUB-S4l6MBREKYFKFvPiyiijoq5ufyXQuA7rxNHuY4ZOYrW6X9S3D67UjE-4KZsotL23wDi96XHYELb1FMlEIen7JxLA-GZCZQuP8PO~aSgooWzFEIH64rJ2t4Bf8lnk24HXD6Ee9WHEZ25nxHeFE9EJtjkFzJlV9TWsZbj9~0OxwZU96AWdilYPPttC-5V2q01kApUvWkXx6AczarE3ciGYwIkYGc-aoyasYiJ8UoDv3dLh3XSVXlXmSgRY0i8eC9~r27ebC92miA8u3RakddDw95sdi4rv8ruILCS15f-Jt6Px4pPyirn8rPVIvfQPcw__',],
       // typeApartment: List<int>.generate(5, (index) => index + 1),
       typeApartment: List<int>.generate(
         (index % 5) + 1,
         (i) => (i - 1 + index) % SettingsClass().typesApartments.length,
       ),
+      nbrNeightbord: (index*123)%10,
       caracteristiques:ApartmentCaracteristique(
         id: index, 
-        superficie: "${(60 + (5 - 1)/(40-index) * (index / 20)).toDouble()} cm2", 
+        superficieTotale: "${(60 + (5 - 1)/(40-index) * (index / 20)).toDouble()} cm2", 
+        equipements: List<ApartementEquipement>.generate(
+          20,
+          (i) => ApartementEquipement(
+            id: i,
+            type: SettingsClass().equipementsType[(index*i+1) % 10],
+          ),
+        ),
+        services: List<ServiceClosest>.generate(
+          10,
+          (i) =>  i%2 == 0 ? ServiceClosest(id:i, name: 'Marchés Locaux', description: """Explorez les marchés animés à quelques pas de votre porte, où vous pourrez découvrir des produits frais, de l'artisanat local et l'effervescence quotidienne de la vie marchande."""
+            ) : ServiceClosest(id: i, name: "Restaurants Authentiques", description: """Profitez d'une variété de restaurants locaux proposant une délicieuse cuisine béninoise, offrant une expérience culinaire authentique. """),
+        ),
         rooms: [
         Room(id: index, superficie: "${(60 + (5 - 1) * (index / 20)).toDouble()} cm2", type: SettingsClass().roomTypes[1]),
         // Room(id: index+1, superficie: "${(60 + (5)/20 * (index / 20)).toDouble()} cm2", type: SettingsClass().roomTypes[0]),
@@ -358,7 +379,10 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
               itemBuilder: (context, index) {
                 return Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20.0),
-                  child: _buildApartmentItem(apartmentsFoavorite[index]),
+                  child: InkWell(
+                    onTap: (){Navigator.of(context).pushNamed(ApartementView.routeName, arguments: apartmentsFoavorite[index]);},
+                    child: _buildApartmentItem(apartmentsFoavorite[index]),
+                  ),
                 );
               },
             ),
@@ -434,7 +458,7 @@ Widget _buildJournal() {
                             children: [
                             ClipRRect(
                               key: ValueKey("${journal.index}-${journal.date}"),
-                                borderRadius: BorderRadius.circular(25),
+                                borderRadius: BorderRadius.circular(8),
                                 child: Image.network(
                                   journal.apartmentCard.imageUrl[0],
                                   height: 93,

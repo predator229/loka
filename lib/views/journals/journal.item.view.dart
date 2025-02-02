@@ -14,6 +14,7 @@ class JournalItem extends StatefulWidget {
 class _JournalItemState extends State<JournalItem> {
 
   bool _isExpanded = true;
+  int currentImage = 0;
   @override
   Widget build(BuildContext context) {
     dynamic args = ModalRoute.of(context)!.settings.arguments;
@@ -49,7 +50,7 @@ class _JournalItemState extends State<JournalItem> {
                     key: ValueKey("${journalCard.index}-${journalCard.date}"),
                     borderRadius: BorderRadius.circular(15),
                     child: Image.network(
-                      journalCard.apartmentCard.imageUrl[0],
+                      journalCard.apartmentCard.imageUrl[currentImage],
                       height: 267,
                       width: double.infinity,
                       fit: BoxFit.cover,
@@ -66,6 +67,7 @@ class _JournalItemState extends State<JournalItem> {
                       ),
                     ),
                   ),
+                  if (currentImage < (journalCard.apartmentCard.imageUrl.length - 1))
                   Positioned(
                     top: 100,
                     bottom: 100,
@@ -74,10 +76,13 @@ class _JournalItemState extends State<JournalItem> {
                       backgroundColor: const Color.fromARGB(150, 23, 23, 23),
                       child: IconButton(
                         icon: Icon(Icons.arrow_forward_outlined, color: Colors.white, ),
-                        onPressed: () {},
+                        onPressed: () {
+                          setState(() { currentImage += 1; });
+                        },
                       ),
                     ),
                   ),
+                  if (currentImage >0)
                   Positioned(
                     top: 100,
                     bottom: 100,
@@ -86,10 +91,13 @@ class _JournalItemState extends State<JournalItem> {
                       backgroundColor: const Color.fromARGB(150, 23, 23, 23),
                       child: IconButton(
                         icon: Icon(Icons.arrow_back_outlined, color: Colors.white,),
-                        onPressed: () {},
+                        onPressed: () {
+                          setState(() { currentImage -= 1; });
+                        },
                       ),
                     ),
                   ),
+                  // if (currentImage == 0)
                   Positioned(
                     bottom: 8,
                     left: 8,
@@ -99,7 +107,7 @@ class _JournalItemState extends State<JournalItem> {
                         color: const Color.fromARGB(150, 23, 23, 23),
                       ),
                       child: Text(
-                        "1/${journalCard.apartmentCard.imageUrl.length}",
+                        "${currentImage+1}/${journalCard.apartmentCard.imageUrl.length}",
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.white,
@@ -205,107 +213,139 @@ class _JournalItemState extends State<JournalItem> {
               ),
               SizedBox(height: 10,),
               if (_isExpanded)
-              Container(
-                padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 17),
-                decoration: BoxDecoration(
-                  color: Color.fromARGB(60, 239, 225, 159),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Row(
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        SizedBox(
-                          width: 52,
-                          height: 52,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(50),
-                            child: Image.asset("images/damien.jpeg", width: 52, height: 52,),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 8),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Damien le vrai boss",
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w700,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 50.0, ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Color.fromARGB(60, 239, 225, 159),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: Color.fromARGB(22, 0, 0, 0),
+                      width: 1,
+                    )
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all( 20.0),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+                            SizedBox(
+                              width: 52,
+                              height: 52,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(50),
+                                child: Image.asset("images/damien.jpeg", width: 52, height: 52,),
                               ),
-                              Text("Demarcheur", style: TextStyle(fontSize: 13,overflow: TextOverflow.ellipsis,),),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 10,),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      mainAxisSize: MainAxisSize.max,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        TextButton(
-                          onPressed: (){},
-                          child: Row(
-                            children: [
-                              Icon(Icons.star, color: SettingsClass().bottunColor, size: 30,),
-                              Icon(Icons.star, color: SettingsClass().bottunColor, size: 30,),
-                              Icon(Icons.star, color: SettingsClass().bottunColor, size: 30,),
-                              Icon(Icons.star, color: SettingsClass().bottunColor, size: 30,),
-                              Icon(Icons.star_border, color: Colors.black, size: 30,),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 10),
-                                child: Text("4,5", style: TextStyle(color: Colors.black),),
-                              ),
-                            ],
-                          )
-                        ),
-                        Container(
-                          width: 93,
-                          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
-                          decoration: BoxDecoration(
-                            color: Color.fromARGB(255, 248, 234, 154),
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              Text( "Certifié", style: TextStyle( fontWeight: FontWeight.w500, ), ),
-                              Image.asset("images/certificat.jpg", width: 20,)
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 10,),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 17),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.max,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              border: BorderDirectional(),
                             ),
-                            child: Icon(Icons.trending_up_sharp),
-                          ),
-                          Text("  2 456", style: TextStyle(fontSize: 15, color: Colors.black, fontWeight: FontWeight.w700),),
-                          Text("  biens vendus", style: TextStyle(fontSize: 15, color: Colors.black,),),
-                        ],
+                            Padding(
+                              padding: const EdgeInsets.only(left: 8),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "Damien le vrai boss",
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w700,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  Text("Demarcheur", style: TextStyle(fontSize: 13,overflow: TextOverflow.ellipsis,),),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          mainAxisSize: MainAxisSize.max,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                          Row(
+                            children: [
+                                Icon(Icons.star, color: SettingsClass().bottunColor, size: 30,),
+                                Icon(Icons.star, color: SettingsClass().bottunColor, size: 30,),
+                                Icon(Icons.star, color: SettingsClass().bottunColor, size: 30,),
+                                Icon(Icons.star, color: SettingsClass().bottunColor, size: 30,),
+                                Icon(Icons.star_border, color: Colors.black, size: 30,),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 10),
+                                  child: Text("4,5", style: TextStyle(color: Colors.black),),
+                                ),
+                              ],
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
+                              decoration: BoxDecoration(
+                                color: Color.fromARGB(255, 248, 234, 154),
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                mainAxisSize: MainAxisSize.max,
+                                children: [
+                                  Text( "Certifié", style: TextStyle( fontWeight: FontWeight.w500, ), ),
+                                  Image.asset("images/certificat.jpg", width: 20,)
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 20.0, right: 20.0, top: 20),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.max,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                border: BorderDirectional(),
+                              ),
+                              child: Icon(Icons.trending_up_sharp),
+                            ),
+                            Text("  2 456", style: TextStyle(fontSize: 15, color: Colors.black, fontWeight: FontWeight.w700),),
+                            Text("  biens vendus", style: TextStyle(fontSize: 15, color: Colors.black,),),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: InkWell(
+                          onTap: (){
+                            // setState(() { showMoreServices =!showMoreServices ; });
+                          },
+                          child: Container(
+                            padding: EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Colors.black,
+                              ),
+                              borderRadius: BorderRadius.circular(8)
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              mainAxisSize: MainAxisSize.max,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text("Prendre un rendez-vous", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400),),
+                                Icon(Icons.arrow_forward_ios, color: Colors.black, size: 20,),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
