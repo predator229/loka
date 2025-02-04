@@ -70,7 +70,7 @@ class _LoginViewState extends State<LoginView> {
           actions: [
             TextButton(
               onPressed: () {},
-              child: Text('Skip', style: TextStyle(color: Colors.grey, )),
+              child: Text('Skip', style: TextStyle(fontFamily: "Figtree",color: Colors.grey, )),
             ),
           ],
         ),
@@ -91,7 +91,7 @@ class _LoginViewState extends State<LoginView> {
                           children: [
                             const Text(
                               "Connexion",
-                              style: TextStyle(fontSize: 34, fontWeight: FontWeight.bold),
+                              style: TextStyle(fontFamily: "Figtree",fontSize: 34, fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(height: 30),
                             FutureBuilder<Widget>(
@@ -139,7 +139,7 @@ class _LoginViewState extends State<LoginView> {
                             onPressed: () {
                               Navigator.pushNamed(context, RegisterView.routeName);
                             },
-                            child: Text('Inscrivez vous ici ', style: TextStyle(color: SettingsClass().color )),
+                            child: Text('Inscrivez vous ici ', style: TextStyle(fontFamily: "Figtree",color: SettingsClass().color )),
                           ),
                         ],
                       ),
@@ -170,7 +170,7 @@ class _LoginViewState extends State<LoginView> {
                 children: [
                   const Text(
                     "Vérification de compte",
-                    style: TextStyle(
+                    style: TextStyle(fontFamily: "Figtree",
                       fontSize: 30,
                       fontWeight: FontWeight.bold,
                     ),
@@ -178,7 +178,7 @@ class _LoginViewState extends State<LoginView> {
                   const SizedBox(height: 10),
                   Text(
                     "Entrer le code sms envoyé au ${selectedCountry.dialcode + _phoneNumber.text} :",
-                    style: TextStyle(fontSize: 16),
+                    style: TextStyle(fontFamily: "Figtree",fontSize: 16),
                   ),
                   const SizedBox(height: 30),
                   Row(
@@ -199,7 +199,7 @@ class _LoginViewState extends State<LoginView> {
                           },
                           keyboardType: TextInputType.number,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
+                          style: const TextStyle(fontFamily: "Figtree",
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
@@ -241,14 +241,14 @@ class _LoginViewState extends State<LoginView> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Text("Sms non reçu ? ",
-                          style: TextStyle(color: Colors.black54)),
+                          style: TextStyle(fontFamily: "Figtree",color: Colors.black54)),
                       GestureDetector(
                         onTap: () {
                           // Action pour renvoyer le code
                         },
                         child: const Text(
                           "Renvoyer le code",
-                          style: TextStyle(
+                          style: TextStyle(fontFamily: "Figtree",
                             color: Colors.teal,
                             fontWeight: FontWeight.bold,
                           ),
@@ -267,7 +267,7 @@ class _LoginViewState extends State<LoginView> {
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder( borderRadius: BorderRadius.circular(10), ), 
                       ), 
-                      child: const Text( "Continuer", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      child: const Text( "Continuer", style: TextStyle(fontFamily: "Figtree",fontSize: 16, fontWeight: FontWeight.bold)),
                     ),
                   ),
                 ],
@@ -399,13 +399,13 @@ Future<Widget> _buildFuturePhoneNumber() async {
                     children: [
                       Text(
                         country.emoji,
-                        style: TextStyle(fontSize: 24),
+                        style: TextStyle(fontFamily: "Figtree",fontSize: 24),
                       ),
                       SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           '${country.name}(${country.dialcode})',
-                          style: TextStyle(fontSize: 16),
+                          style: TextStyle(fontFamily: "Figtree",fontSize: 16),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),

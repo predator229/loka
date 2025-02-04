@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:loka/controllers/root.page.controller.dart';
 import 'package:loka/models/auth.class.dart';
 import 'package:loka/views/apartement.view.dart';
+import 'package:loka/views/filter.view.dart';
 import 'package:loka/views/home.view.dart';
 import 'package:loka/views/authentifications/login.view.dart';
 import 'package:loka/views/authentifications/register.view.dart';
@@ -43,6 +44,7 @@ class EntryApp extends StatelessWidget {
           RoutePage.routeName : (context) => const RoutePage(),
           JournalItem.routeName : (context) => const JournalItem(),
           ApartementView.routeName : (content) => const ApartementView(),
+          FilterView.routeName : (content) => const FilterView(),
         },
         initialRoute: RoutePage.routeName,
       ),

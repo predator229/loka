@@ -78,7 +78,9 @@ flutter:
     - images/damien.jpeg
     - images/certificat.png
     - images/certificat.jpg
-    - images/map_loader.png
+    - images/couverture_dallee.png
+    - images/couverture_plafonnnee.png
+    - images/couverture_staffee.png
 
   #   - images/a_dot_ham.jpeg
 

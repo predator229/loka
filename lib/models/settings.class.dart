@@ -34,6 +34,11 @@ class SettingsClass {
     EquimentType(id: 10, name: 'Salle de bain', description: "Toillettes americaine", icon: Icons.bathroom),
     EquimentType(id: 11, name: 'Jardin', description: "Toillettes americaine", icon: Icons.gradient_rounded),
   ];
+  List<CouvertureChambre> couvertureChambres = [
+    CouvertureChambre(id: 1, name: 'Plafonné', description: "Plafonné", icon: "images/couverture_plafonnnee.png"),
+    CouvertureChambre(id: 1, name: 'Dallé', description: "Dallé", icon: "images/couverture_dallee.png"),
+    CouvertureChambre(id: 1, name: 'Staffée', description: "Staffée", icon: "images/couverture_staffee.png"),
+  ];
 }
 
 class JournalCard {
@@ -145,4 +150,13 @@ class ServiceClosest {
   String description;
 
   ServiceClosest({required this.id, required this.description, required this.name});
+}
+
+class CouvertureChambre{
+  int id;
+  String name;
+  String? description;
+  String icon;
+
+  CouvertureChambre({ required this.name, required this.id, required this.icon, this.description });
 }

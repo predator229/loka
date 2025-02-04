@@ -90,12 +90,12 @@ class _RegisterViewState extends State<RegisterView> {
                             const SizedBox(height: 30),
                             const Text(
                               "Vos informations",
-                              style: TextStyle(fontSize: 34, fontWeight: FontWeight.bold),
+                              style: TextStyle(fontFamily: "Figtree",fontSize: 34, fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(height: 10),
                             const Text(
                               "Comment vous appelez-vous ?",
-                              style: TextStyle(fontWeight: FontWeight.w100),
+                              style: TextStyle(fontFamily: "Figtree",fontWeight: FontWeight.w100),
                             ),
                             const SizedBox(height: 30),
                             ToolsController().buildTextField(
@@ -157,7 +157,7 @@ class _RegisterViewState extends State<RegisterView> {
                             Text('Vous avez deja un compte  ?'),
                             TextButton(
                               onPressed: (){ Navigator.of(context).pop(); }, //damien
-                              child: Text(' Connectez-vous ici ', style: TextStyle(color: SettingsClass().color)),
+                              child: Text(' Connectez-vous ici ', style: TextStyle(fontFamily: "Figtree",color: SettingsClass().color)),
                             ),
                           ],
                         ),
@@ -195,12 +195,12 @@ class _RegisterViewState extends State<RegisterView> {
                           const SizedBox(height: 30),
                           const Text(
                             "Numéro de téléphone",
-                            style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
+                            style: TextStyle(fontFamily: "Figtree",fontSize: 36, fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 10),
                           const Text(
                             "Le numéro de téléphone sera utilisé pour vous connecter",
-                            style: TextStyle(fontWeight: FontWeight.w100),
+                            style: TextStyle(fontFamily: "Figtree",fontWeight: FontWeight.w100),
                           ),
                           const SizedBox(height: 30),
                           SizedBox(
@@ -271,7 +271,7 @@ class _RegisterViewState extends State<RegisterView> {
                 children: [
                   const Text(
                     "Vérification de compte",
-                    style: TextStyle(
+                    style: TextStyle(fontFamily: "Figtree",
                       fontSize: 30,
                       fontWeight: FontWeight.bold,
                     ),
@@ -279,7 +279,7 @@ class _RegisterViewState extends State<RegisterView> {
                   const SizedBox(height: 10),
                   Text(
                     "Entrer le code sms envoyé au ${selectedCountry.dialcode + _phoneNumber.text} :",
-                    style: TextStyle(fontSize: 16),
+                    style: TextStyle(fontFamily: "Figtree",fontSize: 16),
                   ),
                   const SizedBox(height: 30),
                   Row(
@@ -300,7 +300,7 @@ class _RegisterViewState extends State<RegisterView> {
                           },
                           keyboardType: TextInputType.number,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
+                          style: const TextStyle(fontFamily: "Figtree",
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
@@ -342,14 +342,14 @@ class _RegisterViewState extends State<RegisterView> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Text("Sms non reçu ? ",
-                          style: TextStyle(color: Colors.black54)),
+                          style: TextStyle(fontFamily: "Figtree",color: Colors.black54)),
                       GestureDetector(
                         onTap: () {
                           // Action pour renvoyer le code
                         },
                         child: const Text(
                           "Renvoyer le code",
-                          style: TextStyle(
+                          style: TextStyle(fontFamily: "Figtree",
                             color: Colors.teal,
                             fontWeight: FontWeight.bold,
                           ),
@@ -368,7 +368,7 @@ class _RegisterViewState extends State<RegisterView> {
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder( borderRadius: BorderRadius.circular(10), ), 
                       ), 
-                      child: const Text( "Continuer", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      child: const Text( "Continuer", style: TextStyle(fontFamily: "Figtree",fontSize: 16, fontWeight: FontWeight.bold)),
                     ),
                   ),
                 ],
@@ -503,13 +503,13 @@ Future<Widget> _buildFuturePhoneNumber() async {
                     children: [
                       Text(
                         country.emoji,
-                        style: TextStyle(fontSize: 24),
+                        style: TextStyle(fontFamily: "Figtree",fontSize: 24),
                       ),
                       SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           '${country.name}(${country.dialcode})',
-                          style: TextStyle(fontSize: 16),
+                          style: TextStyle(fontFamily: "Figtree",fontSize: 16),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),

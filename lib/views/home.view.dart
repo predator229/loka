@@ -6,6 +6,7 @@ import 'package:loka/models/auth.class.dart';
 import 'package:loka/models/settings.class.dart';
 import 'package:intl/intl.dart';
 import 'package:loka/views/apartement.view.dart';
+import 'package:loka/views/filter.view.dart';
 import 'package:loka/views/journals/journal.item.view.dart';
 
 class HomeView extends StatefulWidget {
@@ -211,7 +212,7 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
                     children: [
                       Text(
                         "Félicitations",
-                        style: TextStyle(
+                        style: TextStyle(fontFamily: "Figtree",
                             fontSize: 30,
                             color: const Color.fromARGB(255, 11, 11, 11)),
                       ),
@@ -221,12 +222,12 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
                         children: [
                           Text(
                             "1000 pièces ",
-                            style: TextStyle(
+                            style: TextStyle(fontFamily: "Figtree",
                                 fontSize: 30, color: SettingsClass().color),
                           ),
                           Text(
                             "offert !",
-                            style: TextStyle(
+                            style: TextStyle(fontFamily: "Figtree",
                                 fontSize: 30,
                                 color: const Color.fromARGB(255, 11, 11, 11)),
                           ),
@@ -236,7 +237,7 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
                       Text(
                         'Bienvenu sur Loka, nous vous offrons 1000 pièces pour vos différents parcours sur Loka.',
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.grey),
+                        style: TextStyle(fontFamily: "Figtree",color: Colors.grey),
                       ),
                       const SizedBox(height: 30),
                     ],
@@ -368,7 +369,7 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 15.0),
             child: Row(
-              children: [ Text( "Favoris", style: TextStyle( fontSize: 36, fontWeight: FontWeight.bold ),), ],
+              children: [ Text( "Favoris", style: TextStyle(fontFamily: "Figtree", fontSize: 36, fontWeight: FontWeight.bold ),), ],
             ),
           ),
           Expanded(
@@ -401,7 +402,7 @@ Widget _buildJournal() {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 15.0),
               child: Row(
-                children: [ Text( "Journal", style: TextStyle( fontSize: 36, fontWeight: FontWeight.bold ),), ],
+                children: [ Text( "Journal", style: TextStyle(fontFamily: "Figtree", fontSize: 36, fontWeight: FontWeight.bold ),), ],
               ),
             ),
             Padding(
@@ -481,7 +482,7 @@ Widget _buildJournal() {
                                     children: [
                                       Text(
                                         activJournal['title'],
-                                        style: TextStyle(
+                                        style: TextStyle(fontFamily: "Figtree",
                                           fontWeight: FontWeight.w500,
                                           color: Colors.white,
                                         ),
@@ -497,7 +498,7 @@ Widget _buildJournal() {
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(journal.apartmentCard.title, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 20),),
+                              Text(journal.apartmentCard.title, style: TextStyle(fontFamily: "Figtree",fontWeight: FontWeight.w700, fontSize: 20),),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 mainAxisSize: MainAxisSize.max,
@@ -513,13 +514,13 @@ Widget _buildJournal() {
                                           border: Border.all( color: Colors.transparent),
                                           color: Color.fromARGB(255, 245, 245, 245),
                                         ),
-                                        child: Text(typesApartments[journal.apartmentCard.typeApartment[i]].name, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 14),),
+                                        child: Text(typesApartments[journal.apartmentCard.typeApartment[i]].name, style: TextStyle(fontFamily: "Figtree",fontWeight: FontWeight.w500, fontSize: 14),),
                                     ),
                                   ),
                                 ]
                               ),
-                              Text(journal.apartmentCard.location, style: TextStyle(fontWeight: FontWeight.w500, )),
-                              Text(journal.date, style: TextStyle(fontWeight: FontWeight.w500, color: Colors.grey)),
+                              Text(journal.apartmentCard.location, style: TextStyle(fontFamily: "Figtree",fontWeight: FontWeight.w500, )),
+                              Text(journal.date, style: TextStyle(fontFamily: "Figtree",fontWeight: FontWeight.w500, color: Colors.grey)),
                             ],
                           )
                         ],
@@ -542,7 +543,7 @@ Widget _buildJournal() {
       child: Center(
         child: ElevatedButton(
           onPressed: (){ auth.signOut(); }, child: 
-          Text('Se deconnecter', style: TextStyle(color: Colors.white),)),));
+          Text('Se deconnecter', style: TextStyle(fontFamily: "Figtree",color: Colors.white),)),));
   }
 
   Stack _buildHead (){
@@ -568,7 +569,7 @@ Widget _buildJournal() {
                         const SizedBox(width: 5),
                         const Text(
                           'Loka',
-                          style: TextStyle(
+                          style: TextStyle(fontFamily: "Figtree",
                             fontSize: 30,
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -617,7 +618,7 @@ Widget _buildJournal() {
                               const SizedBox(width: 10),
                               const Text(
                                 '1000',
-                                style: TextStyle(
+                                style: TextStyle(fontFamily: "Figtree",
                                   fontSize: 16,
                                   color: Color.fromARGB(255, 0, 0, 0),
                                 ),
@@ -643,7 +644,7 @@ Widget _buildJournal() {
                         ),
                         child: TextFormField(
                           controller: _searchController,
-                          style: const TextStyle(
+                          style: const TextStyle(fontFamily: "Figtree",
                             // fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
@@ -654,7 +655,7 @@ Widget _buildJournal() {
                               size: 25,
                             ),
                             hintText: 'Chercher dans une ville',
-                            hintStyle: TextStyle(color: Colors.white),
+                            hintStyle: TextStyle(fontFamily: "Figtree",color: Colors.white),
                             border: OutlineInputBorder(
                               borderSide: BorderSide.none,
                             ),
@@ -668,8 +669,7 @@ Widget _buildJournal() {
                     Expanded(
                       flex: 1,
                       child: Container(
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 10.0),
+                        padding: EdgeInsets.symmetric(horizontal: 10.0),
                         decoration: BoxDecoration(
                           // color: const Color.fromARGB(48, 255, 255, 255),
                           borderRadius: BorderRadius.circular(30),
@@ -678,19 +678,21 @@ Widget _buildJournal() {
                           ),
                         ),
                         child: TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.of(context).pushNamed(FilterView.routeName);
+                          },
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             mainAxisSize: MainAxisSize.max,
                             crossAxisAlignment: CrossAxisAlignment.center,
-                            children: const [
-                              Icon(
+                            children: [
+                              const Icon(
                                 Icons.filter_list_alt,
                                 color: Colors.white,
                                 size: 25,
                               ),
-                              Text("Filtrer",
-                                  style: TextStyle(color: Colors.white)),
+                              const Text("Filtrer",
+                                  style: TextStyle(fontFamily: "Figtree",color: Colors.white)),
                             ],
                           ),
                         ),
@@ -737,7 +739,7 @@ Widget _buildJournal() {
                     Image.asset("images/coin.png", width: 15),
                     Text(
                       itemApartment.crownPoints.toString(),
-                      style: TextStyle(
+                      style: TextStyle(fontFamily: "Figtree",
                         fontSize: 16,
                         color: Color.fromARGB(255, 0, 0, 0),
                       ),
@@ -769,7 +771,7 @@ Widget _buildJournal() {
             children: [
               Text(
                 itemApartment.title,
-                style: const TextStyle(
+                style: const TextStyle(fontFamily: "Figtree",
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
                 ),
@@ -778,7 +780,7 @@ Widget _buildJournal() {
               const SizedBox(height: 4),
               Text(
                 itemApartment.description,
-                style: TextStyle(
+                style: TextStyle(fontFamily: "Figtree",
                   color: Colors.grey[600],
                   fontSize: 14,
                 ),
@@ -790,14 +792,14 @@ Widget _buildJournal() {
                 children: [
                   Text(
                     itemApartment.location,
-                    style: TextStyle(
+                    style: TextStyle(fontFamily: "Figtree",
                       color: Colors.grey[600],
                       fontSize: 12,
                     ),
                   ),
                   Text(
                     "Jusqu'au ${itemApartment.date}",
-                    style: TextStyle(
+                    style: TextStyle(fontFamily: "Figtree",
                       color: Colors.grey[600],
                       fontSize: 12,
                     ),
@@ -810,7 +812,7 @@ Widget _buildJournal() {
                 children: [
                   Text(
                     "${itemApartment.price.toString()} ${itemApartment.devise} / ${itemApartment.perPeriod}",
-                    style: const TextStyle(
+                    style: const TextStyle(fontFamily: "Figtree",
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
                     ),
@@ -821,11 +823,11 @@ Widget _buildJournal() {
                       const SizedBox(width: 4),
                       Text(
                         itemApartment.rating.toString(),
-                        style: const TextStyle(fontSize: 14),
+                        style: const TextStyle(fontFamily: "Figtree",fontSize: 14),
                       ),
                       Text(
                         ' (${itemApartment.reviews.toString()} avis)',
-                        style: TextStyle(
+                        style: TextStyle(fontFamily: "Figtree",
                           color: Colors.grey[600],
                           fontSize: 12,
                         ),
@@ -869,7 +871,7 @@ Widget _buildJournal() {
                   size: 25,
                 ),
                 const SizedBox(width: 5),
-                Text(typeArp.name,style: TextStyle(color: _selectedType.id == typeArp.id ?  Colors.white : Colors.grey)),
+                Text(typeArp.name,style: TextStyle(fontFamily: "Figtree",color: _selectedType.id == typeArp.id ?  Colors.white : Colors.grey)),
               ],
             ),
           ),

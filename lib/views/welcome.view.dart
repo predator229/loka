@@ -149,12 +149,12 @@ final List<WelcomePageView> pageViews = [
           ),
         ),
         SizedBox(height: 20,),
-        Text(pageDetails.description, style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold,),),
+        Text(pageDetails.description, style: TextStyle(fontFamily: "Figtree",fontSize: 15, fontWeight: FontWeight.bold,),),
       ],
     );
   }
 
   Widget _buildTitleContent({required WelcomeTitle titleDetail }){
-    return titleDetail.isGreen ? Text(titleDetail.text, style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: SettingsClass().color),) : Text(titleDetail.text, style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold,),);
+    return titleDetail.isGreen ? Text(titleDetail.text, style: TextStyle(fontFamily: "Figtree",fontSize: 30, fontWeight: FontWeight.bold, color: SettingsClass().color),) : Text(titleDetail.text, style: TextStyle(fontFamily: "Figtree",fontSize: 30, fontWeight: FontWeight.bold,),);
   }
 }

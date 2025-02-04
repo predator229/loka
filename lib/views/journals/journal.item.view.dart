@@ -36,7 +36,7 @@ class _JournalItemState extends State<JournalItem> {
             icon: Icon(Icons.cancel, color: Colors.grey, size: 41),
           ),
         ),
-        title: Text('Détails de la demande', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
+        title: Text('Détails de la demande', style: TextStyle(fontFamily: "Figtree",fontSize: 20, fontWeight: FontWeight.w600)),
       ),
       body: Expanded(
         child: Padding(
@@ -108,7 +108,7 @@ class _JournalItemState extends State<JournalItem> {
                       ),
                       child: Text(
                         "${currentImage+1}/${journalCard.apartmentCard.imageUrl.length}",
-                        style: TextStyle(
+                        style: TextStyle(fontFamily: "Figtree",
                           fontSize: 14,
                           color: Colors.white,
                           fontWeight: FontWeight.w600
@@ -131,7 +131,7 @@ class _JournalItemState extends State<JournalItem> {
                   children: [
                     Text(
                       journalCard.apartmentCard.title,
-                      style: TextStyle(
+                      style: TextStyle(fontFamily: "Figtree",
                         fontSize: 20,
                         fontWeight: FontWeight.w700,
                       ),
@@ -144,7 +144,7 @@ class _JournalItemState extends State<JournalItem> {
                       children: [
                         Text(
                           "${journalCard.apartmentCard.price.toString()} ${journalCard.apartmentCard.devise} / ${journalCard.apartmentCard.perPeriod}",
-                          style: const TextStyle(
+                          style: const TextStyle(fontFamily: "Figtree",
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
                           ),
@@ -162,7 +162,7 @@ class _JournalItemState extends State<JournalItem> {
                             children: [
                               Text(
                                 activJournal['title'],
-                                style: TextStyle(
+                                style: TextStyle(fontFamily: "Figtree",
                                   fontWeight: FontWeight.w500,
                                   color: Colors.white,
                                 ),
@@ -181,14 +181,14 @@ class _JournalItemState extends State<JournalItem> {
                           onPressed: (){},
                           child: Row(
                             children: [
-                              Text("Voir tous les detaills", style: TextStyle(color: SettingsClass().bottunColor),),
+                              Text("Voir tous les detaills", style: TextStyle(fontFamily: "Figtree",color: SettingsClass().bottunColor),),
                               Icon(Icons.arrow_forward, color: SettingsClass().bottunColor, size: 30,)
                             ],
                           )
                         ),
                         TextButton(
                           onPressed: (){},
-                          child: Text("Annuler", style: TextStyle(color: const Color.fromARGB(255, 70, 57, 57)),),
+                          child: Text("Annuler", style: TextStyle(fontFamily: "Figtree",color: const Color.fromARGB(255, 70, 57, 57)),),
 
                         ),
                       ],
@@ -202,7 +202,7 @@ class _JournalItemState extends State<JournalItem> {
                 mainAxisSize: MainAxisSize.max,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text("Informations de l’annonceur", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),),
+                  Text("Informations de l’annonceur", style: TextStyle(fontFamily: "Figtree",fontSize: 20, fontWeight: FontWeight.w600),),
                   IconButton(
                     onPressed: (){
                       setState(() { _isExpanded = !_isExpanded; });
@@ -249,13 +249,13 @@ class _JournalItemState extends State<JournalItem> {
                                 children: [
                                   Text(
                                     "Damien le vrai boss",
-                                    style: TextStyle(
+                                    style: TextStyle(fontFamily: "Figtree",
                                       fontSize: 15,
                                       fontWeight: FontWeight.w700,
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
-                                  Text("Demarcheur", style: TextStyle(fontSize: 13,overflow: TextOverflow.ellipsis,),),
+                                  Text("Demarcheur", style: TextStyle(fontFamily: "Figtree",fontSize: 13,overflow: TextOverflow.ellipsis,),),
                                 ],
                               ),
                             ),
@@ -278,7 +278,7 @@ class _JournalItemState extends State<JournalItem> {
                                 Icon(Icons.star_border, color: Colors.black, size: 30,),
                                 Padding(
                                   padding: const EdgeInsets.only(left: 10),
-                                  child: Text("4,5", style: TextStyle(color: Colors.black),),
+                                  child: Text("4,5", style: TextStyle(fontFamily: "Figtree",color: Colors.black),),
                                 ),
                               ],
                             ),
@@ -292,7 +292,7 @@ class _JournalItemState extends State<JournalItem> {
                                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                                 mainAxisSize: MainAxisSize.max,
                                 children: [
-                                  Text( "Certifié", style: TextStyle( fontWeight: FontWeight.w500, ), ),
+                                  Text( "Certifié", style: TextStyle(fontFamily: "Figtree", fontWeight: FontWeight.w500, ), ),
                                   Image.asset("images/certificat.jpg", width: 20,)
                                 ],
                               ),
@@ -313,8 +313,8 @@ class _JournalItemState extends State<JournalItem> {
                               ),
                               child: Icon(Icons.trending_up_sharp),
                             ),
-                            Text("  2 456", style: TextStyle(fontSize: 15, color: Colors.black, fontWeight: FontWeight.w700),),
-                            Text("  biens vendus", style: TextStyle(fontSize: 15, color: Colors.black,),),
+                            Text("  2 456", style: TextStyle(fontFamily: "Figtree",fontSize: 15, color: Colors.black, fontWeight: FontWeight.w700),),
+                            Text("  biens vendus", style: TextStyle(fontFamily: "Figtree",fontSize: 15, color: Colors.black,),),
                           ],
                         ),
                       ),
@@ -337,7 +337,7 @@ class _JournalItemState extends State<JournalItem> {
                               mainAxisSize: MainAxisSize.max,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                Text("Prendre un rendez-vous", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400),),
+                                Text("Prendre un rendez-vous", style: TextStyle(fontFamily: "Figtree",fontSize: 14, fontWeight: FontWeight.w400),),
                                 Icon(Icons.arrow_forward_ios, color: Colors.black, size: 20,),
                               ],
                             ),

@@ -126,7 +126,7 @@ class _ApartementViewState extends State<ApartementView> {
                                     Image.asset("images/coin.png", width: 15),
                                     Text(
                                       apartentCard.crownPoints.toString(),
-                                      style: TextStyle(
+                                      style: TextStyle(fontFamily: "Figtree",
                                         fontSize: 16,
                                         color: Color.fromARGB(255, 0, 0, 0),
                                       ),
@@ -146,7 +146,7 @@ class _ApartementViewState extends State<ApartementView> {
                                 ),
                                 child: Text(
                                   "${currentImgIndex+1}/${apartentCard.imageUrl.length}",
-                                  style: TextStyle(
+                                  style: TextStyle(fontFamily: "Figtree",
                                     fontSize: 14,
                                     color: Colors.white,
                                     fontWeight: FontWeight.w600
@@ -211,7 +211,7 @@ class _ApartementViewState extends State<ApartementView> {
             child: Center(
               child: Text(
                 "+ ${apartentCard.imageUrl.length - 4}",
-                style: const TextStyle(fontSize: 22, color: Colors.black, fontWeight: FontWeight.w700),
+                style: const TextStyle(fontFamily: "Figtree",fontSize: 22, color: Colors.black, fontWeight: FontWeight.w700),
               ),
             ),
           ),
@@ -297,13 +297,13 @@ if (displayAllPicture)
                                         mainAxisAlignment: MainAxisAlignment.start,
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          Text("Colocataires", style: TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600),),
+                                          Text("Colocataires", style: TextStyle(fontFamily: "Figtree",fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600),),
                                           InkWell(
                                             onTap: (){},
                                             child: Text(
                                               "Vous pourrez être dans le même lieu d’appartement avec ${apartentCard.nrColoc} colocataires.",
                                               softWrap: true,
-                                              style: TextStyle(
+                                              style: TextStyle(fontFamily: "Figtree",
                                                 fontSize: 13,
                                                 color: Colors.black,
                                                 fontWeight: FontWeight.w400,
@@ -329,7 +329,7 @@ if (displayAllPicture)
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text("Caractéristiques", style: TextStyle(fontSize: 20, color: Colors.black, fontWeight:FontWeight.w600),),
+                                Text("Caractéristiques", style: TextStyle(fontFamily: "Figtree",fontSize: 20, color: Colors.black, fontWeight:FontWeight.w600),),
                                 SizedBox(height: 10),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.start,
@@ -360,7 +360,7 @@ if (displayAllPicture)
                                                     decoration: BoxDecoration(
                                                       color: const Color.fromARGB(23, 8, 131, 120)
                                                     ),
-                                                    child: Text(apartentCard.caracteristiques.rooms[j].superficie, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400, color: SettingsClass().bottunColor),),
+                                                    child: Text(apartentCard.caracteristiques.rooms[j].superficie, style: TextStyle(fontFamily: "Figtree",fontSize: 12, fontWeight: FontWeight.w400, color: SettingsClass().bottunColor),),
                                                   ),
                                                 ),
                                               ],
@@ -395,7 +395,7 @@ if (displayAllPicture)
                                                   decoration: BoxDecoration(
                                                     color: const Color.fromARGB(23, 8, 131, 120)
                                                   ),
-                                                  child: Text(apartentCard.caracteristiques.superficieTotale, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400, color: SettingsClass().bottunColor),),
+                                                  child: Text(apartentCard.caracteristiques.superficieTotale, style: TextStyle(fontFamily: "Figtree",fontSize: 12, fontWeight: FontWeight.w400, color: SettingsClass().bottunColor),),
                                                 ),
                                               ],
                                             ),
@@ -418,7 +418,7 @@ if (displayAllPicture)
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text("Description du domicile", style: TextStyle(fontSize: 20, color: Colors.black, fontWeight:FontWeight.w600),),
+                                Text("Description du domicile", style: TextStyle(fontFamily: "Figtree",fontSize: 20, color: Colors.black, fontWeight:FontWeight.w600),),
                                 SizedBox(height: 10),
                                 if (!showMoreDescription)
                                 Text(
@@ -426,7 +426,7 @@ if (displayAllPicture)
                                   softWrap: true,
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 4,
-                                  style: TextStyle(
+                                  style: TextStyle(fontFamily: "Figtree",
                                     fontSize: 15,
                                     color: Colors.black,
                                     fontWeight: FontWeight.w400,
@@ -436,7 +436,7 @@ if (displayAllPicture)
                                 Text(
                                   apartentCard.description,
                                   softWrap: true,
-                                  style: TextStyle(
+                                  style: TextStyle(fontFamily: "Figtree",
                                     fontSize: 15,
                                     color: Colors.black,
                                     fontWeight: FontWeight.w400,
@@ -446,7 +446,7 @@ if (displayAllPicture)
                                 onTap: (){
                                   setState(() { showMoreDescription = !showMoreDescription; });
                                 },
-                                child: Text( showMoreDescription ? "Lire moins .." :  "Lire plus ...", style: TextStyle(color: SettingsClass().bottunColor, decoration: TextDecoration.underline, decorationColor: SettingsClass().bottunColor, fontSize: 15, fontWeight: FontWeight.w600),),
+                                child: Text( showMoreDescription ? "Lire moins .." :  "Lire plus ...", style: TextStyle(fontFamily: "Figtree",color: SettingsClass().bottunColor, decoration: TextDecoration.underline, decorationColor: SettingsClass().bottunColor, fontSize: 15, fontWeight: FontWeight.w600),),
                                 ),
                               ],
                             )
@@ -456,7 +456,7 @@ if (displayAllPicture)
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [ 
-                              Text("Aménagement.s disponible", style: TextStyle(fontSize: 20, color: Colors.black, fontWeight:FontWeight.w600),),
+                              Text("Aménagement.s disponible", style: TextStyle(fontFamily: "Figtree",fontSize: 20, color: Colors.black, fontWeight:FontWeight.w600),),
                               Padding(
                                 padding: const EdgeInsets.symmetric(vertical:10),
                                 child: Row(
@@ -514,7 +514,7 @@ if (displayAllPicture)
                                 onTap: (){ setState(() { showMoreEchipment = !showMoreEchipment; });},
                                 child: Row(
                                   children: [
-                                    Text( !showMoreEchipment ? "Voir toutes les aménagements " :  "Voir  moins ...", style: TextStyle(color: SettingsClass().bottunColor, decoration: TextDecoration.underline, decorationColor: SettingsClass().bottunColor, fontSize: 15, fontWeight: FontWeight.w600),),
+                                    Text( !showMoreEchipment ? "Voir toutes les aménagements " :  "Voir  moins ...", style: TextStyle(fontFamily: "Figtree",color: SettingsClass().bottunColor, decoration: TextDecoration.underline, decorationColor: SettingsClass().bottunColor, fontSize: 15, fontWeight: FontWeight.w600),),
                                     Icon(!showMoreEchipment ? Icons.arrow_forward : Icons.arrow_back, color: SettingsClass().bottunColor, size: 30,)
                                   ],
                                 ),
@@ -533,7 +533,7 @@ if (displayAllPicture)
                                   children: [
                                     Padding(
                                       padding: const EdgeInsets.only(right: 8.0),
-                                      child: Icon(Icons.person_2_outlined),
+                                      child: Icon(Icons.group_rounded),
                                     ),
                                     Text("Il y a ${apartentCard.nbrNeightbord} voisins proche de chez vous",),
                                   ],
@@ -557,11 +557,11 @@ if (displayAllPicture)
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text("Localisation du lieu", style: TextStyle(fontSize: 20, color: Colors.black, fontWeight:FontWeight.w600),),
+                                Text("Localisation du lieu", style: TextStyle(fontFamily: "Figtree",fontSize: 20, color: Colors.black, fontWeight:FontWeight.w600),),
                                 SizedBox(height: 10),
                                 Padding(
                                   padding: const EdgeInsets.only(bottom: 8.0),
-                                  child: Text(apartentCard.location, style: TextStyle(fontSize: 16, color: Colors.black, fontWeight: FontWeight.w600),),
+                                  child: Text(apartentCard.location, style: TextStyle(fontFamily: "Figtree",fontSize: 16, color: Colors.black, fontWeight: FontWeight.w600),),
                                 ),
                                 if (!showMoreDescriptionLocation && apartentCard.descriptionLocation!.isNotEmpty)
                                 Text(
@@ -569,7 +569,7 @@ if (displayAllPicture)
                                   softWrap: true,
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 4,
-                                  style: TextStyle(
+                                  style: TextStyle(fontFamily: "Figtree",
                                     fontSize: 15,
                                     color: Colors.black,
                                     fontWeight: FontWeight.w400,
@@ -579,7 +579,7 @@ if (displayAllPicture)
                                 Text(
                                   "${apartentCard.descriptionLocation}",
                                   softWrap: true,
-                                  style: TextStyle(
+                                  style: TextStyle(fontFamily: "Figtree",
                                     fontSize: 15,
                                     color: Colors.black,
                                     fontWeight: FontWeight.w400,
@@ -592,7 +592,7 @@ if (displayAllPicture)
                                   onTap: (){
                                     setState(() { showMoreDescriptionLocation = !showMoreDescriptionLocation; });
                                   },
-                                  child: Text( showMoreDescriptionLocation ? "Lire moins .." :  "Lire plus ...", style: TextStyle(color: SettingsClass().bottunColor, decoration: TextDecoration.underline, decorationColor: SettingsClass().bottunColor, fontSize: 15, fontWeight: FontWeight.w600),),
+                                  child: Text( showMoreDescriptionLocation ? "Lire moins .." :  "Lire plus ...", style: TextStyle(fontFamily: "Figtree",color: SettingsClass().bottunColor, decoration: TextDecoration.underline, decorationColor: SettingsClass().bottunColor, fontSize: 15, fontWeight: FontWeight.w600),),
                                   ),
                                 ),
                               ],
@@ -610,7 +610,7 @@ if (displayAllPicture)
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text("Voir l’itinéraire", style: TextStyle(color: Color.fromARGB(255,8, 131, 120),),),
+                                  Text("Voir l’itinéraire", style: TextStyle(fontFamily: "Figtree",color: Color.fromARGB(255,8, 131, 120),),),
                                   Icon(Icons.location_on_sharp, color: SettingsClass().bottunColor, size: 30,),
                                 ],
                               ),
@@ -666,7 +666,7 @@ if (displayAllPicture)
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text("Services à proximité", style: TextStyle(fontSize: 20, color: Colors.black, fontWeight:FontWeight.w600),),
+                              Text("Services à proximité", style: TextStyle(fontFamily: "Figtree",fontSize: 20, color: Colors.black, fontWeight:FontWeight.w600),),
                               SizedBox(height: 10),
                               for (int i=0; i < (apartentCard.caracteristiques.services.length > 2 && !showMoreServices ? 2 : apartentCard.caracteristiques.services.length ) ; i++ )
                               Padding(
@@ -677,12 +677,12 @@ if (displayAllPicture)
                                   children: [
                                     Text(
                                       "${apartentCard.caracteristiques.services[i].name} : ",
-                                      style: const TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600,),
+                                      style: const TextStyle(fontFamily: "Figtree",fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600,),
                                     ),
                                     Text(
                                       apartentCard.caracteristiques.services[i].description,
                                       softWrap: true,
-                                      style: TextStyle(
+                                      style: TextStyle(fontFamily: "Figtree",
                                         fontSize: 15,
                                         color: Colors.black,
                                         fontWeight: FontWeight.w400,
@@ -711,7 +711,7 @@ if (displayAllPicture)
                                 mainAxisSize: MainAxisSize.max,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  Text(showMoreServices ? "Voir moins de services proches" : "Voir tous les services proches", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400),),
+                                  Text(showMoreServices ? "Voir moins de services proches" : "Voir tous les services proches", style: TextStyle(fontFamily: "Figtree",fontSize: 14, fontWeight: FontWeight.w400),),
                                   Icon(showMoreServices ? Icons.keyboard_arrow_left_outlined : Icons.arrow_forward_ios, color: Colors.black, size: 20,),
                                 ],
                               ),
@@ -729,7 +729,7 @@ if (displayAllPicture)
                             mainAxisSize: MainAxisSize.max,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Text("Informations de l’annonceur", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),),
+                              Text("Informations de l’annonceur", style: TextStyle(fontFamily: "Figtree",fontSize: 20, fontWeight: FontWeight.w600),),
                               IconButton(
                                 onPressed: (){
                                   setState(() { _isExpanded = !_isExpanded; });
@@ -776,13 +776,13 @@ if (displayAllPicture)
                                             children: [
                                               Text(
                                                 "Damien le vrai boss",
-                                                style: TextStyle(
+                                                style: TextStyle(fontFamily: "Figtree",
                                                   fontSize: 15,
                                                   fontWeight: FontWeight.w700,
                                                   overflow: TextOverflow.ellipsis,
                                                 ),
                                               ),
-                                              Text("Demarcheur", style: TextStyle(fontSize: 13,overflow: TextOverflow.ellipsis,),),
+                                              Text("Demarcheur", style: TextStyle(fontFamily: "Figtree",fontSize: 13,overflow: TextOverflow.ellipsis,),),
                                             ],
                                           ),
                                         ),
@@ -805,7 +805,7 @@ if (displayAllPicture)
                                             Icon(Icons.star_border, color: Colors.black, size: 30,),
                                             Padding(
                                               padding: const EdgeInsets.only(left: 10),
-                                              child: Text("4,5", style: TextStyle(color: Colors.black),),
+                                              child: Text("4,5", style: TextStyle(fontFamily: "Figtree",color: Colors.black),),
                                             ),
                                           ],
                                         ),
@@ -819,7 +819,7 @@ if (displayAllPicture)
                                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                                             mainAxisSize: MainAxisSize.max,
                                             children: [
-                                              Text( "Certifié", style: TextStyle( fontWeight: FontWeight.w500, ), ),
+                                              Text( "Certifié", style: TextStyle(fontFamily: "Figtree", fontWeight: FontWeight.w500, ), ),
                                               Image.asset("images/certificat.jpg", width: 20,)
                                             ],
                                           ),
@@ -840,8 +840,8 @@ if (displayAllPicture)
                                           ),
                                           child: Icon(Icons.trending_up_sharp),
                                         ),
-                                        Text("  2 456", style: TextStyle(fontSize: 15, color: Colors.black, fontWeight: FontWeight.w700),),
-                                        Text("  biens vendus", style: TextStyle(fontSize: 15, color: Colors.black,),),
+                                        Text("  2 456", style: TextStyle(fontFamily: "Figtree",fontSize: 15, color: Colors.black, fontWeight: FontWeight.w700),),
+                                        Text("  biens vendus", style: TextStyle(fontFamily: "Figtree",fontSize: 15, color: Colors.black,),),
                                       ],
                                     ),
                                   ),
@@ -864,7 +864,7 @@ if (displayAllPicture)
                                           mainAxisSize: MainAxisSize.max,
                                           crossAxisAlignment: CrossAxisAlignment.center,
                                           children: [
-                                            Text("Prendre un rendez-vous", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400),),
+                                            Text("Prendre un rendez-vous", style: TextStyle(fontFamily: "Figtree",fontSize: 14, fontWeight: FontWeight.w400),),
                                             Icon(Icons.arrow_forward_ios, color: Colors.black, size: 20,),
                                           ],
                                         ),
@@ -901,14 +901,14 @@ if (displayAllPicture)
                     children: [
                       Text(
                       "${apartentCard.price.toString()} ${apartentCard.devise} / ${apartentCard.perPeriod}",
-                        style: const TextStyle(
+                        style: const TextStyle(fontFamily: "Figtree",
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
                         ),
                       ),
                       Text(
                       "Jusqu'au ${apartentCard.date}",
-                      style: TextStyle(
+                      style: TextStyle(fontFamily: "Figtree",
                         color: Colors.grey[600],
                         fontSize: 12,
                       ),

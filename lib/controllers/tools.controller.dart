@@ -142,13 +142,13 @@ Future<Widget> buildComboNumber({required TextEditingController phoneNumber, req
                         children: [
                           Text(
                             country.emoji,
-                            style: TextStyle(fontSize: 24),
+                            style: TextStyle(fontFamily: "Figtree",fontSize: 24),
                           ),
                           SizedBox(width: 8),
                           Expanded(
                             child: Text(
                               '${country.name}(${country.dialcode})',
-                              style: TextStyle(fontSize: 16),
+                              style: TextStyle(fontFamily: "Figtree",fontSize: 16),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
