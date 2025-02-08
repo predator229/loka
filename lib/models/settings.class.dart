@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:loka/views/profil.view.dart';
+
 class SettingsClass {
+  final FirebaseAuth auth = FirebaseAuth.instance;
   Color color =  Color.fromARGB(255,2,124,125);
   Color color_ =  Color.fromARGB(255,1,155,137);
   Color bottunColor =  Color.fromARGB(255,8,131,120);
@@ -36,8 +40,24 @@ class SettingsClass {
   ];
   List<CouvertureChambre> couvertureChambres = [
     CouvertureChambre(id: 1, name: 'Plafonné', description: "Plafonné", icon: "images/couverture_plafonnnee.png"),
-    CouvertureChambre(id: 1, name: 'Dallé', description: "Dallé", icon: "images/couverture_dallee.png"),
-    CouvertureChambre(id: 1, name: 'Staffée', description: "Staffée", icon: "images/couverture_staffee.png"),
+    CouvertureChambre(id: 2, name: 'Dallé', description: "Dallé", icon: "images/couverture_dallee.png"),
+    CouvertureChambre(id: 3, name: 'Staffée', description: "Staffée", icon: "images/couverture_staffee.png"),
+  ];
+
+  List<ProfilMenu> profilsMenu = [
+    ProfilMenu(id: 1, title: 'Informations personnelles', icon: Icons.person, routeName: ProfilView.routeName),
+    ProfilMenu(id: 2, title: 'Mes pièces', icon: Icons.monetization_on_outlined),
+    ProfilMenu(id: 3, title: 'Paramètres', icon: Icons.settings),
+    ProfilMenu(id: 4, title: 'Aide', icon: Icons.report_gmailerrorred),
+    ProfilMenu(id: 4, title: 'Protection des données (RGPD)', icon: Icons.private_connectivity_sharp),
+    ProfilMenu(id: 5, title: 'Conditions d’utilisations', icon: Icons.filter_none_sharp),
+    ProfilMenu(id: 6, title: 'Déconnection', isLogout: true,),
+  ];
+
+  List<TypeUser> typeUser = [
+    TypeUser(id: 1, title: 'Propriétaire',),
+    TypeUser(id: 2, title: 'Compte client',),
+    TypeUser(id: 3, title: 'Administrateur',),
   ];
 }
 
@@ -159,4 +179,32 @@ class CouvertureChambre{
   String icon;
 
   CouvertureChambre({ required this.name, required this.id, required this.icon, this.description });
+}
+
+class ProfilMenu {
+  int id;
+  String title;
+  String? description;
+  IconData? icon;
+  String? routeName;
+  bool? isLogout;
+  ProfilMenu({this.icon, this.isLogout, required this.id, required this.title, this.description, this.routeName});
+}
+
+class UserAuthentificate {
+  String? id;
+  String? email;
+  String? phoneNumber;
+  String? name;
+  String? imgPath;
+  TypeUser typeUser;
+  UserAuthentificate({this.email, this.imgPath, this.name, this.phoneNumber, required this.typeUser, this.id});
+}
+
+class TypeUser{
+  int id;
+  String title;
+  String? description;
+
+  TypeUser({ required this.id, required this.title, this.description});
 }

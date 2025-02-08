@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:loka/models/country.class.dart';
+import 'package:loka/models/settings.class.dart';
 import 'package:loka/views/home.view.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -12,7 +13,8 @@ abstract class BaseAuth {
   Future<void> attemptLoginAndSendBackErrorMessage(BuildContext context, dynamic credential);
   Future<User?> currentUser();
   Future<void> signOut();
-  bool get isNewUser ;
+  bool get isNewUser;
+  UserAuthentificate get userAuthentificate;
 }
 
 class Auth implements BaseAuth {
@@ -23,11 +25,15 @@ class Auth implements BaseAuth {
     return true; //ici a retourner avec l'api
   }
 
+  @override
+  UserAuthentificate get userAuthentificate {
+    return UserAuthentificate(typeUser: SettingsClass().typeUser[2], name: "Damien", email: "damienzipadonou@gmail.com", phoneNumber: "+40736141740", imgPath: "images/damien.jpeg"); //ici a retourner avec l'api
+  }
+
     @override
   Stream<User?> get onAuthStatusChanged {
     return _firebaseAuth.authStateChanges();
   }
-
 
   @override
   Future<void> sendCodeAndWaitResponse(BuildContext context, String phoneNumber, Country? country, void Function(String) isCodeSentUserFromFireBase) async {
@@ -84,6 +90,7 @@ class Auth implements BaseAuth {
     try {
       UserCredential userCredential = await _firebaseAuth.signInWithCredential(credential);
       if (userCredential.user!=null){
+        // this.
             Navigator.pushReplacementNamed(context, HomeView.routeName);
         }else{
           ScaffoldMessenger.of(context).showSnackBar( const SnackBar(content: Text('Erreur de connexion ! Veuillliez réessayer')),

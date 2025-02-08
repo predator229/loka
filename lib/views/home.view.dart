@@ -536,16 +536,223 @@ Widget _buildJournal() {
     );
   }
 
+Widget _buildItemList (ProfilMenu profil) {
+  return profil.routeName != null ?
+  InkWell(
+    onTap: () { 
+      if (profil.routeName != null) { Navigator.of(context).pushNamed(profil.routeName!); }
+    },
+    child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisSize: MainAxisSize.max,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Row(
+            children: [
+              if (profil.icon != null)
+              Icon(profil.icon, size: 24,),
+              if (profil.icon != null)
+              SizedBox(width: 10),
+              Text(profil.title, style: TextStyle(fontFamily: "Figtree",fontWeight: FontWeight.w500, fontSize: 16),),
+            ],
+          ),
+          if (profil.icon != null)
+          Icon(Icons.arrow_forward_ios_sharp)
+        ],
+      ),
+  ) :
+    Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisSize: MainAxisSize.max,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        if (profil.icon != null)
+        Row(
+          children: [
+            Icon(profil.icon, size: 24,),
+            SizedBox(width: 10),
+            Text(profil.title, style: TextStyle(fontFamily: "Figtree",fontWeight: FontWeight.w500, fontSize: 16),),
+          ],
+        ),
+        if (profil.isLogout !=null)
+        InkWell(
+          onTap: () { auth.signOut(); },
+          child: Text(profil.title, style: TextStyle(fontFamily: "Figtree",fontWeight: FontWeight.w500, fontSize: 16, decoration: TextDecoration.underline, color: Color.fromARGB(255, 116, 116, 116)),),
+        ),
+        if (profil.icon != null)
+        Icon(Icons.arrow_forward_ios_sharp)
+      ],
+    );
 
+}
 
   Widget _buildProfile() {
-    return SafeArea(
-      child: Center(
-        child: ElevatedButton(
-          onPressed: (){ auth.signOut(); }, child: 
-          Text('Se deconnecter', style: TextStyle(fontFamily: "Figtree",color: Colors.white),)),));
+     return Column(
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          _buildHeadProfile (),
+          SizedBox(height: 30,),
+          Expanded(
+            child: ListView.builder(
+              padding: EdgeInsets.zero,
+              shrinkWrap: true, 
+              itemCount: SettingsClass().profilsMenu.length,
+              itemBuilder: (context, index) {
+                var item = SettingsClass().profilsMenu[index];
+                return Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
+                  child: _buildItemList (item),
+                );
+              },
+            ),
+          ),
+        ],
+      );
   }
 
+  Stack _buildHeadProfile(){
+    return Stack(
+      children: [
+        Container(
+          width: MediaQuery.of(context).size.width,
+          height: (MediaQuery.of(context).size.width*2/3 > 280 ? 280 : MediaQuery.of(context).size.width*2/3) +50,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                const Color.fromARGB(255, 91, 168, 151),
+                Color.fromARGB(255, 8, 131, 120),
+                // Color.fromARGB(85, 8, 131, 120),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.only(bottomRight: Radius.circular(36)),
+          ),
+        ),
+        Positioned(
+          top: 100,
+          right: 30,
+          child: Container(
+            width: MediaQuery.of(context).size.width*2/3,
+            height: (MediaQuery.of(context).size.width*2/3 > 277 ? 277 : MediaQuery.of(context).size.width*2/3),
+            decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                const Color.fromARGB(0, 8, 131, 120),
+                Color.fromARGB(255, 8, 131, 120),
+                // Color.fromARGB(85, 8, 131, 120),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+              shape: BoxShape.circle,
+              ),
+          ),
+        ),
+        Positioned(
+          top: 55,
+          left: -56,
+          child: Container(
+            width: MediaQuery.of(context).size.width*2/3,
+            height: (MediaQuery.of(context).size.width*2/3 > 277 ? 277 : MediaQuery.of(context).size.width*2/3),
+            decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                const Color.fromARGB(0, 8, 131, 120),
+                Color.fromARGB(255, 8, 131, 120),
+                // Color.fromARGB(85, 8, 131, 120),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+              shape: BoxShape.circle,
+          ),
+          ),
+        ),
+        Container(
+          width: MediaQuery.of(context).size.width,
+          decoration: BoxDecoration(
+          ),
+          child: Padding(
+            padding: const EdgeInsets.only( top: 66.0, left: 20, right: 20, bottom: 20),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Profile',
+                      style: TextStyle(fontFamily: "Figtree",
+                        fontSize: 30,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.max,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Column(
+                        children: [
+                        Container(
+                            width: MediaQuery.of(context).size.width / 3 > 140 ? 140 : MediaQuery.of(context).size.width / 3,
+                            height: MediaQuery.of(context).size.width / 3 > 140 ? 140 : MediaQuery.of(context).size.width / 3,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: LinearGradient(
+                                colors: [
+                                  const Color.fromARGB(255, 255, 255, 255),
+                                  Color.fromARGB(255, 153, 193, 121500),
+                                  // Color.fromARGB(85, 8, 131, 120),
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              border: Border.all(
+                                width: 5,
+                                color: Colors.transparent,
+                              ),
+                            ),
+                            child: ClipOval(
+                              child: Image.asset(
+                                auth.userAuthentificate.imgPath ??  "images/damien.jpeg",
+                                width: MediaQuery.of(context).size.width / 3 > 140 ? 140 : MediaQuery.of(context).size.width / 3,
+                                height: MediaQuery.of(context).size.width / 3 > 140 ? 140 : MediaQuery.of(context).size.width / 3,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                        ),
+                        Text(
+                          auth.userAuthentificate.name ?? '',
+                          style: TextStyle(fontFamily: "Figtree",
+                            fontSize: 24,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        Text(
+                          auth.userAuthentificate.typeUser.title ?? '',
+                          style: TextStyle(fontFamily: "Figtree",
+                            fontSize: 14,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+    ],
+    );
+  }
   Stack _buildHead (){
     return Stack(
       children: [

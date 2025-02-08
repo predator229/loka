@@ -9,6 +9,7 @@ import 'package:loka/views/authentifications/login.view.dart';
 import 'package:loka/views/authentifications/register.view.dart';
 import 'package:loka/controllers/auth.provider.controller.dart';
 import 'package:loka/views/journals/journal.item.view.dart';
+import 'package:loka/views/profil.view.dart';
 import 'package:loka/views/welcome.view.dart';
 import 'firebase_options.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -45,6 +46,7 @@ class EntryApp extends StatelessWidget {
           JournalItem.routeName : (context) => const JournalItem(),
           ApartementView.routeName : (content) => const ApartementView(),
           FilterView.routeName : (content) => const FilterView(),
+          ProfilView.routeName : (content) => const ProfilView(),
         },
         initialRoute: RoutePage.routeName,
       ),
