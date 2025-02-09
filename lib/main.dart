@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:loka/controllers/root.page.controller.dart';
 import 'package:loka/models/auth.class.dart';
+import 'package:loka/views/add.coins.view.dart';
 import 'package:loka/views/apartement.view.dart';
 import 'package:loka/views/filter.view.dart';
 import 'package:loka/views/home.view.dart';
@@ -9,6 +10,8 @@ import 'package:loka/views/authentifications/login.view.dart';
 import 'package:loka/views/authentifications/register.view.dart';
 import 'package:loka/controllers/auth.provider.controller.dart';
 import 'package:loka/views/journals/journal.item.view.dart';
+import 'package:loka/views/mymoins.view.dart';
+import 'package:loka/views/payement.method.view.dart';
 import 'package:loka/views/profil.view.dart';
 import 'package:loka/views/welcome.view.dart';
 import 'firebase_options.dart';
@@ -47,6 +50,9 @@ class EntryApp extends StatelessWidget {
           ApartementView.routeName : (content) => const ApartementView(),
           FilterView.routeName : (content) => const FilterView(),
           ProfilView.routeName : (content) => const ProfilView(),
+          MyCoinsView.routeName : (content) => const MyCoinsView(),
+          AddCoinView.routeAddCoinView : (content) => const AddCoinView(),
+          PayementMethodView.routeName : (content) => const PayementMethodView(),
         },
         initialRoute: RoutePage.routeName,
       ),

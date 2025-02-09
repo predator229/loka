@@ -15,10 +15,12 @@ abstract class BaseAuth {
   Future<void> signOut();
   bool get isNewUser;
   UserAuthentificate get userAuthentificate;
+  set userAuthentificate(UserAuthentificate auth);
 }
 
 class Auth implements BaseAuth {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  UserAuthentificate _userAuthentificate = UserAuthentificate( coins:3500, typeUser: SettingsClass().typeUser[2], name: "Damien", email: "damienzipadonou@gmail.com", phoneNumber: "+40736141740", imgPath: "images/damien.jpeg");
 
   @override
   bool get isNewUser {
@@ -27,10 +29,14 @@ class Auth implements BaseAuth {
 
   @override
   UserAuthentificate get userAuthentificate {
-    return UserAuthentificate(typeUser: SettingsClass().typeUser[2], name: "Damien", email: "damienzipadonou@gmail.com", phoneNumber: "+40736141740", imgPath: "images/damien.jpeg"); //ici a retourner avec l'api
+    return _userAuthentificate; //ici a retourner avec l'api
   }
 
-    @override
+  set userAuthentificate(UserAuthentificate user) {
+    _userAuthentificate = user;
+  }
+
+  @override
   Stream<User?> get onAuthStatusChanged {
     return _firebaseAuth.authStateChanges();
   }

@@ -1,5 +1,7 @@
 
 import 'package:flutter/material.dart';
+import 'package:loka/controllers/auth.provider.controller.dart';
+import 'package:loka/models/auth.class.dart';
 import 'package:loka/models/settings.class.dart';
 
 class ApartementView extends StatefulWidget {
@@ -10,7 +12,7 @@ class ApartementView extends StatefulWidget {
   State<ApartementView> createState() => _ApartementViewState();
 }
 
-class _ApartementViewState extends State<ApartementView> {
+class _ApartementViewState extends State<ApartementView> with SingleTickerProviderStateMixin{
 
   int currentImgIndex = 0;
   bool showMoreDescription = false;
@@ -19,11 +21,19 @@ class _ApartementViewState extends State<ApartementView> {
   bool showMoreServices = false;
   bool _isExpanded = true;
 
+  late BaseAuth auth;
+
   bool displayAllPicture = false;
 
   @override
   void initState() {
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    auth = AuthProviders.of(context).auth;
   }
 
   @override
@@ -222,7 +232,6 @@ if (displayAllPicture)
   Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      // Bouton pour fermer la vue des images
       Align(
         alignment: Alignment.centerRight,
         child: IconButton(
@@ -532,7 +541,7 @@ if (displayAllPicture)
                                 child: Row(
                                   children: [
                                     Padding(
-                                      padding: const EdgeInsets.only(right: 8.0),
+                                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
                                       child: Icon(Icons.group_rounded),
                                     ),
                                     Text("Il y a ${apartentCard.nbrNeightbord} voisins proche de chez vous",),

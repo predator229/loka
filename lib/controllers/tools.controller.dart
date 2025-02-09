@@ -7,7 +7,6 @@ import 'package:loka/models/settings.class.dart';
 
 class ToolsController {
   
-
   Widget buildProgressIndicator({required int nbr, int max_=3, withPadding=true}) {
     List<Widget> toReturn = [];
     for (int i = 0; i < nbr; i++) { toReturn.add(_oneProgressContainer(color : SettingsClass().progressBGC, withPadding : withPadding)); }
@@ -88,15 +87,15 @@ class ToolsController {
     );
   }
 
-  Widget buildDividerWithOr() {
+  Widget buildDividerWithOr({String text=""}) {
     return Row(
       children: [
         Expanded(
           child: Container(height: 1, color: Colors.grey),
         ),
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8.0),
-          child: Text('OR'),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Text( text ?? 'OR'),
         ),
         Expanded(
           child: Container(height: 1, color: Colors.grey),

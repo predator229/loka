@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:loka/controllers/auth.provider.controller.dart';
 import 'package:loka/models/auth.class.dart';
@@ -54,6 +53,8 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
   TypeApartment _selectedType = SettingsClass().typesApartments[0];
   int _selectedTypeJournal = 0;
   late dynamic activJournal;
+
+  // late Orientation _orientation;
 
   late List<ApartmentCard> apartments = List<ApartmentCard>.generate(
     20,
@@ -126,7 +127,6 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
   late List<ApartmentCard> apartmentsFiltered;
   late List<JournalCard> journalCardFiltered;
   late List<ApartmentCard> apartmentsFoavorite;
-  late TabController _tabController = TabController(length: 3, vsync: this);
 
   int _currentIndex = 0;
 
@@ -174,16 +174,13 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
   @override
   void dispose() {
     _timer.cancel();
-    _tabController.dispose();
     super.dispose();
   }
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     auth = AuthProviders.of(context).auth;
     homePageSee = auth.isNewUser;
-    _tabController = TabController(length: 3, vsync: this);
   }
 
   @override
@@ -312,16 +309,17 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
   _buildCurrentPage (){
     Widget toReturn = Container();
     switch (_currentIndex) {
-      case 0: toReturn = _buildHomePage(); break;
+      case 0: toReturn = MediaQuery.of(context).orientation == Orientation.portrait ? _buildHomePagePortrait() :_buildHomePageLandScape(); break;
       case 1: toReturn = _buildFavoritePage(); break;
       case 2: toReturn = _buildJournal(); break;
-      case 3: toReturn = _buildProfile(); break;
+      case 3: toReturn = MediaQuery.of(context).orientation == Orientation.portrait ? _buildProfilPortrait() :  _buildProfilLandScape(); break;
+
     }
     return toReturn;
   }
 
   // Wifgets
-   Widget _buildHomePage (){
+   Widget _buildHomePagePortrait (){
     return Column(
         mainAxisSize: MainAxisSize.max,
         children: [
@@ -361,6 +359,57 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
         ],
       );
   }
+
+     Widget _buildHomePageLandScape (){
+      return Column(
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          Expanded(
+            child: ListView(
+              padding: EdgeInsets.zero,
+              shrinkWrap: true, 
+              children:[
+                _buildHead (),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 40.0),
+                  child: SizedBox(
+                    height: 40,
+                    width: MediaQuery.of(context).size.width,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: typesApartments.length,
+                      itemBuilder: (context, index) {
+                        return _buildFilter(typesApartments[index]);
+                      },
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: SizedBox(
+                    child: ListView.builder(
+                      padding: EdgeInsets.zero,
+                      shrinkWrap: true, 
+                      itemCount: apartmentsFiltered.length,
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 20.0),
+                          child: InkWell(
+                            onTap: (){
+                              Navigator.of(context).pushNamed(ApartementView.routeName, arguments: apartmentsFiltered[index]);
+                            },
+                            child:_buildApartmentItem(apartmentsFiltered[index]),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      );
+    }
 
   Widget _buildFavoritePage (){
     return SafeArea(
@@ -586,7 +635,7 @@ Widget _buildItemList (ProfilMenu profil) {
 
 }
 
-  Widget _buildProfile() {
+  Widget _buildProfilPortrait() {
      return Column(
         mainAxisSize: MainAxisSize.max,
         children: [
@@ -609,6 +658,28 @@ Widget _buildItemList (ProfilMenu profil) {
         ],
       );
   }
+       Widget _buildProfilLandScape (){
+      return Column(
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          Expanded(
+            child: ListView(
+              padding: EdgeInsets.zero,
+              shrinkWrap: true, 
+              children:[
+                _buildHeadProfile (),
+                SizedBox(height: 30,),
+                for (var item in SettingsClass().profilsMenu)
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
+                  child: _buildItemList (item),
+                ),
+                ],
+            ),
+          ),
+        ],
+      );
+    }
 
   Stack _buildHeadProfile(){
     return Stack(
@@ -630,11 +701,11 @@ Widget _buildItemList (ProfilMenu profil) {
           ),
         ),
         Positioned(
-          top: 100,
-          right: 30,
+          top: 70,
+          right: 10,
           child: Container(
-            width: MediaQuery.of(context).size.width*2/3,
-            height: (MediaQuery.of(context).size.width*2/3 > 277 ? 277 : MediaQuery.of(context).size.width*2/3),
+            width: MediaQuery.of(context).size.width*2/3 + 100,
+            height: (MediaQuery.of(context).size.width*2/3 > 277 ? 277 : MediaQuery.of(context).size.width*2/3) + 100,
             decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
@@ -650,11 +721,11 @@ Widget _buildItemList (ProfilMenu profil) {
           ),
         ),
         Positioned(
-          top: 55,
-          left: -56,
+          top: 50,
+          left: -100,
           child: Container(
-            width: MediaQuery.of(context).size.width*2/3,
-            height: (MediaQuery.of(context).size.width*2/3 > 277 ? 277 : MediaQuery.of(context).size.width*2/3),
+            width: MediaQuery.of(context).size.width*2/3 + 100,
+            height: (MediaQuery.of(context).size.width*2/3 > 277 ? 277 : MediaQuery.of(context).size.width*2/3) + 100,
             decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
@@ -754,7 +825,7 @@ Widget _buildItemList (ProfilMenu profil) {
     );
   }
   Stack _buildHead (){
-    return Stack(
+    return  Stack(
       children: [
         Container(
           width: MediaQuery.of(context).size.width,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:loka/views/mymoins.view.dart';
 import 'package:loka/views/profil.view.dart';
 
 class SettingsClass {
@@ -46,12 +47,19 @@ class SettingsClass {
 
   List<ProfilMenu> profilsMenu = [
     ProfilMenu(id: 1, title: 'Informations personnelles', icon: Icons.person, routeName: ProfilView.routeName),
-    ProfilMenu(id: 2, title: 'Mes pièces', icon: Icons.monetization_on_outlined),
+    ProfilMenu(id: 2, title: 'Mes pièces', icon: Icons.monetization_on_outlined, routeName: MyCoinsView.routeName),
     ProfilMenu(id: 3, title: 'Paramètres', icon: Icons.settings),
     ProfilMenu(id: 4, title: 'Aide', icon: Icons.report_gmailerrorred),
     ProfilMenu(id: 4, title: 'Protection des données (RGPD)', icon: Icons.private_connectivity_sharp),
     ProfilMenu(id: 5, title: 'Conditions d’utilisations', icon: Icons.filter_none_sharp),
     ProfilMenu(id: 6, title: 'Déconnection', isLogout: true,),
+  ];
+
+  List<PayementMethod> payementMethods = [
+    PayementMethod(id: 1, title: 'Mobile money', icon: Icons.sd_card, routeName: ProfilView.routeName),
+    PayementMethod(id: 2, title: 'Carte bancaire', icon: Icons.credit_card_outlined, routeName: MyCoinsView.routeName),
+    // PayementMethod(id: 3, title: 'Visa', assetPath: "images/visa.png"),
+    // PayementMethod(id: 4, title: 'Mastercard', assetPath: "images/mastercard.png"),
   ];
 
   List<TypeUser> typeUser = [
@@ -196,9 +204,14 @@ class UserAuthentificate {
   String? email;
   String? phoneNumber;
   String? name;
+  String? surname;
   String? imgPath;
   TypeUser typeUser;
-  UserAuthentificate({this.email, this.imgPath, this.name, this.phoneNumber, required this.typeUser, this.id});
+  double coins;
+  SelectedPayement? selectedPayementMethod;
+  List<CardModel> ? cards;
+  List<Mobil> ? mobils;
+  UserAuthentificate({required this.coins, this.email, this.imgPath, this.name, this.phoneNumber, required this.typeUser, this.id, this.selectedPayementMethod, this.cards});
 }
 
 class TypeUser{
@@ -207,4 +220,40 @@ class TypeUser{
   String? description;
 
   TypeUser({ required this.id, required this.title, this.description});
+}
+
+class PayementMethod {
+  int id;
+  String title;
+  String? description;
+  IconData? icon;
+  String? assetPath;
+  String? routeName;
+  PayementMethod({this.icon, this.assetPath, required this.id, required this.title, this.description, this.routeName});
+}
+
+class CardModel{
+  int id;
+  String digits;
+  String title;
+  String expiration;
+  String cvv;
+
+  CardModel({required this.id, required this.digits, required this.title, required this.expiration, required this.cvv});
+}
+
+class Mobil{
+  int id;
+  String digits;
+  String indicatif;
+  String title;
+  Mobil({required this.id, required this.digits, required this.title, required this.indicatif});
+}
+
+class SelectedPayement{
+  int id;
+  String title;
+  Mobil? mobil;
+  Card? card;
+  SelectedPayement({required this.id, required this.title, this.mobil, this.card});
 }
