@@ -198,6 +198,9 @@ class _LoginViewState extends State<LoginView> {
                             }
                           },
                           keyboardType: TextInputType.number,
+ 
+inputFormatters: [ FilteringTextInputFormatter.digitsOnly, ],
+
                           textAlign: TextAlign.center,
                           style: const TextStyle(fontFamily: "Figtree",
                             fontSize: 20,

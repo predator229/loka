@@ -299,6 +299,9 @@ class _RegisterViewState extends State<RegisterView> {
                             }
                           },
                           keyboardType: TextInputType.number,
+ 
+inputFormatters: [ FilteringTextInputFormatter.digitsOnly, ],
+
                           textAlign: TextAlign.center,
                           style: const TextStyle(fontFamily: "Figtree",
                             fontSize: 20,

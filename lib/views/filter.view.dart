@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:loka/models/settings.class.dart';
 
 class FilterView extends StatefulWidget {
@@ -136,6 +137,7 @@ class _FilterViewState extends State<FilterView> {
                                               }
                                             },
                                             keyboardType: TextInputType.number,
+                                            inputFormatters: [ FilteringTextInputFormatter.digitsOnly, ],
                                             decoration: InputDecoration(
                                               contentPadding: EdgeInsets.all(10),
                                               border: OutlineInputBorder(
@@ -178,6 +180,7 @@ class _FilterViewState extends State<FilterView> {
                                               }
                                             },
                                             keyboardType: TextInputType.number,
+                                            inputFormatters: [ FilteringTextInputFormatter.digitsOnly, ],
                                             decoration: InputDecoration(
                                               contentPadding: EdgeInsets.all(10),
                                               border: OutlineInputBorder(
@@ -311,6 +314,9 @@ class _FilterViewState extends State<FilterView> {
                                 child: TextFormField(
                                   controller: _nbrChambreController,
                                   keyboardType: TextInputType.number,
+ 
+inputFormatters: [ FilteringTextInputFormatter.digitsOnly, ],
+
                                   textAlign: TextAlign.center,
                                   decoration: InputDecoration(
                                     border: InputBorder.none,
@@ -406,6 +412,9 @@ class _FilterViewState extends State<FilterView> {
                                 child: TextFormField(
                                   controller: _nbrSalonControler,
                                   keyboardType: TextInputType.number,
+ 
+inputFormatters: [ FilteringTextInputFormatter.digitsOnly, ],
+
                                   textAlign: TextAlign.center,
                                   decoration: InputDecoration(
                                     border: InputBorder.none,
@@ -564,6 +573,9 @@ class _FilterViewState extends State<FilterView> {
                                               }
                                             },
                                             keyboardType: TextInputType.number,
+ 
+inputFormatters: [ FilteringTextInputFormatter.digitsOnly, ],
+
                                             decoration: InputDecoration(
                                               contentPadding: EdgeInsets.all(10),
                                               border: OutlineInputBorder(
@@ -606,6 +618,9 @@ class _FilterViewState extends State<FilterView> {
                                               }
                                             },
                                             keyboardType: TextInputType.number,
+ 
+inputFormatters: [ FilteringTextInputFormatter.digitsOnly, ],
+
                                             decoration: InputDecoration(
                                               contentPadding: EdgeInsets.all(10),
                                               border: OutlineInputBorder(
@@ -811,6 +826,9 @@ class _FilterViewState extends State<FilterView> {
                                                   }
                                                 },
                                                 keyboardType: TextInputType.number,
+ 
+inputFormatters: [ FilteringTextInputFormatter.digitsOnly, ],
+
                                                 decoration: InputDecoration(
                                                   contentPadding: EdgeInsets.all(10),
                                                   border: OutlineInputBorder(

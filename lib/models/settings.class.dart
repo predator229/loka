@@ -251,9 +251,7 @@ class Mobil{
 }
 
 class SelectedPayement{
-  int id;
-  String title;
   Mobil? mobil;
-  Card? card;
-  SelectedPayement({required this.id, required this.title, this.mobil, this.card});
+  CardModel? card;
+  SelectedPayement({this.mobil, this.card});
 }

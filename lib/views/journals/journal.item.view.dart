@@ -1,7 +1,10 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:loka/controllers/auth.provider.controller.dart';
+import 'package:loka/models/auth.class.dart';
 import 'package:loka/models/settings.class.dart';
+import 'package:loka/views/apartement.view.dart';
 
 class JournalItem extends StatefulWidget {
   static const String routeName = '/journal-item';
@@ -11,10 +14,26 @@ class JournalItem extends StatefulWidget {
   State<JournalItem> createState() => _JournalItemState();
 }
 
-class _JournalItemState extends State<JournalItem> {
+class _JournalItemState extends State<JournalItem> with SingleTickerProviderStateMixin {
 
+  late BaseAuth auth;
   bool _isExpanded = true;
   int currentImage = 0;
+
+  @override
+  void initState() {
+    super.initState();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        auth = AuthProviders.of(context).auth;
+      });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    auth = AuthProviders.of(context).auth;
+  }
+
   @override
   Widget build(BuildContext context) {
     dynamic args = ModalRoute.of(context)!.settings.arguments;
@@ -178,7 +197,14 @@ class _JournalItemState extends State<JournalItem> {
                       mainAxisSize: MainAxisSize.max,
                       children: [
                         TextButton(
-                          onPressed: (){},
+                          onPressed: (){
+                            if (auth.userAuthentificate.coins <= journalCard.apartmentCard.crownPoints){
+                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Vous n'avez pas assez de pièces pour voir cet appartement. Veuillez recharger votre compte.")));
+                              return;
+                            }
+                            setState(() { auth.userAuthentificate.coins -= journalCard.apartmentCard.crownPoints; });
+                            Navigator.of(context).pushNamed(ApartementView.routeName, arguments: journalCard.apartmentCard);
+                          },
                           child: Row(
                             children: [
                               Text("Voir tous les detaills", style: TextStyle(fontFamily: "Figtree",color: SettingsClass().bottunColor),),

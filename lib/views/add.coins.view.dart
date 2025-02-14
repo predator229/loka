@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -7,6 +8,7 @@ import 'package:loka/controllers/tools.controller.dart';
 import 'package:loka/models/auth.class.dart';
 import 'package:loka/models/country.class.dart';
 import 'package:loka/models/settings.class.dart';
+import 'package:loka/views/home.view.dart';
 import 'package:loka/views/payement.method.view.dart';
 
 class AddCoinView extends StatefulWidget {
@@ -71,28 +73,166 @@ class _AddCoinViewState extends State<AddCoinView> {
   ];
 
   final TextEditingController _nbrChambreController = TextEditingController();
-  
   late BaseAuth auth;
+  int currentStep = 0;
+  double evoluatingWidth =  0.0;
+  late Timer _timer;
 
   @override
   void initState() {
     _nbrChambreController.text = "100";
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   auth = AuthProviders.of(context).auth;
-    //   _phoneNumber.text = "";
-    // });
+      evoluatingWidth = 0.0;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      auth = AuthProviders.of(context).auth;
+      // _phoneNumber.text = "";
+        // _startProgressAnimation();
+    });
 
+  }
+
+  void _startProgressAnimation() {
+    final maxSize = MediaQuery.of(context).size.width - 50;
+    const increment = 20.0;
+    const duration = Duration(milliseconds: 500);
+
+    _timer = Timer.periodic(duration, (timer) {
+      setState(() {
+        evoluatingWidth += increment;
+        if (evoluatingWidth >= maxSize) {
+          evoluatingWidth = maxSize;
+          if (currentStep == 2){
+            _timer.cancel();
+            Navigator.of(context).pushReplacementNamed(HomeView.routeName);
+          }
+          if (currentStep == 1){
+            auth.userAuthentificate.coins = auth.userAuthentificate.coins + double.parse(_nbrChambreController.text);
+            currentStep = 2;
+          }
+          evoluatingWidth = 0.0;
+        }
+      });
+    });
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     auth = AuthProviders.of(context).auth;
-
   }
 
   @override
   Widget build(BuildContext context) {
+    return whoIhaveToReturn();
+  }
+
+  Widget whoIhaveToReturn () {
+    var toReturn = Container();
+    switch (currentStep)  {
+      case 1:
+      case 2:
+        return firstConnection();
+    }
+    return NotPaidYet();
+  }
+
+    Widget firstConnection() {
+    return Scaffold(
+      body: Container(
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
+        color: Colors.white,
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(flex: 1, child: Container()),
+            Expanded(
+              flex: 3,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Image.asset( currentStep == 2 ?  "images/preocced.gif" : "images/process_payement.png", width: 400),
+                  Column(
+                    children: [
+                      Text(
+                        currentStep == 1 ? "Veuillez patienter" :"Recharge effectuée !",
+                        style: TextStyle(fontFamily: "Figtree",
+                            fontSize: 24,
+                            fontWeight: FontWeight.w700,
+                            color: const Color.fromARGB(255, 11, 11, 11)),
+                      ),
+                      if (currentStep == 2)
+                      Wrap(
+                          spacing: 10.0,
+                          runSpacing: 20.0,
+                          alignment: WrapAlignment.start,
+                        children: [
+                          Text(
+                            "${_nbrChambreController.text} pièces ",
+                            style: TextStyle(fontFamily: "Figtree",
+                                fontSize: 32, color: SettingsClass().color),
+                          ),
+                          Text(
+                            "reçu !",
+                            style: TextStyle(fontFamily: "Figtree",
+                                fontSize: 32,
+                                color: const Color.fromARGB(255, 11, 11, 11),
+                                fontWeight: FontWeight.w700,
+                                ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              flex: 1,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 30),
+                  if (currentStep == 2)
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 500),
+                    height: 5,
+                    width: evoluatingWidth,
+                    decoration: BoxDecoration(
+                      color: SettingsClass().color,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  if (currentStep == 2)
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() { Navigator.of(context).pushReplacementNamed(HomeView.routeName); });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: SettingsClass().bottunColor,
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size(double.infinity, 50),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: const Text('Aller à l\'accueil'),
+                  ),
+                  const SizedBox(height: 30),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+
+  Scaffold NotPaidYet (){
     return Scaffold(
       appBar: AppBar(
         leading: Container(
@@ -174,6 +314,7 @@ class _AddCoinViewState extends State<AddCoinView> {
                                 child: TextFormField(
                                   controller: _nbrChambreController,
                                   keyboardType: TextInputType.number,
+                                  inputFormatters: [ FilteringTextInputFormatter.digitsOnly, ],
                                   textAlign: TextAlign.center,
                                   decoration: InputDecoration(
                                     border: InputBorder.none,
@@ -252,17 +393,208 @@ class _AddCoinViewState extends State<AddCoinView> {
                   mainAxisSize: MainAxisSize.max,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    if (auth.userAuthentificate.selectedPayementMethod == null)
                     InkWell(
                       onTap: () {
-                        Navigator.of(context).pushNamed(PayementMethodView.routeName);
+                          // Navigator.of(context).pushNamed(PayementMethodView.routeName);
+                        showModalBottomSheet( 
+                          context: context,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                          ),
+                          builder: (BuildContext context) {
+                            return Container(
+                              padding: const EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                              ),
+                              child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Expanded(
+                                        child: ListView(
+                                          children: [
+                                            Text(
+                                              "Recharger par",
+                                              style: TextStyle(
+                                                fontSize: 30,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 10),
+                                            Text("Selectionnez le moyen de recharge", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400, fontFamily: "Figtree"),),
+                                            const SizedBox(height: 20),
+                                            for (int i = 0; i < SettingsClass().payementMethods.length; i++)
+                                              ListTile(
+                                                leading:  SettingsClass().payementMethods[i].assetPath != null ? Image.asset(SettingsClass().payementMethods[i].assetPath!, width: 30) : (SettingsClass().payementMethods[i].icon != null ? Icon(SettingsClass().payementMethods[i].icon,) : Icon(Icons.arrow_forward_ios_sharp, color: Colors.blue)),
+                                                title: Column(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                  mainAxisSize: MainAxisSize.max,
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Row(
+                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                      mainAxisSize: MainAxisSize.max,
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        Text(SettingsClass().payementMethods[i].title),
+                                                      ],
+                                                    ),
+                                                    Column(
+                                                      mainAxisSize: MainAxisSize.min,
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        if (i == 0 && auth.userAuthentificate.mobils != null)
+                                                        for ( int j=0; j< auth.userAuthentificate.mobils!.length; j++)
+                                                        Row(
+                                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                          mainAxisSize: MainAxisSize.max,
+                                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                                          children: [
+                                                            Expanded(
+                                                              child: Padding(
+                                                                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                                                child: Container(
+                                                                  padding: EdgeInsets.only(left: 10),
+                                                                  decoration: BoxDecoration(
+                                                                    color: Colors.grey[200],
+                                                                    borderRadius: BorderRadius.circular(10),
+                                                                  ),
+                                                                  child: Row(
+                                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                    mainAxisSize: MainAxisSize.max,
+                                                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                                                    children: [
+                                                                      Text(auth.userAuthentificate.mobils![j].digits),
+                                                                      Checkbox(
+                                                                        value: auth.userAuthentificate.selectedPayementMethod != null && auth.userAuthentificate.selectedPayementMethod!.mobil != null && auth.userAuthentificate.selectedPayementMethod!.mobil!.id == auth.userAuthentificate.mobils![j].id,
+                                                                        onChanged: (bool? value) {
+                                                                          setState(() { 
+                                                                            SelectedPayement selectedPayement = SelectedPayement( mobil: auth.userAuthentificate.mobils![j],);
+                                                                            auth.userAuthentificate.selectedPayementMethod = selectedPayement;
+                                                                          });
+                                                                        },
+                                                                        activeColor: SettingsClass().bottunColor,
+                                                                        side: BorderSide(width: 2),
+                                                                        shape: RoundedRectangleBorder(
+                                                                          borderRadius: BorderRadius.circular(5),
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        if (i != 0 && auth.userAuthentificate.cards != null)
+                                                        for ( int j=0; j< auth.userAuthentificate.cards!.length; j++)
+                                                        Row(
+                                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                          mainAxisSize: MainAxisSize.max,
+                                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                                          children: [
+                                                            Expanded(
+                                                              child: Padding(
+                                                                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                                                child: Container(
+                                                                  padding: EdgeInsets.only(left:10),
+                                                                  decoration: BoxDecoration(
+                                                                    color: Colors.grey[200],
+                                                                    borderRadius: BorderRadius.circular(10),
+                                                                  ),
+                                                                  child: Row(
+                                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                    mainAxisSize: MainAxisSize.max,
+                                                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                                                    children: [
+                                                                      Text(
+                                                                        auth.userAuthentificate.cards![j].digits.split('').asMap().entries.map((entry) {
+                                                                          int each = entry.key;
+                                                                          String digit = entry.value;
+                                                                          return each < 15 ? "*" : digit;
+                                                                        }).join(),
+                                                                      ),
+                                                                      Checkbox(
+                                                                        value: auth.userAuthentificate.selectedPayementMethod != null && auth.userAuthentificate.selectedPayementMethod!.card != null && auth.userAuthentificate.selectedPayementMethod!.card!.id == auth.userAuthentificate.cards![j].id,
+                                                                        onChanged: (bool? value) {
+                                                                          setState(() { 
+                                                                            SelectedPayement selectedPayement = SelectedPayement( card: auth.userAuthentificate.cards![j],);
+                                                                            auth.userAuthentificate.selectedPayementMethod = selectedPayement;
+                                                                          });
+                                                                        },
+                                                                        activeColor: SettingsClass().bottunColor,
+                                                                        side: BorderSide(width: 2),
+                                                                        shape: RoundedRectangleBorder(
+                                                                          borderRadius: BorderRadius.circular(5),
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ],
+                                                    ),
+
+                                                  ],
+                                                ),
+                                                onTap: () { setState(() {
+                                                  // isOpenedOptionsPayment[i] = !isOpenedOptionsPayment[i];
+                                                }); 
+                                              },
+                                              ),
+                                          ],
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(bottom: 10.0),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          mainAxisSize: MainAxisSize.max,
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          children: [
+                                            ElevatedButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                                Navigator.of(context).pushNamed(PayementMethodView.routeName);
+                                              },
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: SettingsClass().bottunColor,
+                                                  foregroundColor: Colors.white,
+                                                  shape: RoundedRectangleBorder( borderRadius: BorderRadius.circular(10), ),
+                                                ),
+                                                child: const Text("Ajouter un nouveau moyen de payement", style: TextStyle(fontFamily: "Figtree",fontSize: 14, fontWeight: FontWeight.w600),),
+                                              ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                ),
+                              );
+                          });
                       },
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         mainAxisSize: MainAxisSize.max,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Text("Choississez votre moyen de recharge", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400, fontFamily: "Figtree"),),
+                          if (auth.userAuthentificate.selectedPayementMethod != null &&  auth.userAuthentificate.selectedPayementMethod!.mobil != null)
+                            Text('${auth.userAuthentificate.selectedPayementMethod!.mobil!.indicatif} ${auth.userAuthentificate.selectedPayementMethod!.mobil!.digits}', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400, fontFamily: "Figtree"),),
+                          if (auth.userAuthentificate.selectedPayementMethod != null &&  auth.userAuthentificate.selectedPayementMethod!.card != null)
+                            Text(
+                              auth.userAuthentificate.selectedPayementMethod!.card!.digits.split('').asMap().entries.map((entry) {
+                                int each = entry.key;
+                                String digit = entry.value;
+                                return each < 15 ? "*" : digit;
+                              }).join(),
+                               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400, fontFamily: "Figtree"),),
+                          if (auth.userAuthentificate.selectedPayementMethod == null)
+                            Text("Choississez votre moyen de recharge", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400, fontFamily: "Figtree"),),
                           Container(
                             height: 30,
                             width: 30,
@@ -303,7 +635,14 @@ class _AddCoinViewState extends State<AddCoinView> {
                         children: [
                           Expanded(
                             child: ElevatedButton(
-                              onPressed: (){},
+                              onPressed: (){
+                                if (auth.userAuthentificate.selectedPayementMethod == null){
+                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Veuillez choisir un moyen de payement")));
+                                  return;
+                                }
+                                setState(() { currentStep = 1; });
+                                _startProgressAnimation();
+                              },
                               style: ElevatedButton.styleFrom(
                                 padding: EdgeInsets.symmetric(vertical: 20),
                                 backgroundColor: SettingsClass().bottunColor,
@@ -325,7 +664,6 @@ class _AddCoinViewState extends State<AddCoinView> {
       ),
     );
   }
-
   bool _isNumeric(String str) {
     if (str.isEmpty) {
       return false;
@@ -385,74 +723,5 @@ class _AddCoinViewState extends State<AddCoinView> {
     );
   }
 
-
-  // showModalBottomSheet(
-  //                         context: context,
-  //                         shape: RoundedRectangleBorder(
-  //                           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-  //                         ),
-  //                         builder: (BuildContext context) {
-  //                           return Container(
-  //                             padding: const EdgeInsets.all(20),
-  //                             decoration: BoxDecoration(
-  //                               color: Colors.white,
-  //                               borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-  //                             ),
-  //                             child: Column(
-  //                                 mainAxisSize: MainAxisSize.min,
-  //                                 crossAxisAlignment: CrossAxisAlignment.start,
-  //                                 children: [
-  //                                   Text(
-  //                                     "Recharger par",
-  //                                     style: TextStyle(
-  //                                       fontSize: 18,
-  //                                       fontWeight: FontWeight.bold,
-  //                                     ),
-  //                                   ),
-  //                                   const SizedBox(height: 10),
-  //                                   Text("Selectionnez le moyen de recharge", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400, fontFamily: "Figtree"),),
-  //                                   for (int i = 0; i < SettingsClass().payementMethods.length; i++)
-  //                                     ListTile(
-  //                                       leading: 
-  //                                       SettingsClass().payementMethods[i].assetPath != null ? Image.asset(SettingsClass().payementMethods[i].assetPath!, width: 30) : (SettingsClass().payementMethods[i].icon != null ? Icon(SettingsClass().payementMethods[i].icon,) : Icon(Icons.arrow_forward_ios_sharp, color: Colors.blue)),
-  //                                       title: Column(
-  //                                         children: [
-  //                                           Row(
-  //                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //                                             mainAxisSize: MainAxisSize.max,
-  //                                             crossAxisAlignment: CrossAxisAlignment.center,
-  //                                             children: [
-  //                                               Text(SettingsClass().payementMethods[i].title),
-  //                                               ElevatedButton(
-  //                                                   onPressed: displayDialogNewPayementMode(context, i),
-  //                                                   style: ElevatedButton.styleFrom(
-  //                                                     backgroundColor: SettingsClass().bottunColor,
-  //                                                     foregroundColor: Colors.white,
-  //                                                   ),
-  //                                                   child: const Text("+", style: TextStyle(fontFamily: "Figtree",fontSize: 14, fontWeight: FontWeight.w600),),
-  //                                                 ),
-  //                                               // Icon(isOpenedOptionsPayment[i] != null && isOpenedOptionsPayment[i] ? Icons.expand_less_sharp : Icons.expand_more_outlined,),
-  //                                             ],
-  //                                           ),
-  //                                           Row(
-  //                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //                                             mainAxisSize: MainAxisSize.max,
-  //                                             crossAxisAlignment: CrossAxisAlignment.center,
-  //                                             children: [
-  //                                             ],
-  //                                           ),
-  //                                         ],
-  //                                       ),
-  //                                       onTap: () {
-  //                                         Navigator.pop(context); // Ferme la Bottom Sheet
-  //                                         isOpenedOptionsPayment[i] = !isOpenedOptionsPayment[i];
-  //                                       },
-  //                                     ),
-  //                                 ],
-  //                               ),
-  //                             );
-  //                         });
-
 }
 
-//with SingleTickerProviderStateMixin{

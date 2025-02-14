@@ -17,7 +17,7 @@ class PayementMethodView extends StatefulWidget {
 
 class _PayementMethodViewState extends State<PayementMethodView> {
   
-    late BaseAuth auth;
+  late BaseAuth auth;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   late Country selectedCountry;
@@ -27,12 +27,13 @@ class _PayementMethodViewState extends State<PayementMethodView> {
   final _expiratingMonth = TextEditingController();
   final _cvv = TextEditingController();
   final _cardName = TextEditingController();
-  List<bool> isOpenedOptionsPayment = List<bool>.filled(SettingsClass().payementMethods.length, false);
+  List<bool> isOpenedOptionsPayment = List<bool>.filled(SettingsClass().payementMethods.length, true);
 
   void initState() {
     super.initState();
     loadComboBoc();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      auth = AuthProviders.of(context).auth;
     });
   }
   
@@ -54,7 +55,7 @@ class _PayementMethodViewState extends State<PayementMethodView> {
             borderRadius: BorderRadius.circular(10),
           ),
           child: IconButton(
-            onPressed: (){ Navigator.of(context).pop(); },
+            onPressed: (){  Navigator.of(context).pop(); },
             icon: Icon(Icons.cancel, color: Colors.grey, size: 41),
           ),
         ),
@@ -66,125 +67,161 @@ class _PayementMethodViewState extends State<PayementMethodView> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Text(
-                "Recharger par",
-                style: TextStyle(
-                  fontSize: 30,
-                  fontWeight: FontWeight.bold,
+              Expanded(
+                child: ListView(
+                  children: [
+                    Text(
+                      "Recharger par",
+                      style: TextStyle(
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text("Selectionnez le moyen de recharge", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400, fontFamily: "Figtree"),),
+                    const SizedBox(height: 20),
+                    for (int i = 0; i < SettingsClass().payementMethods.length; i++)
+                      ListTile(
+                        leading:  SettingsClass().payementMethods[i].assetPath != null ? Image.asset(SettingsClass().payementMethods[i].assetPath!, width: 30) : (SettingsClass().payementMethods[i].icon != null ? Icon(SettingsClass().payementMethods[i].icon,) : Icon(Icons.arrow_forward_ios_sharp, color: Colors.blue)),
+                        title: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          mainAxisSize: MainAxisSize.max,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              mainAxisSize: MainAxisSize.max,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(SettingsClass().payementMethods[i].title),
+                                Icon(isOpenedOptionsPayment[i] != null && isOpenedOptionsPayment[i] ? Icons.expand_less_sharp : Icons.expand_more_outlined,),
+                              ],
+                            ),
+                            if (isOpenedOptionsPayment[i])
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                if (i == 0 && auth.userAuthentificate.mobils != null)
+                                for ( int j=0; j< auth.userAuthentificate.mobils!.length; j++)
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisSize: MainAxisSize.max,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Expanded(
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                        child: Container(
+                                          padding: EdgeInsets.only(left: 10),
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey[200],
+                                            borderRadius: BorderRadius.circular(10),
+                                          ),
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            mainAxisSize: MainAxisSize.max,
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            children: [
+                                              Text(auth.userAuthentificate.mobils![j].digits),
+                                              Checkbox(
+                                                value: auth.userAuthentificate.selectedPayementMethod != null && auth.userAuthentificate.selectedPayementMethod!.mobil != null && auth.userAuthentificate.selectedPayementMethod!.mobil!.id == auth.userAuthentificate.mobils![j].id,
+                                                onChanged: (bool? value) {
+                                                  setState(() { 
+                                                    SelectedPayement selectedPayement = SelectedPayement( mobil: auth.userAuthentificate.mobils![j],);
+                                                    auth.userAuthentificate.selectedPayementMethod = selectedPayement;
+                                                   });
+                                                },
+                                                activeColor: SettingsClass().bottunColor,
+                                                side: BorderSide(width: 2),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(5),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                if (i != 0 && auth.userAuthentificate.cards != null)
+                                for ( int j=0; j< auth.userAuthentificate.cards!.length; j++)
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisSize: MainAxisSize.max,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Expanded(
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                        child: Container(
+                                          padding: EdgeInsets.only(left:10),
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey[200],
+                                            borderRadius: BorderRadius.circular(10),
+                                          ),
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            mainAxisSize: MainAxisSize.max,
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                auth.userAuthentificate.cards![j].digits.split('').asMap().entries.map((entry) {
+                                                  int each = entry.key;
+                                                  String digit = entry.value;
+                                                  return each < 15 ? "*" : digit;
+                                                }).join(),
+                                              ),
+                                              Checkbox(
+                                                value: auth.userAuthentificate.selectedPayementMethod != null && auth.userAuthentificate.selectedPayementMethod!.card != null && auth.userAuthentificate.selectedPayementMethod!.card!.id == auth.userAuthentificate.cards![j].id,
+                                                onChanged: (bool? value) {
+                                                  setState(() { 
+                                                    SelectedPayement selectedPayement = SelectedPayement( card: auth.userAuthentificate.cards![j],);
+                                                    auth.userAuthentificate.selectedPayementMethod = selectedPayement;
+                                                   });
+                                                },
+                                                activeColor: SettingsClass().bottunColor,
+                                                side: BorderSide(width: 2),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(5),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisSize: MainAxisSize.max,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    ElevatedButton(
+                                      onPressed: () => displayDialogNewPayementMode(context, i),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: SettingsClass().bottunColor,
+                                          foregroundColor: Colors.white,
+                                        ),
+                                        child: const Text("+", style: TextStyle(fontFamily: "Figtree",fontSize: 14, fontWeight: FontWeight.w600),),
+                                      ),
+                                  ],
+                                ),
+                              ],
+                            ),
+
+                          ],
+                        ),
+                        onTap: () { setState(() {
+                          isOpenedOptionsPayment[i] = !isOpenedOptionsPayment[i];
+                        }); 
+                      },
+                      ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 10),
-              Text("Selectionnez le moyen de recharge", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400, fontFamily: "Figtree"),),
-              const SizedBox(height: 20),
-              for (int i = 0; i < SettingsClass().payementMethods.length; i++)
-                ListTile(
-                  leading: 
-                  SettingsClass().payementMethods[i].assetPath != null ? Image.asset(SettingsClass().payementMethods[i].assetPath!, width: 30) : (SettingsClass().payementMethods[i].icon != null ? Icon(SettingsClass().payementMethods[i].icon,) : Icon(Icons.arrow_forward_ios_sharp, color: Colors.blue)),
-                  title: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    mainAxisSize: MainAxisSize.max,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        mainAxisSize: MainAxisSize.max,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(SettingsClass().payementMethods[i].title),
-                          Icon(isOpenedOptionsPayment[i] != null && isOpenedOptionsPayment[i] ? Icons.expand_less_sharp : Icons.expand_more_outlined,),
-                        ],
-                      ),
-                      if (isOpenedOptionsPayment[i])
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (i == 0 && auth.userAuthentificate.mobils != null)
-                          for ( int j=0; j< auth.userAuthentificate.mobils!.length; j++)
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            mainAxisSize: MainAxisSize.max,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Expanded(
-                                child: Container(
-                                  padding: EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey[200],
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    mainAxisSize: MainAxisSize.max,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      Text(auth.userAuthentificate.mobils![j].digits),
-                                      IconButton(
-                                        onPressed: (){},
-                                        icon: Icon(Icons.edit, color: Colors.grey),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          if (i != 0 && auth.userAuthentificate.cards != null)
-                          for ( int j=0; j< auth.userAuthentificate.cards!.length; j++)
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            mainAxisSize: MainAxisSize.max,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Expanded(
-                                child: Container(
-                                  padding: EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey[200],
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    mainAxisSize: MainAxisSize.max,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      Text(auth.userAuthentificate.cards![j].digits),
-                                      IconButton(
-                                        onPressed: (){},
-                                        icon: Icon(Icons.edit, color: Colors.grey),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            mainAxisSize: MainAxisSize.max,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              ElevatedButton(
-                                onPressed: () => displayDialogNewPayementMode(context, i), // Utilisation d'une fonction anonyme
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: SettingsClass().bottunColor,
-                                    foregroundColor: Colors.white,
-                                  ),
-                                  child: const Text("+", style: TextStyle(fontFamily: "Figtree",fontSize: 14, fontWeight: FontWeight.w600),),
-                                ),
-                            ],
-                          ),
-                        ],
-                      ),
-
-                    ],
-                  ),
-                  onTap: () { setState(() {
-                    isOpenedOptionsPayment[i] = !isOpenedOptionsPayment[i];
-                  }); 
-                },
-                ),
             ],
           ),
       ),
@@ -254,18 +291,46 @@ class _PayementMethodViewState extends State<PayementMethodView> {
                         TextFormField(
                           controller: _digitsCard,
                           keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                            labelText: "Numero de carte",
-                            hintText: '1234 5678 9012 3456',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
+                          inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(16),
+                          TextInputFormatter.withFunction(
+                            (oldValue, newValue) {
+                              final text = newValue.text;
+                              final newText = StringBuffer();
+                              for (int i = 0; i < text.length; i++) {
+                                if (i % 4 == 0 && i != 0) {
+                                newText.write(' ');
+                                }
+                                newText.write(text[i]);
+                              }
+                              return TextEditingValue(
+                                text: newText.toString(),
+                                selection: TextSelection.collapsed(offset: newText.length),
+                              );
+                              },
                             ),
+                          ],
+                          decoration: InputDecoration(
+                          labelText: "Numero de carte",
+                          hintText: '1234 5678 9012 3456',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                           ),
                           validator: (value) {
-                            if (value!.isEmpty) {
-                              return 'Entrer votre numero de carte';
+                          if (value!.isEmpty) { return 'Entrer votre numero de carte'; }
+                          if (value.replaceAll(' ', '').length != 16) { return 'Le numero de carte doit contenir 16 chiffres.'; }
+                          var allkO = true;
+                          if (auth.userAuthentificate.cards == null) { return null; }
+                          for (var item in auth.userAuthentificate.cards!){
+                            if (item.cvv == _cvv.text && item.digits == value && item.expiration == _expiratingMonth.text){
+                              allkO = false;
+                              break;
                             }
-                            return null;
+                          }
+                          if (!allkO) { return 'Cette carte est deja enregistrer'; }
+                          return null;
                           },
                         ),
                         const SizedBox(height: 10),
@@ -276,21 +341,54 @@ class _PayementMethodViewState extends State<PayementMethodView> {
                             Expanded(
                               flex: 1,
                               child: TextFormField(
-                                controller: _expiratingMonth,
-                                keyboardType: TextInputType.number,
-                                decoration: InputDecoration(
-                                  labelText: "Date d'expiration",
-                                  hintText: 'MM/YY',
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
+                              controller: _expiratingMonth,
+                              readOnly: true,
+                              onTap: () async {
+                                DateTime? pickedDate = await showDatePicker(
+                                context: context,
+                                initialDate: DateTime.now(),
+                                firstDate: DateTime(2000),
+                                lastDate: DateTime(2100),
+                                builder: (context, child) {
+                                  return Theme(
+                                  data: Theme.of(context).copyWith(
+                                    colorScheme: ColorScheme.light(
+                                    primary: SettingsClass().bottunColor,
+                                    ),
                                   ),
-                                ),
-                                validator: (value) {
-                                  if (value!.isEmpty) {
-                                    return 'Entrer la date d\'expiration';
-                                  }
-                                  return null;
+                                  child: child!,
+                                  );
                                 },
+                                );
+                                if (pickedDate != null) {
+                                setState(() {
+                                  _expiratingMonth.text = "${pickedDate.month.toString().padLeft(2, '0')}/${pickedDate.year.toString().substring(2)}";
+                                });
+                                }
+                              },
+                              decoration: InputDecoration(
+                                labelText: "Date d'expiration",
+                                hintText: 'MM/YY',
+                                border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                return 'Entrer la date d\'expiration';
+                                }
+                                var allkO = true;
+                                if (auth.userAuthentificate.cards == null) { return null; }
+                                for (var item in auth.userAuthentificate.cards!){
+                                  if (item.cvv == _cvv.text && item.digits == _digitsCard.text && item.expiration == value){
+                                    allkO = false;
+                                    break;
+                                  }
+                                }
+                                if (!allkO) { return ''; }
+
+                                return null;
+                              },
                               ),
                             ),
                             const SizedBox(width: 10),
@@ -299,6 +397,10 @@ class _PayementMethodViewState extends State<PayementMethodView> {
                               child: TextFormField(
                                 controller: _cvv,
                                 keyboardType: TextInputType.number,
+                                inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                                  LengthLimitingTextInputFormatter(3),
+                                ],
                                 decoration: InputDecoration(
                                   labelText: "CVV",
                                   hintText: '123',
@@ -307,9 +409,17 @@ class _PayementMethodViewState extends State<PayementMethodView> {
                                   ),
                                 ),
                                 validator: (value) {
-                                  if (value!.isEmpty) {
-                                    return 'Entrer le CVV';
+                                  if (value!.isEmpty) { return 'Entrer le CVV'; }
+                                  if (value.length != 3) { return 'Le CVV doit contenir 3 chiffres.'; }
+                                  var allkO = true;
+                                  if (auth.userAuthentificate.cards == null) { return null; }
+                                  for (var item in auth.userAuthentificate.cards!){
+                                    if (item.cvv == value && item.digits == _digitsCard.text && item.expiration == _expiratingMonth.text){
+                                      allkO = false;
+                                      break;
+                                    }
                                   }
+                                  if (!allkO) { return ''; }
                                   return null;
                                 },
                               ),
@@ -319,7 +429,7 @@ class _PayementMethodViewState extends State<PayementMethodView> {
                         const SizedBox(height: 10),
                         TextFormField(
                           controller: _cardName,
-                          obscureText: true,
+                          // obscureText: true,
                           decoration: InputDecoration(
                             labelText: "Nom de la carte",
                             hintText: 'John Doe',
@@ -449,18 +559,47 @@ void loadComboBoc() async {
           child: IntrinsicHeight(
             child: TextFormField(
               controller: _phoneNumber,
-              keyboardType: TextInputType.phone,
+              keyboardType: TextInputType.number,
+              inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+              LengthLimitingTextInputFormatter(16),
+              TextInputFormatter.withFunction(
+                (oldValue, newValue) {
+                  final text = newValue.text;
+                  final newText = StringBuffer();
+                  for (int i = 0; i < text.length; i++) {
+                    if (i %3 == 0 && i != 0) {
+                    newText.write(' ');
+                    }
+                    newText.write(text[i]);
+                  }
+                  return TextEditingValue(
+                    text: newText.toString(),
+                    selection: TextSelection.collapsed(offset: newText.length),
+                  );
+                  },
+                ),
+              ],
               decoration: InputDecoration(
                 labelText: "Telephone",
-                hintText: '7000000',
+                hintText: '9000000',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
+                
               ),
               validator: (value) {
-                if (value!.isEmpty) {
-                  return 'Entrer votre numero de telephone';
+                if (value!.isEmpty) { return 'Entrer votre numero de telephone'; }
+                if (value.length <10) { return 'Le nr. de telephone doit contenir au moins 8 chiffres.'; }
+                var allkO = true;
+                if (auth.userAuthentificate.mobils == null) { return null; }
+                for (var  number in auth.userAuthentificate.mobils!){
+                  if (number.digits == value && number.indicatif == selectedCountry.dialcode){
+                    allkO = false;
+                    break;
+                  }
                 }
+                if (!allkO) { return 'Ce numero de telephone existe deja'; }
                 return null;
               },
             ),
@@ -469,6 +608,4 @@ void loadComboBoc() async {
       ],
     );
   }
-
-
 }

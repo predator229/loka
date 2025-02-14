@@ -85,6 +85,8 @@ flutter:
     - images/coins_icons.png
     - images/visa.png
     - images/mastercard.png
+    - images/process_payement.png
+    - images/preocced.gif
 
   #   - images/a_dot_ham.jpeg
 
