@@ -9,6 +9,7 @@ import 'package:loka/models/settings.class.dart';
 
 class ProfilView extends StatefulWidget {
   static const String routeName = '/profil';
+
   const ProfilView({super.key});
 
   @override
@@ -53,7 +54,12 @@ class _ProfilViewState extends State<ProfilView> with SingleTickerProviderStateM
       appBar: AppBar(
         title: Text("Mes informations personnelles", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),),
       ),
-      body: Column(
+      body: MediaQuery.of(context).orientation == Orientation.portrait ? _buildFormPortrait() : SafeArea(child: _buildFormPortraitLandScape()),
+    );
+  }
+
+  Column _buildFormPortrait(){
+    return Column(
         mainAxisAlignment: MainAxisAlignment.start,
         mainAxisSize: MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -78,8 +84,8 @@ class _ProfilViewState extends State<ProfilView> with SingleTickerProviderStateM
                       child: Stack(
                         children: [
                           ClipOval(
-                            child: Image.asset(
-                              auth.userAuthentificate.imgPath ??  "images/damien.jpeg",
+                            child: Image.network(
+                              auth.userAuthentificate.imgPath ??  "https://ui-avatars.com/api/?name=${auth.userAuthentificate.name}+${auth.userAuthentificate.surname}&background=random",
                               width: (MediaQuery.of(context).size.width / 3 > 140 ? 140 : MediaQuery.of(context).size.width/ 3) +50,
                               height: (MediaQuery.of(context).size.width / 3 > 140 ? 140 : MediaQuery.of(context).size.width/ 3) +50,
                               fit: BoxFit.cover,
@@ -223,9 +229,184 @@ class _ProfilViewState extends State<ProfilView> with SingleTickerProviderStateM
             ),
           ),
         ],
-      ),
+      );
+  } 
+
+  Widget _buildFormPortraitLandScape(){
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.max,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Expanded(
+          flex: 1,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.max,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                  width: MediaQuery.of(context).size.width/4,
+                  height: MediaQuery.of(context).size.width/4,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      width: 5,
+                      color: Color.fromARGB(255, 226, 226, 226),
+                    ),
+                  ),
+                  child: Stack(
+                    children: [
+                      ClipOval(
+                        child: Image.network(
+                          auth.userAuthentificate.imgPath ??  "https://ui-avatars.com/api/?name=${auth.userAuthentificate.name}+${auth.userAuthentificate.surname}&background=random",
+                          width: MediaQuery.of(context).size.width/4,
+                          height: MediaQuery.of(context).size.width/4,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 10,
+                        right: 0,
+                        left: 0,
+                        child: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: SettingsClass().bottunColor,
+                            border: Border.all(
+                              width: 2,
+                              color: Colors.white,
+                            ),
+                          ),
+                          child: IconButton(
+                            icon: Icon(Icons.camera_alt_outlined, color: Colors.white,),
+                            onPressed: () {},
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          flex: 2,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Expanded(
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Expanded(
+                      child: ListView(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 20.0),
+                            child: TextFormField(
+                              controller: _surnameController,
+                              decoration: InputDecoration(
+                                labelText: "Prenoms",
+                                hintText: 'Doe',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  return 'Entrer vos prenoms';
+                                }
+                                return null;
+                              },
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 20.0),
+                            child: TextFormField(
+                              controller: _nameController,
+                              decoration: InputDecoration(
+                                labelText: "Nom",
+                                hintText: 'John',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  return 'Entrer votre nom';
+                                }
+                                return null;
+                              },
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 20.0),
+                            child: TextFormField(
+                              controller: _emailController,
+                              decoration: InputDecoration(
+                                labelText: "Email (pas obligatoire)",
+                                hintText: 'John',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 50.0),
+                            child: FutureBuilder<Widget>(
+                              future: _buildFuturePhoneNumber(),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                  return CircularProgressIndicator();
+                                } else if (snapshot.hasError) {
+                                  return Text('Error: ${snapshot.error}');
+                                } else {
+                                  return snapshot.data!;
+                                }
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {},
+                            style: ElevatedButton.styleFrom(
+                              padding: EdgeInsets.symmetric(vertical: 20),
+                              backgroundColor: SettingsClass().bottunColor,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder( borderRadius: BorderRadius.circular(10), ), 
+                            ),
+                            child: Text('Sauvegarder', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Figtree"), ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+        ),
+      ],
     );
-  }
+  } 
 
 void loadComboBoc() async {
   final String response = await rootBundle.loadString('assets/countries.json');

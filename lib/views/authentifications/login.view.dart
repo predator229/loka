@@ -425,6 +425,26 @@ Future<Widget> _buildFuturePhoneNumber() async {
             child: TextFormField(
               controller: _phoneNumber,
               keyboardType: TextInputType.phone,
+              inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+              LengthLimitingTextInputFormatter(16),
+              TextInputFormatter.withFunction(
+                (oldValue, newValue) {
+                  final text = newValue.text;
+                  final newText = StringBuffer();
+                  for (int i = 0; i < text.length; i++) {
+                    if (i %3 == 0 && i != 0) {
+                    newText.write(' ');
+                    }
+                    newText.write(text[i]);
+                  }
+                  return TextEditingValue(
+                    text: newText.toString(),
+                    selection: TextSelection.collapsed(offset: newText.length),
+                  );
+                  },
+                ),
+              ],
               decoration: InputDecoration(
                 labelText: "Telephone",
                 hintText: '7000000',

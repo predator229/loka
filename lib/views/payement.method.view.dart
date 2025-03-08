@@ -1,8 +1,11 @@
 import 'dart:convert';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:loka/controllers/apis.controller.dart';
 import 'package:loka/controllers/auth.provider.controller.dart';
+import 'package:loka/controllers/root.page.controller.dart';
 import 'package:loka/models/auth.class.dart';
 import 'package:loka/models/country.class.dart';
 import 'package:loka/models/settings.class.dart';
@@ -129,7 +132,8 @@ class _PayementMethodViewState extends State<PayementMethodView> {
                                                 onChanged: (bool? value) {
                                                   setState(() { 
                                                     SelectedPayement selectedPayement = SelectedPayement( mobil: auth.userAuthentificate.mobils![j],);
-                                                    auth.userAuthentificate.selectedPayementMethod = selectedPayement;
+                                                    _selectedPayementMethod(context, selectedPayement);
+
                                                    });
                                                 },
                                                 activeColor: SettingsClass().bottunColor,
@@ -178,7 +182,7 @@ class _PayementMethodViewState extends State<PayementMethodView> {
                                                 onChanged: (bool? value) {
                                                   setState(() { 
                                                     SelectedPayement selectedPayement = SelectedPayement( card: auth.userAuthentificate.cards![j],);
-                                                    auth.userAuthentificate.selectedPayementMethod = selectedPayement;
+                                                    _selectedPayementMethod(context, selectedPayement);
                                                    });
                                                 },
                                                 activeColor: SettingsClass().bottunColor,
@@ -460,18 +464,14 @@ class _PayementMethodViewState extends State<PayementMethodView> {
                               if (_formKey.currentState!.validate()) {
                                 UserAuthentificate user = auth.userAuthentificate;
                                 if (i == 0){
-                                  Mobil newMethod = Mobil(digits: _phoneNumber.text, id: (user.mobils == null ? 1 : user.mobils!.length+1), title: "Mobile", indicatif: selectedCountry.dialcode);
+                                  Mobil newMethod = Mobil(digits: _phoneNumber.text, id: (user.mobils == null ? 1 : user.mobils!.length+1).toString(), title: "Mobile", indicatif: selectedCountry.dialcode);
                                   setState(() {
-                                    if (user.mobils == null) { user.mobils = [newMethod]; } 
-                                    else { user.mobils!.add(newMethod); }
-                                    auth.userAuthentificate = user;
+                                    _addMobilServer(context, newMethod);
                                   });
                                 }else{
-                                  CardModel newMethod = CardModel(digits: _digitsCard.text, id: (user.cards == null ? 1 : user.cards!.length+1), title: _cardName.text, expiration: _expiratingMonth.text, cvv: _cvv.text);
+                                  CardModel newMethod = CardModel(digits: _digitsCard.text, id: (user.cards == null ? 1 : user.cards!.length+1).toString(), title: _cardName.text, expiration: _expiratingMonth.text, cvv: _cvv.text);
                                   setState(() {
-                                    if (user.cards == null) { user.cards = [newMethod];} 
-                                    else { user.cards!.add(newMethod); }
-                                    auth.userAuthentificate = user;
+                                    _addCardServer(context, newMethod);
                                   });
                                 }
                                 Navigator.of(context).pop();
@@ -607,5 +607,90 @@ void loadComboBoc() async {
         ),
       ],
     );
+  }
+
+  Future<void> _addMobilServer(BuildContext context, Mobil mobil) async {
+    try {
+      ApiController api = ApiController();
+      final user = FirebaseAuth.instance.currentUser;
+
+      dynamic response = await api.post('users/add-mobil', {
+        'uid': user?.uid ?? '',
+        'mobil': mobil.toJson(),
+      });
+
+      if (response != null) {
+        setState(() {
+          if (response['user'] != null) {
+            auth.userAuthentificate =  UserAuthentificate.fromJson(response['user']);
+            return;
+          }
+        _handleAuthError(context);
+        });
+      } 
+      else { _handleAuthError(context); }
+    } catch (e) {
+      _handleAuthError(context);
+    }
+  }
+
+  Future<void> _selectedPayementMethod(BuildContext context, SelectedPayement selectedPayement) async {
+    try {
+      ApiController api = ApiController();
+      final user = FirebaseAuth.instance.currentUser;
+
+      dynamic response = await api.post('users/select-payement-method', {
+        'uid': user?.uid ?? '',
+        'selectedPayement': selectedPayement.toJson(),
+      });
+
+      if (response != null) {
+        setState(() {
+          if (response['user'] != null) {
+            auth.userAuthentificate = UserAuthentificate.fromJson(response['user']);
+            return;
+          }
+          _handleAuthError(context);
+        });
+      } else {
+        _handleAuthError(context);
+      }
+    } catch (e) {
+      _handleAuthError(context);
+    }
+  }
+
+  Future<void> _addCardServer(BuildContext context, CardModel card) async {
+    try {
+      ApiController api = ApiController();
+      final user = FirebaseAuth.instance.currentUser;
+
+      dynamic response = await api.post('users/add-card', {
+        'uid': user?.uid ?? '',
+        'card': card.toJson(),
+      });
+
+      if (response != null) {
+        setState(() {
+          if (response['user'] != null) {
+            auth.userAuthentificate =  UserAuthentificate.fromJson(response['user']);
+            return;
+          }
+        _handleAuthError(context);
+        });
+      } 
+      else { _handleAuthError(context); }
+    } catch (e) {
+      _handleAuthError(context);
+    }
+  }
+
+  void _handleAuthError(BuildContext context) async {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Une erreur est survenue. Veuillez vous reconnecter.')),
+    );
+    final auth = AuthProviders.of(context).auth;
+    await auth.signOut(); // Déconnexion de Firebase
+    Navigator.of(context).pushReplacementNamed(RoutePage.routeName);
   }
 }

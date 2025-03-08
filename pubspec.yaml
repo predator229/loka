@@ -39,6 +39,7 @@ dependencies:
   geocoding: ^2.0.5
   google_sign_in: ^6.2.2
   intl: ^0.17.0
+  http: ^1.3.0
 
 dev_dependencies:
   flutter_test:
@@ -87,6 +88,11 @@ flutter:
     - images/mastercard.png
     - images/process_payement.png
     - images/preocced.gif
+    - images/temp/card1.png
+    - images/temp/card2.png
+    - images/icon_loka/name.png
+    - images/icon_loka/oval.png
+    - images/icon_loka/centered.png
 
   #   - images/a_dot_ham.jpeg
 

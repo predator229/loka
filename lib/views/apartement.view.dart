@@ -89,7 +89,7 @@ class _ApartementViewState extends State<ApartementView> with SingleTickerProvid
                             ClipRRect(
                               key: ValueKey("${apartentCard.index}-${apartentCard.date}"),
                               borderRadius: BorderRadius.circular(15),
-                              child: Image.network(
+                              child: Image.asset(
                                 apartentCard.imageUrl[currentImgIndex],
                                 height: 270,
                                 width: double.infinity,
@@ -198,7 +198,7 @@ class _ApartementViewState extends State<ApartementView> with SingleTickerProvid
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8),
-                child: Image.network(apartentCard.imageUrl[i], fit: BoxFit.cover),
+                child: Image.asset(apartentCard.imageUrl[i], fit: BoxFit.cover),
               ),
             ),
           ),
@@ -265,7 +265,7 @@ if (displayAllPicture)
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(8),
-                      child: Image.network(apartentCard.imageUrl[i], fit: BoxFit.cover),
+                      child: Image.asset(apartentCard.imageUrl[i], fit: BoxFit.cover),
                     ),
                   ),
                 ),

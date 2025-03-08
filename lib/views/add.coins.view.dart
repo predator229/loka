@@ -395,7 +395,6 @@ class _AddCoinViewState extends State<AddCoinView> {
                   children: [
                     InkWell(
                       onTap: () {
-                          // Navigator.of(context).pushNamed(PayementMethodView.routeName);
                         showModalBottomSheet( 
                           context: context,
                           shape: RoundedRectangleBorder(

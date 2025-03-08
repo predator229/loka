@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:loka/controllers/auth.provider.controller.dart';
+import 'package:loka/controllers/root.page.controller.dart';
 import 'package:loka/models/auth.class.dart';
 import 'package:loka/models/settings.class.dart';
 import 'package:intl/intl.dart';
@@ -73,7 +74,7 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
       descriptionLocation: "Situé dans le quartier animé de Gbegamey Boa, à Cotonou, en venant de l'aéroport international de Cotonou, notre emplacement stratégique permet un trajet rapide d'environ 20 minutes. De plus, la proximité avec les principales artères routières facilite les déplacements vers d'autres quartiers de la ville.",
       nrColoc: ((60 + (5 - 1) * (index / 20)).toInt())%20,
       imageUrl: List.generate(10, 
-      (i) => (index + i)%2 == 0 ? 'https://s3-alpha-sig.figma.com/img/d8b2/19a0/f3ea601deefee2be41c6c1c37fd681d3?Expires=1740355200&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=pLI3uqEJB4yOOXP7JYhKixHL45Gd461D1AmChytiMriM~FktvHJpnFS2MkMu1OyQNgj34cg8SSui1QS99wWVCg8azXq-27uiKAojOaTR37mPYIF1NJpRGxux9gS6EJRVDRdK28P5Vx~ZRi47PV61OvC5M3wkiPBaCT2Vc3P0KKxJUmU9xBMo8~6Zxv6rRUCOpHn8Bx5qhktVzKlOYSC5klRpBqLMq8eleZoRj-pYx~fRHcUhX~j6Y8pL8qNmiymfbSjWXh84W7KZ5sLNpVoFhoots6TC7Q~jRCw7HFD~GRRP6OW0m5tLcmF9NvNhO72SXhECIXh7AsUFazpwA4wMSQ__' : 'https://s3-alpha-sig.figma.com/img/e2fd/1235/8d6b32664382b6457007c370ec10114c?Expires=1740355200&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=PyvdVdRKIvOi8CC6ZDUZpHF-rBcUFlznM7heZ-iN18TGRbnETrC0jXfTGH6Nr3gflf5xaXhCfxQxEwDkRAV9MhN6jBt5-x9RdfLVKSf-yFZkW4dsz8S9Cm4xL40pjQpjXUdlOjut8PPi9gjfhRPHqXMcTkb-K7qxXYl1fUIqudhkQizBLcdz1cJno-WhtC1WBkboeROD8QXPvhrgCfOkl7sv8Qb7WulJvfStoOMUNSuphgPjLgelblYa0iCxPl~H0RyPSYcH6GKOJ6m7EUXCp5pNDINj1HE~s7-oWG7WXJ-OCBTuAH5tAc6BE99o94zV6SBDnS6qIzGiHYeoqvFyoA__',
+      (i) => (index + i)%2 == 0 ? 'images/temp/card1.png' : 'images/temp/card2.png',
       ),
       // typeApartment: List<int>.generate(5, (index) => index + 1),
       typeApartment: List<int>.generate(
@@ -82,27 +83,27 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
       ),
       nbrNeightbord: (index*123)%10,
       caracteristiques:ApartmentCaracteristique(
-        id: index, 
+        id: index.toString(), 
         superficieTotale: "${(60 + (5 - 1)/(40-index) * (index / 20)).toDouble()} cm2", 
         equipements: List<ApartementEquipement>.generate(
           20,
           (i) => ApartementEquipement(
-            id: i,
+            id: i.toString(),
             type: SettingsClass().equipementsType[(index*i+1) % 10],
           ),
         ),
         services: List<ServiceClosest>.generate(
           10,
-          (i) =>  i%2 == 0 ? ServiceClosest(id:i, name: 'Marchés Locaux', description: """Explorez les marchés animés à quelques pas de votre porte, où vous pourrez découvrir des produits frais, de l'artisanat local et l'effervescence quotidienne de la vie marchande."""
-            ) : ServiceClosest(id: i, name: "Restaurants Authentiques", description: """Profitez d'une variété de restaurants locaux proposant une délicieuse cuisine béninoise, offrant une expérience culinaire authentique. """),
+          (i) =>  i%2 == 0 ? ServiceClosest(id:i.toString(), name: 'Marchés Locaux', description: """Explorez les marchés animés à quelques pas de votre porte, où vous pourrez découvrir des produits frais, de l'artisanat local et l'effervescence quotidienne de la vie marchande."""
+            ) : ServiceClosest(id: i.toString(), name: "Restaurants Authentiques", description: """Profitez d'une variété de restaurants locaux proposant une délicieuse cuisine béninoise, offrant une expérience culinaire authentique. """),
         ),
         rooms: [
-        Room(id: index, superficie: "${(60 + (5 - 1) * (index / 20)).toDouble()} cm2", type: SettingsClass().roomTypes[1]),
+        Room(id: index.toString(), superficie: "${(60 + (5 - 1) * (index / 20)).toDouble()} cm2", type: SettingsClass().roomTypes[1]),
         // Room(id: index+1, superficie: "${(60 + (5)/20 * (index / 20)).toDouble()} cm2", type: SettingsClass().roomTypes[0]),
         // Room(id: index+2, superficie: "${(60 + (5 - 1)/(40-index) * (index / 20)).toDouble()} cm2", type: SettingsClass().roomTypes[0]),
         ...List<Room>.generate(
           (index + 20) % 5 == 0 ? 1 : (index + 20) % 5,
-          (indextype) => Room(id: indextype, superficie: "${(60 + (5 - 1) * (index / 20)).toDouble()} cm2", type: SettingsClass().roomTypes[0])
+          (indextype) => Room(id: indextype.toString(), superficie: "${(60 + (5 - 1) * (index / 20)).toDouble()} cm2", type: SettingsClass().roomTypes[0])
         )
       ],
       ),
@@ -144,7 +145,7 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
     const duration = Duration(milliseconds: 500);
 
     auth = AuthProviders.of(context).auth;
-    homePageSee = auth.isNewUser;
+    homePageSee = !auth.isNewUser;
 
     _timer = Timer.periodic(duration, (timer) {
       setState(() {
@@ -172,7 +173,7 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
 
   @override
   Widget build(BuildContext context) {
-    return homePageSee ? homePage() : firstConnection();
+    return homePageSee ? homePage() : (MediaQuery.of(context).orientation == Orientation.portrait ? firstConnection() : firstConnectionLandScap());
   }
 
   Widget firstConnection() {
@@ -263,6 +264,98 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
                     child: const Text('Aller à l\'accueil'),
                   ),
                   const SizedBox(height: 30),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+    Widget firstConnectionLandScap() {
+    return Scaffold(
+      body: Container(
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
+        color: Colors.white,
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: ListView(
+                children: [
+                  Image.asset("images/pound.gif", width: 20),
+                  const SizedBox(height: 30),
+                  Column(
+                    children: [
+                      Text(
+                        "Félicitations",
+                        style: TextStyle(fontFamily: "Figtree",
+                            fontSize: 30,
+                            color: const Color.fromARGB(255, 11, 11, 11)),
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "1000 pièces ",
+                            style: TextStyle(fontFamily: "Figtree",
+                                fontSize: 30, color: SettingsClass().color),
+                          ),
+                          Text(
+                            "offert !",
+                            style: TextStyle(fontFamily: "Figtree",
+                                fontSize: 30,
+                                color: const Color.fromARGB(255, 11, 11, 11)),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        'Bienvenu sur Loka, nous vous offrons 1000 pièces pour vos différents parcours sur Loka.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontFamily: "Figtree",color: Colors.grey),
+                      ),
+                      const SizedBox(height: 30),
+                    ],
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 30),
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 500),
+                        height: 5,
+                        width: evoluatingWidth,
+                        decoration: BoxDecoration(
+                          color: SettingsClass().color,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            homePageSee = true;
+                          });
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: SettingsClass().bottunColor,
+                          foregroundColor: Colors.white,
+                          minimumSize: const Size(double.infinity, 50),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: const Text('Aller à l\'accueil'),
+                      ),
+                      const SizedBox(height: 30),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -387,6 +480,11 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
                           padding: EdgeInsets.symmetric(horizontal: 20.0),
                           child: InkWell(
                             onTap: (){
+                              if (auth.userAuthentificate.coins <= apartmentsFiltered[index].crownPoints){
+                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Vous n'avez pas assez de pièces pour voir cet appartement. Veuillez recharger votre compte.")));
+                                return;
+                              }
+                              setState(() { auth.userAuthentificate.coins -= apartmentsFiltered[index].crownPoints; });
                               Navigator.of(context).pushNamed(ApartementView.routeName, arguments: apartmentsFiltered[index]);
                             },
                             child:_buildApartmentItem(apartmentsFiltered[index]),
@@ -422,7 +520,14 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
                 return Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20.0),
                   child: InkWell(
-                    onTap: (){Navigator.of(context).pushNamed(ApartementView.routeName, arguments: apartmentsFoavorite[index]);},
+                    onTap: (){
+                      if (auth.userAuthentificate.coins <= apartmentsFiltered[index].crownPoints){
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Vous n'avez pas assez de pièces pour voir cet appartement. Veuillez recharger votre compte.")));
+                        return;
+                      }
+                      setState(() { auth.userAuthentificate.coins -= apartmentsFiltered[index].crownPoints; });
+                      Navigator.of(context).pushNamed(ApartementView.routeName, arguments: apartmentsFoavorite[index]);
+                    },
                     child: _buildApartmentItem(apartmentsFoavorite[index]),
                   ),
                 );
@@ -446,38 +551,42 @@ Widget _buildJournal() {
                 children: [ Text( "Journal", style: TextStyle(fontFamily: "Figtree", fontSize: 36, fontWeight: FontWeight.bold ),), ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 15.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: journals.map((journal) {
-                  return ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                      backgroundColor: journal['selected'] ? SettingsClass().bottunColor : Colors.white,
-                      foregroundColor: journal['selected'] ? Colors.white : Colors.black,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                        side: BorderSide.none,
-                      ),
-                      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-                      ),
-                    onPressed: (){
-                      setState(() {
-                        journals.forEach((element) {
-                          element['selected'] = false;
-                          if (element['id'] == journal['id']) {element['selected'] = true;}
-                          _selectedTypeJournal = journal['type'];
-                          activJournal = journal;
-                          letFilterJournal();
+            Expanded(
+              flex: 1,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 15.0),
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  children: journals.map((journal) {
+                    return ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                        backgroundColor: journal['selected'] ? SettingsClass().bottunColor : Colors.white,
+                        foregroundColor: journal['selected'] ? Colors.white : Colors.black,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          side: BorderSide.none,
+                        ),
+                        padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                        ),
+                      onPressed: (){
+                        setState(() {
+                          journals.forEach((element) {
+                            element['selected'] = false;
+                            if (element['id'] == journal['id']) {element['selected'] = true;}
+                            _selectedTypeJournal = journal['type'];
+                            activJournal = journal;
+                            letFilterJournal();
+                          });
                         });
-                      });
-                    },
-                    child: Text( journal['title'], ),
-                  );
-                }).toList(),
+                      },
+                      child: Text( journal['title'], ),
+                    );
+                  }).toList(),
+                ),
               ),
             ),
-            Flexible(
+            Expanded(
+              flex: 8,
               child: ListView.builder(
                 itemCount: journalCardFiltered.length,
                 padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 15.0),
@@ -501,7 +610,7 @@ Widget _buildJournal() {
                             ClipRRect(
                               key: ValueKey("${journal.index}-${journal.date}"),
                                 borderRadius: BorderRadius.circular(8),
-                                child: Image.network(
+                                child: Image.asset(
                                   journal.apartmentCard.imageUrl[0],
                                   height: 93,
                                   width: 93,
@@ -617,7 +726,10 @@ Widget _buildItemList (ProfilMenu profil) {
         ),
         if (profil.isLogout !=null)
         InkWell(
-          onTap: () { auth.signOut(); },
+          onTap: () {
+             auth.signOut();
+             Navigator.of(context).pushReplacementNamed(RoutePage.routeName);
+           },
           child: Text(profil.title, style: TextStyle(fontFamily: "Figtree",fontWeight: FontWeight.w500, fontSize: 16, decoration: TextDecoration.underline, color: Color.fromARGB(255, 116, 116, 116)),),
         ),
         if (profil.icon != null)
@@ -650,7 +762,7 @@ Widget _buildItemList (ProfilMenu profil) {
         ],
       );
   }
-       Widget _buildProfilLandScape (){
+    Widget _buildProfilLandScape (){
       return Column(
         mainAxisSize: MainAxisSize.max,
         children: [
@@ -781,8 +893,13 @@ Widget _buildItemList (ProfilMenu profil) {
                               ),
                             ),
                             child: ClipOval(
-                              child: Image.asset(
-                                auth.userAuthentificate.imgPath ??  "images/damien.jpeg",
+                              child: auth.userAuthentificate.imgPath != null ? Image.network(
+                                auth.userAuthentificate.imgPath ?? '',
+                                width: MediaQuery.of(context).size.width / 3 > 140 ? 140 : MediaQuery.of(context).size.width / 3,
+                                height: MediaQuery.of(context).size.width / 3 > 140 ? 140 : MediaQuery.of(context).size.width / 3,
+                                fit: BoxFit.cover,
+                              ) : Image.asset(
+                                "images/damien.jpeg",
                                 width: MediaQuery.of(context).size.width / 3 > 140 ? 140 : MediaQuery.of(context).size.width / 3,
                                 height: MediaQuery.of(context).size.width / 3 > 140 ? 140 : MediaQuery.of(context).size.width / 3,
                                 fit: BoxFit.cover,
@@ -886,8 +1003,8 @@ Widget _buildItemList (ProfilMenu profil) {
                             children: [
                               Image.asset("images/coin.png", width: 20),
                               const SizedBox(width: 10),
-                              const Text(
-                                '1000',
+                              Text(
+                                '${auth.userAuthentificate.coins}',
                                 style: TextStyle(fontFamily: "Figtree",
                                   fontSize: 16,
                                   color: Color.fromARGB(255, 0, 0, 0),
@@ -985,7 +1102,7 @@ Widget _buildItemList (ProfilMenu profil) {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(25),
-              child: Image.network(
+              child: Image.asset(
                 itemApartment.imageUrl[0],
                 height: 267,
                 width: double.infinity,

@@ -20,11 +20,11 @@ abstract class BaseAuth {
 
 class Auth implements BaseAuth {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-  UserAuthentificate _userAuthentificate = UserAuthentificate( coins:3500, typeUser: SettingsClass().typeUser[2], name: "Damien", email: "damienzipadonou@gmail.com", phoneNumber: "+40736141740", imgPath: "images/damien.jpeg");
+  UserAuthentificate _userAuthentificate = UserAuthentificate(id:'2', coins:3500, typeUser: SettingsClass().typeUser[2], name: "notgooduser", email: "notgooduser@gmail.com",  phoneNumber: "736141740", imgPath: "images/damien.jpeg");
 
   @override
   bool get isNewUser {
-    return true; //ici a retourner avec l'api
+    return false; //ici a retourner avec l'api
   }
 
   @override
@@ -96,12 +96,11 @@ class Auth implements BaseAuth {
     try {
       UserCredential userCredential = await _firebaseAuth.signInWithCredential(credential);
       if (userCredential.user!=null){
-        // this.
-            Navigator.pushReplacementNamed(context, HomeView.routeName);
-        }else{
-          ScaffoldMessenger.of(context).showSnackBar( const SnackBar(content: Text('Erreur de connexion ! Veuillliez réessayer')),
-          );
-        }
+        Navigator.pushReplacementNamed(context, HomeView.routeName);
+      }else{
+        ScaffoldMessenger.of(context).showSnackBar( const SnackBar(content: Text('Erreur de connexion ! Veuillliez réessayer')),
+        );
+      }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'invalid-verification-code') {
       ScaffoldMessenger.of(context).showSnackBar( const SnackBar(content: Text('The verification code is invalid. Please try again.')));

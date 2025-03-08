@@ -52,7 +52,12 @@ class _MyCoinsViewState extends State<MyCoinsView> with SingleTickerProviderStat
       appBar: AppBar(
         title: Text("Mes pièces", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),),
       ),
-      body: Column(
+      body: MediaQuery.of(context).orientation == Orientation.portrait ? _buildFormPortrait() : SafeArea(child: _buildFormPortraitLandScape()),
+    );
+  }
+
+  Column _buildFormPortrait() {
+    return Column(
         mainAxisAlignment: MainAxisAlignment.start,
         mainAxisSize: MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -66,7 +71,7 @@ class _MyCoinsViewState extends State<MyCoinsView> with SingleTickerProviderStat
                 child: Padding(
                   padding: EdgeInsets.all(20),
                   child: Container(
-                    height: (MediaQuery.of(context).size.width / 3 > 158 ? 158 : MediaQuery.of(context).size.width / 3) +50,
+                    // height: (MediaQuery.of(context).size.width / 3 > 158 ? 158 : MediaQuery.of(context).size.width / 3) +50,
                     decoration: BoxDecoration(
                       // shape: BoxShape.circle,
                       borderRadius: BorderRadius.circular(10),
@@ -81,27 +86,34 @@ class _MyCoinsViewState extends State<MyCoinsView> with SingleTickerProviderStat
                       ),
                     ),
                     child: Padding(
-                      padding: const EdgeInsets.all(20.0),
+                      padding: const EdgeInsets.only(left: 20.0, bottom: 50, top: 50),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         mainAxisSize: MainAxisSize.max,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             mainAxisSize: MainAxisSize.max,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text("Solde actuel", style: TextStyle(fontSize: 17, fontWeight: FontWeight.w400, fontFamily: "Figtree"),),
-                              Row(
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text("${auth.userAuthentificate.coins}", style: TextStyle(fontSize: 32, fontWeight: FontWeight.w600, fontFamily: "Figtree"),),
-                                  SizedBox(width: 10),
-                                  Image.asset("images/coin.png", width: 40),
+                                  Text("Solde actuel", style: TextStyle(fontSize: 17, fontWeight: FontWeight.w400, fontFamily: "Figtree"),),
+                                  Row(
+                                    children: [
+                                      Text("${auth.userAuthentificate.coins}", style: TextStyle(fontSize: 32, fontWeight: FontWeight.w600, fontFamily: "Figtree"),),
+                                      SizedBox(width: 10),
+                                      Image.asset("images/coin.png", width: 40),
+                                    ],
+                                  ),
                                 ],
                               ),
                               Padding(
-                                padding: const EdgeInsets.only(top: 30.0),
+                                padding: const EdgeInsets.only(top: 20.0),
                                 child: ElevatedButton(
                                   onPressed: (){
                                      Navigator.of(context).pushNamed(AddCoinView.routeAddCoinView);
@@ -109,7 +121,7 @@ class _MyCoinsViewState extends State<MyCoinsView> with SingleTickerProviderStat
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: SettingsClass().bottunColor,
                                     foregroundColor: Colors.white,
-                                    // shape: RoundedRectangleBorder( borderRadius: BorderRadius.circular(10), ), 
+                                    shape: RoundedRectangleBorder( borderRadius: BorderRadius.circular(10), ), 
                                   ),
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -146,10 +158,7 @@ class _MyCoinsViewState extends State<MyCoinsView> with SingleTickerProviderStat
                 child: Expanded(
                 child: Form(
                   key: _formKey,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.max,
+                  child: ListView(
                     children: [
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
@@ -174,34 +183,267 @@ class _MyCoinsViewState extends State<MyCoinsView> with SingleTickerProviderStat
             ),
           ),
         ],
-      ),
-    );
+      );
   }
+
+  Widget _buildFormPortraitLandScape(){
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.max,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Expanded(
+          flex: 1,
+          child: ListView(
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
+                  child: Text(
+                    "Moyen de recharge",
+                    style: TextStyle(
+                      fontSize: 23,
+                      fontWeight: FontWeight.w700,
+                      fontFamily: "Figtree",
+                    ),
+                  ),
+                ),
+                for (var item in SettingsClass().payementMethods)
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 15),
+                    child: _buildItemList (item),
+                  ),
+              ],
+            ),
+        ),
+        Expanded(
+          flex: 2,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Expanded(
+              child: Form(
+                key: _formKey,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.max,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Padding(
+                        padding: EdgeInsets.all(20),
+                        child: Container(
+                          height: MediaQuery.of(context).size.width / 3 +50,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            gradient: LinearGradient(
+                              begin: Alignment(-0.951, 0.309,),
+                              end: Alignment(0.9, 0.951),
+                              colors: [
+                                Color.fromARGB(255,255,248,220),
+                                Color.fromARGB(120,232,194,40),
+                              ],
+                              stops: [0.0326, 0.9153],
+                            ),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(20.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.max,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisSize: MainAxisSize.max,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Column(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text("Solde actuel", style: TextStyle(fontSize: 17, fontWeight: FontWeight.w400, fontFamily: "Figtree"),),
+                                        Row(
+                                          children: [
+                                            Text("${auth.userAuthentificate.coins}", style: TextStyle(fontSize: 32, fontWeight: FontWeight.w600, fontFamily: "Figtree"),),
+                                            SizedBox(width: 10),
+                                            Image.asset("images/coin.png", width: 40),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    ElevatedButton(
+                                      onPressed: (){
+                                        Navigator.of(context).pushNamed(AddCoinView.routeAddCoinView);
+                                      }, 
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: SettingsClass().bottunColor,
+                                        foregroundColor: Colors.white,
+                                        shape: RoundedRectangleBorder( borderRadius: BorderRadius.circular(10), ), 
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                        mainAxisSize: MainAxisSize.max,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: [
+                                          Icon(Icons.add, size: 24, color: Colors.white,),
+                                          Text(
+                                            "Recharger mes pièces", 
+                                            style: TextStyle(
+                                              fontSize: 15, 
+                                              fontWeight: FontWeight.w600, 
+                                              fontFamily: "Figtree",
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+        ),
+      ],
+    );
+  } 
+
 
   Widget _buildItemList (PayementMethod profil) {
     return 
-    InkWell(
-      onTap: () { 
-        if (profil.routeName != null) { Navigator.of(context).pushNamed(profil.routeName!); }
-      },
-      child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          mainAxisSize: MainAxisSize.max,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Row(
-              children: [
-                if (profil.icon != null)
-                Icon(profil.icon, size: 24,),
-                if (profil.assetPath != null)
-                Image.asset(profil.assetPath!, width: 24),
-                SizedBox(width: 20),
-                Text(profil.title, style: TextStyle(fontFamily: "Figtree",fontWeight: FontWeight.w500, fontSize: 16),),
-              ],
-            ),
-            Icon(Icons.arrow_forward_ios_sharp)
-          ],
-        ),
+    Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisSize: MainAxisSize.max,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Row(
+                children: [
+                  if (profil.icon != null)
+                  Icon(profil.icon, size: 24,),
+                  if (profil.assetPath != null)
+                  Image.asset(profil.assetPath!, width: 24),
+                  SizedBox(width: 20),
+                  Text(profil.title, style: TextStyle(fontFamily: "Figtree",fontWeight: FontWeight.w500, fontSize: 16),),
+                ],
+              ),
+              Icon(Icons.arrow_forward_ios_sharp)
+            ],
+          ),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (profil.id == 1 && auth.userAuthentificate?.mobils != null)
+              for ( int j=0; j< auth.userAuthentificate.mobils!.length; j++)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisSize: MainAxisSize.max,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: Container(
+                        padding: EdgeInsets.only(left: 10),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200],
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          mainAxisSize: MainAxisSize.max,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(auth.userAuthentificate.mobils![j].digits),
+                            Checkbox(
+                              value: auth.userAuthentificate.selectedPayementMethod != null && auth.userAuthentificate.selectedPayementMethod!.mobil != null && auth.userAuthentificate.selectedPayementMethod!.mobil!.id == auth.userAuthentificate.mobils![j].id,
+                              onChanged: (bool? value) {
+                                setState(() { 
+                                  SelectedPayement selectedPayement = SelectedPayement( mobil: auth.userAuthentificate.mobils![j],);
+                                  auth.userAuthentificate.selectedPayementMethod = selectedPayement;
+                                });
+                              },
+                              activeColor: SettingsClass().bottunColor,
+                              side: BorderSide(width: 2),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              if ( profil.id == 2 && auth.userAuthentificate.cards != null)
+              for ( int j=0; j< auth.userAuthentificate.cards!.length; j++)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisSize: MainAxisSize.max,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: Container(
+                        padding: EdgeInsets.only(left:10),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200],
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          mainAxisSize: MainAxisSize.max,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              auth.userAuthentificate.cards![j].digits.split('').asMap().entries.map((entry) {
+                                int each = entry.key;
+                                String digit = entry.value;
+                                return each < 15 ? "*" : digit;
+                              }).join(),
+                            ),
+                            Checkbox(
+                              value: auth.userAuthentificate.selectedPayementMethod != null && auth.userAuthentificate.selectedPayementMethod!.card != null && auth.userAuthentificate.selectedPayementMethod!.card!.id == auth.userAuthentificate.cards![j].id,
+                              onChanged: (bool? value) {
+                                setState(() { 
+                                  SelectedPayement selectedPayement = SelectedPayement( card: auth.userAuthentificate.cards![j],);
+                                  auth.userAuthentificate.selectedPayementMethod = selectedPayement;
+                                });
+                              },
+                              activeColor: SettingsClass().bottunColor,
+                              side: BorderSide(width: 2),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+      ],
     );
   }
 
