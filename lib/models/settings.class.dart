@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -341,19 +343,21 @@ class Mobil{
 }
 
 class SelectedPayement{
+  String id;
   Mobil? mobil;
   CardModel? card;
-  SelectedPayement({this.mobil, this.card});
+  SelectedPayement({required this.id, this.mobil, this.card});
   factory SelectedPayement.fromJson(Map<String, dynamic> json) {
     return SelectedPayement(
-      mobil: json['mobil'] && json['mobil'] != null ?Mobil.fromJson(json['mobil']) : null,
-      card: json['card'] &&  json['card'] != null  ? CardModel.fromJson(json['card']) : null,
+      id: json['_id'].toString(),
+      mobil: json['mobil'] != null && json['mobil'] != '' ? Mobil.fromJson(json['mobil']) : null,
+      card: json['card'] != null && json['card'] != ''  ? CardModel.fromJson(json['card']) : null,
     );
   }
 
     Map<String, dynamic> toJson() {
     return {
-      'mobil': mobil?..toJson(),
+      'mobil': mobil?.toJson(),
       'card': card?.toJson(),
     };
   }

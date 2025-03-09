@@ -29,7 +29,7 @@ Future<UserAuthentificate?> _getUserAuthentificate(BuildContext context) async {
       'uid': user?.uid ?? '',
     };
 
-      print('Header: ${headers}');
+      // print('Header: ${headers}');
 
     final response = await http.post(
       Uri.parse('http://localhost:5050/api/users/authentificate'),

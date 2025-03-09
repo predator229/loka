@@ -1,12 +1,14 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:loka/controllers/apis.controller.dart';
 import 'package:loka/controllers/auth.provider.controller.dart';
+import 'package:loka/controllers/root.page.controller.dart';
 import 'package:loka/controllers/tools.controller.dart';
 import 'package:loka/models/auth.class.dart';
-import 'package:loka/models/country.class.dart';
 import 'package:loka/models/settings.class.dart';
 import 'package:loka/views/home.view.dart';
 import 'package:loka/views/payement.method.view.dart';
@@ -20,6 +22,8 @@ class AddCoinView extends StatefulWidget {
 }
 
 class _AddCoinViewState extends State<AddCoinView> {
+
+  bool imLoadingDatas = false;
 
   final inMinZone = 0.0;
   final inMaxZone = 300.0;
@@ -413,7 +417,10 @@ class _AddCoinViewState extends State<AddCoinView> {
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       Expanded(
-                                        child: ListView(
+                                        child: imLoadingDatas ?
+                                        Center(child: CircularProgressIndicator()) 
+                                         :
+                                         ListView(
                                           children: [
                                             Text(
                                               "Recharger par",
@@ -470,10 +477,9 @@ class _AddCoinViewState extends State<AddCoinView> {
                                                                       Checkbox(
                                                                         value: auth.userAuthentificate.selectedPayementMethod != null && auth.userAuthentificate.selectedPayementMethod!.mobil != null && auth.userAuthentificate.selectedPayementMethod!.mobil!.id == auth.userAuthentificate.mobils![j].id,
                                                                         onChanged: (bool? value) {
-                                                                          setState(() { 
-                                                                            SelectedPayement selectedPayement = SelectedPayement( mobil: auth.userAuthentificate.mobils![j],);
-                                                                            auth.userAuthentificate.selectedPayementMethod = selectedPayement;
-                                                                          });
+                                                                            SelectedPayement selectedPayement = SelectedPayement( id: auth.userAuthentificate.mobils![j].id, mobil: auth.userAuthentificate.mobils![j],);
+                                                                            _selectedPayementMethod(context, selectedPayement);
+                                                                            Navigator.pop(context);
                                                                         },
                                                                         activeColor: SettingsClass().bottunColor,
                                                                         side: BorderSide(width: 2),
@@ -519,10 +525,9 @@ class _AddCoinViewState extends State<AddCoinView> {
                                                                       Checkbox(
                                                                         value: auth.userAuthentificate.selectedPayementMethod != null && auth.userAuthentificate.selectedPayementMethod!.card != null && auth.userAuthentificate.selectedPayementMethod!.card!.id == auth.userAuthentificate.cards![j].id,
                                                                         onChanged: (bool? value) {
-                                                                          setState(() { 
-                                                                            SelectedPayement selectedPayement = SelectedPayement( card: auth.userAuthentificate.cards![j],);
-                                                                            auth.userAuthentificate.selectedPayementMethod = selectedPayement;
-                                                                          });
+                                                                          SelectedPayement selectedPayement = SelectedPayement(id: auth.userAuthentificate.cards![j].id, card: auth.userAuthentificate.cards![j],);
+                                                                          _selectedPayementMethod(context, selectedPayement);
+                                                                          Navigator.pop(context);
                                                                         },
                                                                         activeColor: SettingsClass().bottunColor,
                                                                         side: BorderSide(width: 2),
@@ -606,25 +611,6 @@ class _AddCoinViewState extends State<AddCoinView> {
                         ],
                       ),
                     ),
-                    // InkWell(
-                    //   child: Row(
-                    //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    //     mainAxisSize: MainAxisSize.max,
-                    //     crossAxisAlignment: CrossAxisAlignment.center,
-                    //     children: [
-                    //       Text("Choississez votre moyen de recharge", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400, fontFamily: "Figtree"),),
-                    //       Container(
-                    //         height: 30,
-                    //         width: 30,
-                    //         decoration: BoxDecoration(
-                    //           border: Border.all(color: Colors.black),
-                    //           borderRadius: BorderRadius.circular(8),
-                    //         ),
-                    //         child: Center(child: Icon(Icons.keyboard_arrow_right_sharp,)),
-                    //       ),
-                    //     ],
-                    //   ),
-                    // ),
                     SizedBox(height: 15),
                     InkWell(
                       child: Row(
@@ -721,6 +707,41 @@ class _AddCoinViewState extends State<AddCoinView> {
         ),
     );
   }
+  Future<void> _selectedPayementMethod(BuildContext context, SelectedPayement selectedPayement) async {
+    setState(() { imLoadingDatas = true; });
+    try {
+      ApiController api = ApiController();
+      final user = FirebaseAuth.instance.currentUser;
 
+      dynamic response = await api.post('users/select-payement-method', {
+        'uid': user?.uid ?? '',
+        'selectedPayement': selectedPayement.toJson(),
+      });
+
+      if (response != null) {
+        setState(() {
+          imLoadingDatas = false;
+          if (response['user'] != null) {
+            auth.userAuthentificate = UserAuthentificate.fromJson(response['user']);
+            return;
+          }
+          _handleAuthError(context);
+        });
+      } else {
+        _handleAuthError(context);
+      }
+    } catch (e) {
+      _handleAuthError(context);
+    }
+  }
+
+  void _handleAuthError(BuildContext context) async {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Une erreur est survenue. Veuillez vous reconnecter.')),
+    );
+    final auth = AuthProviders.of(context).auth;
+    await auth.signOut(); // Déconnexion de Firebase
+    Navigator.of(context).pushReplacementNamed(RoutePage.routeName);
+  }
 }
 

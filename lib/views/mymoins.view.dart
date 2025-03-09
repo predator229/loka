@@ -7,6 +7,7 @@ import 'package:loka/models/auth.class.dart';
 import 'package:loka/models/country.class.dart';
 import 'package:loka/models/settings.class.dart';
 import 'package:loka/views/add.coins.view.dart';
+import 'package:loka/views/payement.method.view.dart';
 
 class MyCoinsView extends StatefulWidget {
   static const String routeName = '/my-coins';
@@ -176,6 +177,27 @@ class _MyCoinsViewState extends State<MyCoinsView> with SingleTickerProviderStat
                           padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 15),
                           child: _buildItemList (item),
                         ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric( horizontal: 20.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.max,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  Navigator.of(context).pushNamed(PayementMethodView.routeName);
+                                },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: SettingsClass().bottunColor,
+                                    foregroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder( borderRadius: BorderRadius.circular(10), ),
+                                  ),
+                                  child: const Text("+", style: TextStyle(fontFamily: "Figtree",fontSize: 14, fontWeight: FontWeight.w600),),
+                                ),
+                            ],
+                          ),
+                        ),
                     ],
                   ),
                 ),
@@ -340,105 +362,6 @@ class _MyCoinsViewState extends State<MyCoinsView> with SingleTickerProviderStat
                   Image.asset(profil.assetPath!, width: 24),
                   SizedBox(width: 20),
                   Text(profil.title, style: TextStyle(fontFamily: "Figtree",fontWeight: FontWeight.w500, fontSize: 16),),
-                ],
-              ),
-              Icon(Icons.arrow_forward_ios_sharp)
-            ],
-          ),
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (profil.id == 1 && auth.userAuthentificate?.mobils != null)
-              for ( int j=0; j< auth.userAuthentificate.mobils!.length; j++)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                mainAxisSize: MainAxisSize.max,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: Container(
-                        padding: EdgeInsets.only(left: 10),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[200],
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          mainAxisSize: MainAxisSize.max,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text(auth.userAuthentificate.mobils![j].digits),
-                            Checkbox(
-                              value: auth.userAuthentificate.selectedPayementMethod != null && auth.userAuthentificate.selectedPayementMethod!.mobil != null && auth.userAuthentificate.selectedPayementMethod!.mobil!.id == auth.userAuthentificate.mobils![j].id,
-                              onChanged: (bool? value) {
-                                setState(() { 
-                                  SelectedPayement selectedPayement = SelectedPayement( mobil: auth.userAuthentificate.mobils![j],);
-                                  auth.userAuthentificate.selectedPayementMethod = selectedPayement;
-                                });
-                              },
-                              activeColor: SettingsClass().bottunColor,
-                              side: BorderSide(width: 2),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              if ( profil.id == 2 && auth.userAuthentificate.cards != null)
-              for ( int j=0; j< auth.userAuthentificate.cards!.length; j++)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                mainAxisSize: MainAxisSize.max,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: Container(
-                        padding: EdgeInsets.only(left:10),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[200],
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          mainAxisSize: MainAxisSize.max,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text(
-                              auth.userAuthentificate.cards![j].digits.split('').asMap().entries.map((entry) {
-                                int each = entry.key;
-                                String digit = entry.value;
-                                return each < 15 ? "*" : digit;
-                              }).join(),
-                            ),
-                            Checkbox(
-                              value: auth.userAuthentificate.selectedPayementMethod != null && auth.userAuthentificate.selectedPayementMethod!.card != null && auth.userAuthentificate.selectedPayementMethod!.card!.id == auth.userAuthentificate.cards![j].id,
-                              onChanged: (bool? value) {
-                                setState(() { 
-                                  SelectedPayement selectedPayement = SelectedPayement( card: auth.userAuthentificate.cards![j],);
-                                  auth.userAuthentificate.selectedPayementMethod = selectedPayement;
-                                });
-                              },
-                              activeColor: SettingsClass().bottunColor,
-                              side: BorderSide(width: 2),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ],
