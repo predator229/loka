@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -107,10 +106,6 @@ class _AddCoinViewState extends State<AddCoinView> {
           if (currentStep == 2){
             _timer.cancel();
             Navigator.of(context).pushReplacementNamed(HomeView.routeName);
-          }
-          if (currentStep == 1){
-            auth.userAuthentificate.coins = auth.userAuthentificate.coins + double.parse(_nbrChambreController.text);
-            currentStep = 2;
           }
           evoluatingWidth = 0.0;
         }
@@ -621,12 +616,15 @@ class _AddCoinViewState extends State<AddCoinView> {
                           Expanded(
                             child: ElevatedButton(
                               onPressed: (){
-                                if (auth.userAuthentificate.selectedPayementMethod == null){
+                                if (auth.userAuthentificate.selectedPayementMethod == null) {
                                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Veuillez choisir un moyen de payement")));
                                   return;
                                 }
-                                setState(() { currentStep = 1; });
-                                _startProgressAnimation();
+                                if(!_isNumeric(_nbrChambreController.text) || double.parse(_nbrChambreController.text) < 0){
+                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Veuillez entrer un nombre de pièces valide")));
+                                  return;
+                                }
+                                _addCoinsServer(context);
                               },
                               style: ElevatedButton.styleFrom(
                                 padding: EdgeInsets.symmetric(vertical: 20),
@@ -707,6 +705,7 @@ class _AddCoinViewState extends State<AddCoinView> {
         ),
     );
   }
+  // selection de moyen de payement
   Future<void> _selectedPayementMethod(BuildContext context, SelectedPayement selectedPayement) async {
     setState(() { imLoadingDatas = true; });
     try {
@@ -735,6 +734,46 @@ class _AddCoinViewState extends State<AddCoinView> {
     }
   }
 
+  // ajout de piece server
+  Future<void> _addCoinsServer(BuildContext context) async {
+    setState(() { currentStep = 1 ; });
+    try {
+      ApiController api = ApiController();
+      final user = FirebaseAuth.instance.currentUser;
+
+      dynamic response = await api.post('users/add-coins', {
+        'uid': user?.uid ?? '',
+        'coins': _nbrChambreController.text,
+      });
+
+    imLoadingDatas = false;
+
+    if (response == null) {
+      _handleAuthError(context);
+      return;
+    }
+
+    if (response['error'] != null && response['error'] != 0) {
+      setState(() { currentStep = 0; });
+      SnackBar(content: Text(response['message'] ?? 'Une erreur est survenue.'));
+      return;
+    }
+
+    if (response['user'] != null) {
+      setState(() {
+        currentStep = 2;
+        _startProgressAnimation();
+        auth.userAuthentificate = UserAuthentificate.fromJson(response['user']);
+      });
+      return;
+    }
+      SnackBar(content: Text('Réponse inattendue du serveur.'));
+  } catch (e) {
+    _handleAuthError(context);  } finally {
+  }
+    _handleAuthError(context);
+  }
+
   void _handleAuthError(BuildContext context) async {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Une erreur est survenue. Veuillez vous reconnecter.')),
@@ -743,5 +782,5 @@ class _AddCoinViewState extends State<AddCoinView> {
     await auth.signOut(); // Déconnexion de Firebase
     Navigator.of(context).pushReplacementNamed(RoutePage.routeName);
   }
-}
+  }
 

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:loka/controllers/auth.provider.controller.dart';
 import 'package:loka/models/auth.class.dart';
 import 'package:loka/models/settings.class.dart';
@@ -51,14 +52,17 @@ Future<UserAuthentificate?> _getUserAuthentificate(BuildContext context) async {
   }
 }
 
-void _handleAuthError(BuildContext context) async {
-  ScaffoldMessenger.of(context).showSnackBar(
-    const SnackBar(content: Text('Une erreur est survenue. Veuillez vous reconnecter.')),
-  );
+Future<void> _handleAuthError(BuildContext context) async {
+  SchedulerBinding.instance.addPostFrameCallback((_) async {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Une erreur est survenue. Veuillez vous reconnecter.')),
+    );
 
-  final auth = AuthProviders.of(context).auth;
-  await auth.signOut(); // Déconnexion de Firebase
-  Navigator.of(context).pushReplacementNamed(RoutePage.routeName);
+    final auth = AuthProviders.of(context).auth;
+    await auth.signOut(); // Déconnexion de Firebase
+    Navigator.of(context).pushReplacementNamed(RoutePage.routeName);
+  });
+
 }
 
 class _RoutePageState extends State<RoutePage> {
