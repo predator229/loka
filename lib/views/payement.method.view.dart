@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:loka/controllers/apis.controller.dart';
 import 'package:loka/controllers/auth.provider.controller.dart';
 import 'package:loka/controllers/root.page.controller.dart';
@@ -713,265 +715,6 @@ class _PayementMethodViewState extends State<PayementMethodView> {
       );
       },
     );
-    // var item = SettingsClass().payementMethods[i];
-    // showModalBottomSheet( 
-    //   context: context,
-    //   shape: RoundedRectangleBorder(
-    //     borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-    //   ),
-    //   builder: (BuildContext context) {
-    //     return Container(
-    //       padding: const EdgeInsets.all(20),
-    //       decoration: BoxDecoration(
-    //         color: Colors.white,
-    //         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-    //       ),
-    //       child: Column(
-    //           mainAxisSize: MainAxisSize.min,
-    //           crossAxisAlignment: CrossAxisAlignment.start,
-    //           children: [
-    //             Row(
-    //               children: [
-    //                 IconButton(
-    //                   onPressed: (){ Navigator.of(context).pop(); },
-    //                   icon: Icon(Icons.cancel, color: Colors.grey, size: 41),
-    //                 ),
-    //                 Text(i == 0 ? "Ajout de numero de telephone" :
-    //                   "Ajout de carte",
-    //                   style: TextStyle(
-    //                     fontSize: 18,
-    //                     fontWeight: FontWeight.bold,
-    //                   ),
-    //                 ),
-    //               ],
-    //             ),
-    //             const SizedBox(height: 10),
-    //             if (i == 0)
-    //             Form(
-    //               key: _formKey,
-    //               child: Padding(
-    //                 padding: const EdgeInsets.only(bottom: 50.0),
-    //                 child: FutureBuilder<Widget>(
-    //                   future: _buildFuturePhoneNumber(),
-    //                   builder: (context, snapshot) {
-    //                     if (snapshot.connectionState == ConnectionState.waiting) {
-    //                       return CircularProgressIndicator();
-    //                     } else if (snapshot.hasError) {
-    //                       return Text('Error: ${snapshot.error}');
-    //                     } else {
-    //                       return snapshot.data!;
-    //                     }
-    //                   },
-    //                 ),
-    //               ),
-    //             ),
-    //             if (i != 0)
-    //             Form(
-    //               key: _formKey,
-    //               child: Padding(
-    //                 padding: const EdgeInsets.only(bottom: 50.0),
-    //                 child: Column(
-    //                   children: [
-    //                     TextFormField(
-    //                       controller: _digitsCard,
-    //                       keyboardType: TextInputType.number,
-    //                       inputFormatters: [
-    //                       FilteringTextInputFormatter.digitsOnly,
-    //                       LengthLimitingTextInputFormatter(16),
-    //                       TextInputFormatter.withFunction(
-    //                         (oldValue, newValue) {
-    //                           final text = newValue.text;
-    //                           final newText = StringBuffer();
-    //                           for (int i = 0; i < text.length; i++) {
-    //                             if (i % 4 == 0 && i != 0) {
-    //                             newText.write(' ');
-    //                             }
-    //                             newText.write(text[i]);
-    //                           }
-    //                           return TextEditingValue(
-    //                             text: newText.toString(),
-    //                             selection: TextSelection.collapsed(offset: newText.length),
-    //                           );
-    //                           },
-    //                         ),
-    //                       ],
-    //                       decoration: InputDecoration(
-    //                       labelText: "Numero de carte",
-    //                       hintText: '1234 5678 9012 3456',
-    //                       border: OutlineInputBorder(
-    //                         borderRadius: BorderRadius.circular(10),
-    //                       ),
-    //                       ),
-    //                       validator: (value) {
-    //                       if (value!.isEmpty) { return 'Entrer votre numero de carte'; }
-    //                       if (value.replaceAll(' ', '').length != 16) { return 'Le numero de carte doit contenir 16 chiffres.'; }
-    //                       var allkO = true;
-    //                       if (auth.userAuthentificate.cards == null) { return null; }
-    //                       for (var item in auth.userAuthentificate.cards!){
-    //                         if (item.cvv == _cvv.text && item.digits == value && item.expiration == _expiratingMonth.text){
-    //                           allkO = false;
-    //                           break;
-    //                         }
-    //                       }
-    //                       if (!allkO) { return 'Cette carte est deja enregistrer'; }
-    //                       return null;
-    //                       },
-    //                     ),
-    //                     const SizedBox(height: 10),
-    //                     Row(
-    //                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    //                       mainAxisSize: MainAxisSize.max,
-    //                       children: [
-    //                         Expanded(
-    //                           flex: 1,
-    //                           child: TextFormField(
-    //                           controller: _expiratingMonth,
-    //                           readOnly: true,
-    //                           onTap: () async {
-    //                             DateTime? pickedDate = await showDatePicker(
-    //                             context: context,
-    //                             initialDate: DateTime.now(),
-    //                             firstDate: DateTime(2000),
-    //                             lastDate: DateTime(2100),
-    //                             builder: (context, child) {
-    //                               return Theme(
-    //                               data: Theme.of(context).copyWith(
-    //                                 colorScheme: ColorScheme.light(
-    //                                 primary: SettingsClass().bottunColor,
-    //                                 ),
-    //                               ),
-    //                               child: child!,
-    //                               );
-    //                             },
-    //                             );
-    //                             if (pickedDate != null) {
-    //                             setState(() {
-    //                               _expiratingMonth.text = "${pickedDate.month.toString().padLeft(2, '0')}/${pickedDate.year.toString().substring(2)}";
-    //                             });
-    //                             }
-    //                           },
-    //                           decoration: InputDecoration(
-    //                             labelText: "Date d'expiration",
-    //                             hintText: 'MM/YY',
-    //                             border: OutlineInputBorder(
-    //                             borderRadius: BorderRadius.circular(10),
-    //                             ),
-    //                           ),
-    //                           validator: (value) {
-    //                             if (value!.isEmpty) {
-    //                             return 'Entrer la date d\'expiration';
-    //                             }
-    //                             var allkO = true;
-    //                             if (auth.userAuthentificate.cards == null) { return null; }
-    //                             for (var item in auth.userAuthentificate.cards!){
-    //                               if (item.cvv == _cvv.text && item.digits == _digitsCard.text && item.expiration == value){
-    //                                 allkO = false;
-    //                                 break;
-    //                               }
-    //                             }
-    //                             if (!allkO) { return ''; }
-
-    //                             return null;
-    //                           },
-    //                           ),
-    //                         ),
-    //                         const SizedBox(width: 10),
-    //                         Expanded(
-    //                           flex: 1,
-    //                           child: TextFormField(
-    //                             controller: _cvv,
-    //                             keyboardType: TextInputType.number,
-    //                             inputFormatters: [
-    //                             FilteringTextInputFormatter.digitsOnly,
-    //                               LengthLimitingTextInputFormatter(3),
-    //                             ],
-    //                             decoration: InputDecoration(
-    //                               labelText: "CVV",
-    //                               hintText: '123',
-    //                               border: OutlineInputBorder(
-    //                                 borderRadius: BorderRadius.circular(10),
-    //                               ),
-    //                             ),
-    //                             validator: (value) {
-    //                               if (value!.isEmpty) { return 'Entrer le CVV'; }
-    //                               if (value.length != 3) { return 'Le CVV doit contenir 3 chiffres.'; }
-    //                               var allkO = true;
-    //                               if (auth.userAuthentificate.cards == null) { return null; }
-    //                               for (var item in auth.userAuthentificate.cards!){
-    //                                 if (item.cvv == value && item.digits == _digitsCard.text && item.expiration == _expiratingMonth.text){
-    //                                   allkO = false;
-    //                                   break;
-    //                                 }
-    //                               }
-    //                               if (!allkO) { return ''; }
-    //                               return null;
-    //                             },
-    //                           ),
-    //                         ),
-    //                       ],
-    //                     ),
-    //                     const SizedBox(height: 10),
-    //                     TextFormField(
-    //                       controller: _cardName,
-    //                       // obscureText: true,
-    //                       decoration: InputDecoration(
-    //                         labelText: "Nom de la carte",
-    //                         hintText: 'John Doe',
-    //                         border: OutlineInputBorder(
-    //                           borderRadius: BorderRadius.circular(10),
-    //                         ),
-    //                       ),
-    //                       validator: (value) {
-    //                         if (value!.isEmpty) {
-    //                           return 'Donner un nom a cette carte';
-    //                         }
-    //                         return null;
-    //                       },
-    //                     ),
-    //                   ],
-    //                 ),
-    //               ),
-    //             ),
-    //             Row(
-    //                 mainAxisAlignment: MainAxisAlignment.center,
-    //                 mainAxisSize: MainAxisSize.max,
-    //                 crossAxisAlignment: CrossAxisAlignment.center,
-    //                 children: [
-    //                   Expanded(
-    //                     child:  
-    //                     ElevatedButton(
-    //                         onPressed: () {
-    //                           if (_formKey.currentState!.validate()) {
-    //                             UserAuthentificate user = auth.userAuthentificate;
-    //                             if (i == 0){
-    //                               Mobil newMethod = Mobil(digits: _phoneNumber.text, id: (user.mobils == null ? 1 : user.mobils!.length+1).toString(), title: "Mobile", indicatif: selectedCountry.dialcode);
-    //                               setState(() {
-    //                                 _addMobilServer(context, newMethod);
-    //                               });
-    //                             }else{
-    //                               CardModel newMethod = CardModel(digits: _digitsCard.text, id: (user.cards == null ? 1 : user.cards!.length+1).toString(), title: _cardName.text, expiration: _expiratingMonth.text, cvv: _cvv.text);
-    //                               setState(() {
-    //                                 _addCardServer(context, newMethod);
-    //                               });
-    //                             }
-    //                             Navigator.of(context).pop();
-    //                           }
-    //                         },
-    //                         style: ElevatedButton.styleFrom(
-    //                           padding: EdgeInsets.symmetric(vertical: 20),
-    //                           backgroundColor: SettingsClass().bottunColor,
-    //                           foregroundColor: Colors.white,
-    //                           shape: RoundedRectangleBorder( borderRadius: BorderRadius.circular(10), ), 
-    //                         ),
-    //                         child: Text('Sauvegarder', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Figtree"), ),
-    //                       ),
-    //                   ),
-    //                 ],
-    //               ),
-    //           ],
-    //         ),
-    //       );
-    //   });
   }
 
 void loadComboBoc() async {
@@ -980,10 +723,29 @@ void loadComboBoc() async {
   setState(() {
     countries = data.map((countryData) => Country.fromJson(countryData)).toList();
     selectedCountry = countries.firstWhere(
-      (country) => country.id == "BJ",
+      (country) => country.dialcode == ( auth.userAuthentificate.phoneNumber != null ? auth.userAuthentificate.phoneNumber?.indicatif : "+229"),
       orElse: () => countries[0],
     );
   });
+  if (auth.userAuthentificate.phoneNumber == null){
+    try {
+      LocationPermission permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.always || permission == LocationPermission.whileInUse) {
+        Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+        List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
+        if (placemarks.isNotEmpty) {
+          String countryCode = placemarks.first.isoCountryCode!;
+          setState(() {
+            selectedCountry = countries.firstWhere(
+              (country) => country.id == countryCode,
+              orElse: () => countries[0],
+            );
+          });
+        }
+      }
+    } catch (e) {
+    }
+  }
 }
 
   Future<Widget> _buildFuturePhoneNumber() async {  

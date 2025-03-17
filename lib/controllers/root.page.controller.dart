@@ -7,6 +7,7 @@ import 'package:loka/controllers/auth.provider.controller.dart';
 import 'package:loka/models/auth.class.dart';
 import 'package:loka/models/settings.class.dart';
 import 'package:loka/views/home.view.dart';
+import 'package:loka/views/profil.view.dart';
 import 'package:loka/views/welcome.view.dart';
 import 'package:http/http.dart' as http;
 
@@ -30,15 +31,18 @@ Future<UserAuthentificate?> _getUserAuthentificate(BuildContext context) async {
       'uid': user?.uid ?? '',
     };
 
-      // print('Header: ${headers}');
+      // print('${user?.uid} : ${headers}');
 
     final response = await http.post(
-      Uri.parse('http://localhost:5050/api/users/authentificate'),
+      Uri.parse('https://backend-loka-production.up.railway.app/api/users/authentificate'),
+      // Uri.parse('http://localhost:5050/api/users/authentificate'),
       headers: headers,
       body: jsonEncode(datas),
     );
 
     if (response.statusCode == 200) {
+      // print('answer : ${response.body}');
+
       final data = jsonDecode(response.body);
       if (data['user'] != null) {
         return UserAuthentificate.fromJson(data['user']);
@@ -46,7 +50,7 @@ Future<UserAuthentificate?> _getUserAuthentificate(BuildContext context) async {
     }
     return null;
   } catch (e) {
-    print('Error occurred: $e');
+    // print('Error occurred: $e');
     _handleAuthError(context);
     return null;
   }
@@ -84,7 +88,7 @@ class _RoutePageState extends State<RoutePage> {
                   return _buildWaitingScreen(context);
                 } else {
                   auth.userAuthentificate = authSnapshot.data!;
-                  return HomeView();
+                  return auth.userAuthentificate.phoneNumber != null ? HomeView() : ProfilView();
                 }
               },
             );

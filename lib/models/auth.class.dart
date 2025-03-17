@@ -20,7 +20,7 @@ abstract class BaseAuth {
 
 class Auth implements BaseAuth {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-  UserAuthentificate _userAuthentificate = UserAuthentificate(id:'2', coins:3500, typeUser: SettingsClass().typeUser[2], name: "notgooduser", email: "notgooduser@gmail.com",  phoneNumber: "736141740", imgPath: "images/damien.jpeg");
+  UserAuthentificate _userAuthentificate = UserAuthentificate(id:'2', coins:3500, typeUser: SettingsClass().typeUser[2], name: "notgooduser", email: "notgooduser@gmail.com",  new_user: 0, phoneNumber: null, imgPath: "images/damien.jpeg");
 
   @override
   bool get isNewUser {

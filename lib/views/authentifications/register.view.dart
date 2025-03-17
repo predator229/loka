@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:loka/controllers/auth.provider.controller.dart';
 import 'package:loka/controllers/tools.controller.dart';
 import 'package:loka/models/auth.class.dart';
@@ -473,6 +475,24 @@ inputFormatters: [ FilteringTextInputFormatter.digitsOnly, ],
       orElse: () => countries[0],
     );
   });
+
+  try {
+    LocationPermission permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.always || permission == LocationPermission.whileInUse) {
+      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
+      if (placemarks.isNotEmpty) {
+        String countryCode = placemarks.first.isoCountryCode!;
+        setState(() {
+          selectedCountry = countries.firstWhere(
+            (country) => country.id == countryCode,
+            orElse: () => countries[0],
+          );
+        });
+      }
+    }
+  } catch (e) {
+  }
 }
 Future<Widget> _buildFuturePhoneNumber() async {  
   if (countries.isEmpty) {

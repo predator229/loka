@@ -1,8 +1,13 @@
 import 'dart:convert';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:loka/controllers/apis.controller.dart';
 import 'package:loka/controllers/auth.provider.controller.dart';
+import 'package:loka/controllers/root.page.controller.dart';
 import 'package:loka/models/auth.class.dart';
 import 'package:loka/models/country.class.dart';
 import 'package:loka/models/settings.class.dart';
@@ -23,10 +28,11 @@ class _ProfilViewState extends State<ProfilView> with SingleTickerProviderStateM
   final _phoneNumber = TextEditingController();
   late Country selectedCountry;
   List<Country> countries = [];
-  int? selectedOption = 1;
   final _nameController = TextEditingController();
   final _surnameController = TextEditingController();
   final _emailController = TextEditingController();
+  bool imLoadingDatas = false;
+  bool imstachhere = false;
 
   @override
   void initState() {
@@ -37,7 +43,8 @@ class _ProfilViewState extends State<ProfilView> with SingleTickerProviderStateM
       _nameController.text = auth.userAuthentificate.name ?? "";
       _surnameController.text = auth.userAuthentificate.surname ?? "";
       _emailController.text = auth.userAuthentificate.email ?? "";
-      _phoneNumber.text = auth.userAuthentificate.phoneNumber ?? "";
+      _phoneNumber.text = (auth.userAuthentificate.phoneNumber != null ? auth.userAuthentificate.phoneNumber?.digits :  "")!;
+      imstachhere = auth.userAuthentificate.phoneNumber == null;
     });
   }
 
@@ -54,7 +61,7 @@ class _ProfilViewState extends State<ProfilView> with SingleTickerProviderStateM
       appBar: AppBar(
         title: Text("Mes informations personnelles", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),),
       ),
-      body: MediaQuery.of(context).orientation == Orientation.portrait ? _buildFormPortrait() : SafeArea(child: _buildFormPortraitLandScape()),
+      body: imLoadingDatas ? Center(child: CircularProgressIndicator()) : ( Form( key: _formKey, child: MediaQuery.of(context).orientation == Orientation.portrait ? _buildFormPortrait() : SafeArea(child: _buildFormPortraitLandScape()))),
     );
   }
 
@@ -119,6 +126,12 @@ class _ProfilViewState extends State<ProfilView> with SingleTickerProviderStateM
               ),
             ],
           ),
+          if (imstachhere)
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Text('Completer votre numro de telephone pour pouvoir utiliser la plateforme'),
+            ),
+
           Expanded(
             flex: 3,
             child: Padding(
@@ -129,99 +142,103 @@ class _ProfilViewState extends State<ProfilView> with SingleTickerProviderStateM
                   mainAxisSize: MainAxisSize.max,
                   children: [
                     Expanded(
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 20.0),
-                            child: TextFormField(
-                              controller: _surnameController,
-                              decoration: InputDecoration(
-                                labelText: "Prenoms",
-                                hintText: 'Doe',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 20.0),
+                          child: TextFormField(
+                            controller: _surnameController,
+                            decoration: InputDecoration(
+                              labelText: "Prenoms",
+                              hintText: 'Doe',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
                               ),
-                              validator: (value) {
-                                if (value!.isEmpty) {
-                                  return 'Entrer vos prenoms';
-                                }
-                                return null;
-                              },
                             ),
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return 'Entrer vos prenoms';
+                              }
+                              return null;
+                            },
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 20.0),
-                            child: TextFormField(
-                              controller: _nameController,
-                              decoration: InputDecoration(
-                                labelText: "Nom",
-                                hintText: 'John',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 20.0),
+                          child: TextFormField(
+                            controller: _nameController,
+                            decoration: InputDecoration(
+                              labelText: "Nom",
+                              hintText: 'John',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
                               ),
-                              validator: (value) {
-                                if (value!.isEmpty) {
-                                  return 'Entrer votre nom';
-                                }
-                                return null;
-                              },
                             ),
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return 'Entrer votre nom';
+                              }
+                              return null;
+                            },
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 20.0),
-                            child: TextFormField(
-                              controller: _emailController,
-                              decoration: InputDecoration(
-                                labelText: "Email (pas obligatoire)",
-                                hintText: 'John',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 20.0),
+                          child: TextFormField(
+                            controller: _emailController,
+                            decoration: InputDecoration(
+                              labelText: "Email (pas obligatoire)",
+                              hintText: 'John',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
                               ),
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 50.0),
-                            child: FutureBuilder<Widget>(
-                              future: _buildFuturePhoneNumber(),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState == ConnectionState.waiting) {
-                                  return CircularProgressIndicator();
-                                } else if (snapshot.hasError) {
-                                  return Text('Error: ${snapshot.error}');
-                                } else {
-                                  return snapshot.data!;
-                                }
-                              },
-                            ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 50.0),
+                          child: FutureBuilder<Widget>(
+                            future: _buildFuturePhoneNumber(),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                return CircularProgressIndicator();
+                              } else if (snapshot.hasError) {
+                                return Text('Error: ${snapshot.error}');
+                              } else {
+                                return snapshot.data!;
+                              }
+                            },
                           ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              Expanded(
-                                child: ElevatedButton(
-                                  onPressed: () {},
-                                  style: ElevatedButton.styleFrom(
-                                    padding: EdgeInsets.symmetric(vertical: 20),
-                                    backgroundColor: SettingsClass().bottunColor,
-                                    foregroundColor: Colors.white,
-                                    shape: RoundedRectangleBorder( borderRadius: BorderRadius.circular(10), ), 
-                                  ),
-                                  child: Text('Sauvegarder', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Figtree"), ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  if (_formKey.currentState!.validate()) {
+                                    _editProfilPicture(context);
+                                  } else{
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text('Remplisser tous les champs obligatoires')),
+                                    );
+                                  }
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  padding: EdgeInsets.symmetric(vertical: 20),
+                                  backgroundColor: SettingsClass().bottunColor,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder( borderRadius: BorderRadius.circular(10), ), 
                                 ),
+                                child: Text('Sauvegarder', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Figtree"), ),
                               ),
-                            ],
-                          ),
-                        ],
-                      ),
-
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -289,7 +306,9 @@ class _ProfilViewState extends State<ProfilView> with SingleTickerProviderStateM
                     ],
                   ),
               ),
-            ],
+              if (imstachhere)
+              Text("Completer votre numro de telephone pour pouvoir utiliser la plateforme)")
+              ],
           ),
         ),
         Expanded(
@@ -300,105 +319,110 @@ class _ProfilViewState extends State<ProfilView> with SingleTickerProviderStateM
             mainAxisSize: MainAxisSize.max,
             children: [
               Expanded(
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    Expanded(
-                      child: ListView(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 20.0),
-                            child: TextFormField(
-                              controller: _surnameController,
-                              decoration: InputDecoration(
-                                labelText: "Prenoms",
-                                hintText: 'Doe',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              validator: (value) {
-                                if (value!.isEmpty) {
-                                  return 'Entrer vos prenoms';
-                                }
-                                return null;
-                              },
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 20.0),
-                            child: TextFormField(
-                              controller: _nameController,
-                              decoration: InputDecoration(
-                                labelText: "Nom",
-                                hintText: 'John',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              validator: (value) {
-                                if (value!.isEmpty) {
-                                  return 'Entrer votre nom';
-                                }
-                                return null;
-                              },
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 20.0),
-                            child: TextFormField(
-                              controller: _emailController,
-                              decoration: InputDecoration(
-                                labelText: "Email (pas obligatoire)",
-                                hintText: 'John',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 50.0),
-                            child: FutureBuilder<Widget>(
-                              future: _buildFuturePhoneNumber(),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState == ConnectionState.waiting) {
-                                  return CircularProgressIndicator();
-                                } else if (snapshot.hasError) {
-                                  return Text('Error: ${snapshot.error}');
-                                } else {
-                                  return snapshot.data!;
-                                }
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.max,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Expanded(
+                    child: ListView(
                       children: [
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: () {},
-                            style: ElevatedButton.styleFrom(
-                              padding: EdgeInsets.symmetric(vertical: 20),
-                              backgroundColor: SettingsClass().bottunColor,
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder( borderRadius: BorderRadius.circular(10), ), 
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 20.0),
+                          child: TextFormField(
+                            controller: _surnameController,
+                            decoration: InputDecoration(
+                              labelText: "Prenoms",
+                              hintText: 'Doe',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
                             ),
-                            child: Text('Sauvegarder', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Figtree"), ),
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return 'Entrer vos prenoms';
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 20.0),
+                          child: TextFormField(
+                            controller: _nameController,
+                            decoration: InputDecoration(
+                              labelText: "Nom",
+                              hintText: 'John',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return 'Entrer votre nom';
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 20.0),
+                          child: TextFormField(
+                            controller: _emailController,
+                            decoration: InputDecoration(
+                              labelText: "Email (pas obligatoire)",
+                              hintText: 'John',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 50.0),
+                          child: FutureBuilder<Widget>(
+                            future: _buildFuturePhoneNumber(),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                return CircularProgressIndicator();
+                              } else if (snapshot.hasError) {
+                                return Text('Error: ${snapshot.error}');
+                              } else {
+                                return snapshot.data!;
+                              }
+                            },
                           ),
                         ),
                       ],
                     ),
-                  ],
-                ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () { 
+                          if (_formKey.currentState!.validate()) {
+                            _editProfilPicture(context);
+                          } else{
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Remplisser tous les champs obligatoires')),
+                            );
+                          }
+                        },
+                          style: ElevatedButton.styleFrom(
+                            padding: EdgeInsets.symmetric(vertical: 20),
+                            backgroundColor: SettingsClass().bottunColor,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder( borderRadius: BorderRadius.circular(10), ), 
+                          ),
+                          child: Text('Sauvegarder', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, fontFamily: "Figtree"), ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
           ],
@@ -414,10 +438,29 @@ void loadComboBoc() async {
   setState(() {
     countries = data.map((countryData) => Country.fromJson(countryData)).toList();
     selectedCountry = countries.firstWhere(
-      (country) => country.id == "BJ",
+      (country) => country.dialcode == ( auth.userAuthentificate.phoneNumber != null ? auth.userAuthentificate.phoneNumber?.indicatif : "+229"),
       orElse: () => countries[0],
     );
   });
+  if (auth.userAuthentificate.phoneNumber == null){
+    try {
+      LocationPermission permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.always || permission == LocationPermission.whileInUse) {
+        Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+        List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
+        if (placemarks.isNotEmpty) {
+          String countryCode = placemarks.first.isoCountryCode!;
+          setState(() {
+            selectedCountry = countries.firstWhere(
+              (country) => country.id == countryCode,
+              orElse: () => countries[0],
+            );
+          });
+        }
+      }
+    } catch (e) {
+    }
+  }
 }
 
   Future<Widget> _buildFuturePhoneNumber() async {  
@@ -436,7 +479,7 @@ void loadComboBoc() async {
           flex: 1,
           child: Center(
             child: DropdownButton<Country>(
-              value: selectedCountry,
+              value: selectedCountry, //damien
               onChanged: (Country? newValue) {
                 setState(() {
                   selectedCountry = newValue!;
@@ -494,4 +537,65 @@ void loadComboBoc() async {
       ],
     );
   }
+
+  Future<void> _editProfilPicture(BuildContext context) async {
+    setState(() { imLoadingDatas = true ; });
+    try {
+      ApiController api = ApiController();
+      final user = FirebaseAuth.instance.currentUser;
+
+      dynamic response = await api.post('users/edit-profil', {
+        'uid': user?.uid ?? '',
+        'name': _nameController.text,
+        'surname': _surnameController.text,
+        'thephone': _phoneNumber.text,
+        'country': selectedCountry.dialcode,
+      });
+
+
+
+    setState(() { imLoadingDatas = false ; });
+
+
+    if (response == null) {
+      _handleAuthError(context);
+      return;
+    }
+
+    if (response['error'] != null && response['error'] != 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(response['message'] ?? 'Une erreur est survenue.')),
+      );
+      return;
+    }
+
+    if (response['user'] != null) {
+      setState(() {
+        auth.userAuthentificate = UserAuthentificate.fromJson(response['user']);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Modificationn effectuee avec success !.')),
+        );
+        if (imstachhere ){
+          Navigator.of(context).pushReplacementNamed(RoutePage.routeName);
+        }
+      });
+      return;
+    }
+      SnackBar(content: Text('Réponse inattendue du serveur. Veuillez vous reconnectez !'));
+  } catch (e) {
+    _handleAuthError(context);  } finally {
+  }
+    _handleAuthError(context);
+  }
+
+  void _handleAuthError(BuildContext context) async {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Une erreur est survenue. Veuillez vous reconnecter.')),
+    );
+    final auth = AuthProviders.of(context).auth;
+    await auth.signOut(); // Déconnexion de Firebase
+    Navigator.of(context).pushReplacementNamed(RoutePage.routeName);
+  }
+
+  //profil-edit
 }

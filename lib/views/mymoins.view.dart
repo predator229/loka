@@ -37,7 +37,7 @@ class _MyCoinsViewState extends State<MyCoinsView> with SingleTickerProviderStat
       _nameController.text = auth.userAuthentificate.name ?? "";
       _surnameController.text = auth.userAuthentificate.surname ?? "";
       _emailController.text = auth.userAuthentificate.email ?? "";
-      _phoneNumber.text = auth.userAuthentificate.phoneNumber ?? "";
+      _phoneNumber.text =  (auth.userAuthentificate.phoneNumber != null ? auth.userAuthentificate.phoneNumber?.digits :  "")!;
     });
   }
 

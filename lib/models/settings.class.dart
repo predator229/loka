@@ -202,24 +202,26 @@ class UserAuthentificate {
   String id;
   String? email;
   Country? country;
-  String? phoneNumber;
+  Mobil? phoneNumber;
   String? name;
   String? surname;
   String? imgPath;
+  int new_user;
   TypeUser typeUser;
   double coins;
   SelectedPayement? selectedPayementMethod;
   List<CardModel> ? cards;
   List<Mobil> ? mobils;
-  UserAuthentificate({required this.coins, this.email, this.imgPath, this.name, this.surname, this.phoneNumber, required this.typeUser, required this.id, this.selectedPayementMethod, this.cards, this.country, this.mobils});
+  UserAuthentificate({required this.coins, this.email, this.imgPath, this.name, this.surname, this.phoneNumber, required this.typeUser, required this.id, this.selectedPayementMethod, this.cards, this.country, this.mobils, required this.new_user});
 
 factory UserAuthentificate.fromJson(Map<String, dynamic> json) {
   return UserAuthentificate(
     id: json['_id'].toString(),
     email: json['email'].toString(),
     country: json['country'] != null ? Country.fromJson(json['country']) : null,
-    phoneNumber: json['phoneNumber'].toString(),
+    phoneNumber: json['phone'] != null ? Mobil.fromJson(json['phone']) : null,
     name: json['name'].toString(),
+    new_user: json['new_user'] is int ? json['new_user'] : int.tryParse(json['new_user'].toString()) ?? 0,
     surname: json['surname'].toString(),
     imgPath: json['imgPath'].toString() ?? 'https://ui-avatars.com/api/?size=500&background=green&name=${json['name']}',
     typeUser: json['role'] == 'admin' ? SettingsClass().typeUser[2] : (json['role'] == 'sealler' ? SettingsClass().typeUser[0] : SettingsClass().typeUser[1]) ,
@@ -241,7 +243,7 @@ factory UserAuthentificate.fromJson(Map<String, dynamic> json) {
       'id': id,
       'email': email,
       'country': country?.toJson(),
-      'phoneNumber': phoneNumber,
+      'phoneNumber': phoneNumber?.toJson(),
       'name': name,
       'surname': surname,
       'imgPath': imgPath,

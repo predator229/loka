@@ -3,7 +3,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class ApiController {
-  final String baseUrl = 'http://localhost:5050/api/';
+  final String baseUrl = 'https://backend-loka-production.up.railway.app/api/';
+  // final String baseUrl = 'http://localhost:5050/api/';
 
   Future<dynamic> get(String endpoint) async {
     try {
@@ -34,9 +35,9 @@ class ApiController {
         body: jsonEncode(data),
       );
 
-      print('Headers: $headers');
-      print('Body: ${jsonEncode(data)}');
-      print('response: ${jsonEncode(response.body)}');
+      // print('Headers: $headers');
+      // print('Body: ${jsonEncode(data)}');
+      // print('response: ${jsonEncode(response.body)}');
 
       return _processResponse(response);
     } catch (e) {

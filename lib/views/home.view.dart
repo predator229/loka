@@ -19,7 +19,7 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin {
   late double evoluatingWidth;
-  late bool homePageSee = true;
+  late bool homePageSee = false;
   late Timer _timer;
   late BaseAuth auth;
   List<String> typesournals = [
@@ -145,7 +145,7 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
     const duration = Duration(milliseconds: 500);
 
     auth = AuthProviders.of(context).auth;
-    homePageSee = !auth.isNewUser;
+    homePageSee = !(auth.userAuthentificate.new_user == 1);
 
     _timer = Timer.periodic(duration, (timer) {
       setState(() {
@@ -168,7 +168,7 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
   void didChangeDependencies() {
     super.didChangeDependencies();
     auth = AuthProviders.of(context).auth;
-    homePageSee = auth.isNewUser;
+    homePageSee = !(auth.userAuthentificate.new_user == 1);
   }
 
   @override
