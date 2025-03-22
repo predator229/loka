@@ -19,7 +19,7 @@ class RoutePage extends StatefulWidget {
   State<RoutePage> createState() => _RoutePageState();
 }
 
-Future<UserAuthentificate?> _getUserAuthentificate(BuildContext context) async {
+Future<dynamic?> _getUserAuthentificate(BuildContext context) async {
   final user = FirebaseAuth.instance.currentUser;
   try {
     final token = await FirebaseAuth.instance.currentUser?.getIdToken(true);
@@ -34,18 +34,23 @@ Future<UserAuthentificate?> _getUserAuthentificate(BuildContext context) async {
       // print('${user?.uid} : ${headers}');
 
     final response = await http.post(
-      Uri.parse('https://backend-loka-production.up.railway.app/api/users/authentificate'),
-      // Uri.parse('http://localhost:5050/api/users/authentificate'),
+      // Uri.parse('https://backend-loka-production.up.railway.app/api/users/authentificate'),
+      Uri.parse('http://localhost:5050/api/users/authentificate'),
       headers: headers,
       body: jsonEncode(datas),
     );
+      // print('headers : ${headers}');
+      // print('datas : ${datas}');
 
     if (response.statusCode == 200) {
       // print('answer : ${response.body}');
 
       final data = jsonDecode(response.body);
       if (data['user'] != null) {
-        return UserAuthentificate.fromJson(data['user']);
+        return {
+          "user": UserAuthentificate.fromJson(data['user']),
+          "typesApartments": data['typeApartment'] != null && (data['typeApartment'] as List).isNotEmpty ? (data['typeApartment'] as List).map((i) => TypeApartment.fromJson(i)).toList() : [], 
+        };
       }
     }
     return null;
@@ -78,7 +83,7 @@ class _RoutePageState extends State<RoutePage> {
       builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
         if (snapshot.connectionState == ConnectionState.active) {
           if (snapshot.hasData) {
-            return FutureBuilder<UserAuthentificate?>(
+            return FutureBuilder<dynamic?>(
               future: _getUserAuthentificate(context),
               builder: (context, authSnapshot) {
                 if (authSnapshot.connectionState == ConnectionState.waiting) {
@@ -87,7 +92,13 @@ class _RoutePageState extends State<RoutePage> {
                   _handleAuthError(context); // Déconnecte et redirige
                   return _buildWaitingScreen(context);
                 } else {
-                  auth.userAuthentificate = authSnapshot.data!;
+                  auth.userAuthentificate = authSnapshot.data!["user"];
+                  if (authSnapshot.data!["typesApartments"] !=null && (authSnapshot.data!["typesApartments"] as List).isNotEmpty) {
+                    auth.typesApartments = authSnapshot.data!["typesApartments"];
+                    print('jeloleglifbasiko');
+                  }else{
+                    print('jelolo');
+                  }
                   return auth.userAuthentificate.phoneNumber != null ? HomeView() : ProfilView();
                 }
               },

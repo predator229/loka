@@ -42,22 +42,24 @@ class _ApartementViewState extends State<ApartementView> with SingleTickerProvid
     List<int> nr_room = List<int>.filled(SettingsClass().roomTypes.length, 0, growable: false);
     List<int> nr_amenagements = List<int>.filled(SettingsClass().equipementsType.length, 0, growable: false);
 
+if (apartentCard.caracteristiques?.rooms != null) {
     for (int i = 0; i< SettingsClass().roomTypes.length; i++) {
-      for (var j = 0; j < apartentCard.caracteristiques.rooms.length; j++) {
-        if (apartentCard.caracteristiques.rooms[j].type.id == SettingsClass().roomTypes[i].id) {
+      for (var j = 0; j < apartentCard.caracteristiques!.rooms.length; j++) {
+        if (apartentCard.caracteristiques!.rooms[j].type.id == SettingsClass().roomTypes[i].id) {
           nr_room[i] += 1;
         }
       }
     }
+  }
 
 
     int nbrEquipLeft = 0;
     int nbrEquipRigth = 0;
 
     for (int i = 0; i< SettingsClass().equipementsType.length; i++) {
-      if (apartentCard.caracteristiques.equipements != null){
-        for (var j = 0; j < apartentCard.caracteristiques.equipements!.length; j++) {
-          if (apartentCard.caracteristiques.equipements![j].type.id == SettingsClass().equipementsType[i].id) {
+      if (apartentCard.caracteristiques?.equipements != null){
+        for (var j = 0; j < apartentCard.caracteristiques!.equipements!.length; j++) {
+          if (apartentCard.caracteristiques!.equipements![j].type.id == SettingsClass().equipementsType[i].id) {
             nr_amenagements[i] += 1;
           }
         }
@@ -66,7 +68,7 @@ class _ApartementViewState extends State<ApartementView> with SingleTickerProvid
       else{ nbrEquipRigth +=1;  }
     }
 
-    List<ServiceClosest> servicess = showMoreServices ? (apartentCard.caracteristiques.services.length > 2 ? apartentCard.caracteristiques.services.sublist(1, 2) : apartentCard.caracteristiques.services)  : apartentCard.caracteristiques.services;
+    List<ServiceClosest> servicess = showMoreServices ? (apartentCard.caracteristiques!.services.length > 2 ? apartentCard.caracteristiques!.services.sublist(1, 2) : apartentCard.caracteristiques!.services)  : apartentCard.caracteristiques!.services;
 
     return Scaffold(
       body: 
@@ -360,8 +362,8 @@ if (displayAllPicture)
                                               crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
                                                 Text("${nr_room[i]} ${SettingsClass().roomTypes[i].name}"),
-                                                for (var j = 0; j < apartentCard.caracteristiques.rooms.length; j++) 
-                                                if (apartentCard.caracteristiques.rooms[j].type.id == SettingsClass().roomTypes[i].id) 
+                                                for (var j = 0; j < apartentCard.caracteristiques!.rooms.length; j++) 
+                                                if (apartentCard.caracteristiques!.rooms[j].type.id == SettingsClass().roomTypes[i].id) 
                                                 Padding(
                                                   padding: const EdgeInsets.symmetric(vertical:2.0),
                                                   child: Container(
@@ -369,7 +371,7 @@ if (displayAllPicture)
                                                     decoration: BoxDecoration(
                                                       color: const Color.fromARGB(23, 8, 131, 120)
                                                     ),
-                                                    child: Text(apartentCard.caracteristiques.rooms[j].superficie, style: TextStyle(fontFamily: "Figtree",fontSize: 12, fontWeight: FontWeight.w400, color: SettingsClass().bottunColor),),
+                                                    child: Text(apartentCard.caracteristiques!.rooms[j].superficie, style: TextStyle(fontFamily: "Figtree",fontSize: 12, fontWeight: FontWeight.w400, color: SettingsClass().bottunColor),),
                                                   ),
                                                 ),
                                               ],
@@ -404,7 +406,7 @@ if (displayAllPicture)
                                                   decoration: BoxDecoration(
                                                     color: const Color.fromARGB(23, 8, 131, 120)
                                                   ),
-                                                  child: Text(apartentCard.caracteristiques.superficieTotale, style: TextStyle(fontFamily: "Figtree",fontSize: 12, fontWeight: FontWeight.w400, color: SettingsClass().bottunColor),),
+                                                  child: Text(apartentCard.caracteristiques!.superficieTotale, style: TextStyle(fontFamily: "Figtree",fontSize: 12, fontWeight: FontWeight.w400, color: SettingsClass().bottunColor),),
                                                 ),
                                               ],
                                             ),
@@ -677,7 +679,7 @@ if (displayAllPicture)
                             children: [
                               Text("Services à proximité", style: TextStyle(fontFamily: "Figtree",fontSize: 20, color: Colors.black, fontWeight:FontWeight.w600),),
                               SizedBox(height: 10),
-                              for (int i=0; i < (apartentCard.caracteristiques.services.length > 2 && !showMoreServices ? 2 : apartentCard.caracteristiques.services.length ) ; i++ )
+                              for (int i=0; i < (apartentCard.caracteristiques!.services.length > 2 && !showMoreServices ? 2 : apartentCard.caracteristiques!.services.length ) ; i++ )
                               Padding(
                                 padding: const EdgeInsets.symmetric(vertical: 10.0),
                                 child: Column(
@@ -685,11 +687,11 @@ if (displayAllPicture)
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      "${apartentCard.caracteristiques.services[i].name} : ",
+                                      "${apartentCard.caracteristiques!.services[i].name} : ",
                                       style: const TextStyle(fontFamily: "Figtree",fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600,),
                                     ),
                                     Text(
-                                      apartentCard.caracteristiques.services[i].description,
+                                      apartentCard.caracteristiques!.services[i].description,
                                       softWrap: true,
                                       style: TextStyle(fontFamily: "Figtree",
                                         fontSize: 15,

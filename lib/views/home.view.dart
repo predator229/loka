@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:loka/controllers/apis.controller.dart';
 import 'package:loka/controllers/auth.provider.controller.dart';
 import 'package:loka/controllers/root.page.controller.dart';
 import 'package:loka/models/auth.class.dart';
@@ -18,6 +20,8 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin {
+
+  bool imLoading = false;
   late double evoluatingWidth;
   late bool homePageSee = false;
   late Timer _timer;
@@ -49,68 +53,15 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
   ];
 
   TextEditingController _searchController = TextEditingController();
-  List<TypeApartment> typesApartments = SettingsClass().typesApartments;
+  late List<TypeApartment> typesApartments =[];
 
-  TypeApartment _selectedType = SettingsClass().typesApartments[0];
+  late TypeApartment _selectedType;
   int _selectedTypeJournal = 0;
   late dynamic activJournal;
 
-  // late Orientation _orientation;
+  late List<ApartmentCard> apartments = [];
 
-  late List<ApartmentCard> apartments = List<ApartmentCard>.generate(
-    20,
-    (index) => ApartmentCard( index:index,
-      isFavourite: index % 2 == 0,
-      crownPoints: (60 + (5 - 1) * (index / 20)).toInt(),
-      reviews: 50,
-      rating: (1 + (5 - 1) * (index / 20)).toDouble(),
-      price: (30000 + (2000 - 3456) * (index / 20)).toDouble(),
-      devise: "FCFA",
-      perPeriod: "mois",
-      date: DateFormat('dd MMM yyyy', 'fr_FR').format(DateTime.now().add(Duration(days: (1 + (200 - 11) * (index / 20)).toInt()))),
-      location: "Cotonou, Benin",
-      title: 'Appartement meublé $index',
-      description: """Bienvenue dans ce charmant appartement idéalement situé à Cotonou, où le confort moderne rencontre l'authenticité africaine. Aménagées, cet espace offre une retraite paisible au cœur de la ville dynamique. Dès que vous franchirez la porte, vous serez accueilli par une atmosphère chaleureuse et une décoration soignée, mêlant harmonieusement des éléments contemporains à des touches locales. La cuisine entièrement équipée vous invite à préparer des repas délicieux, tandis que le salon spacieux offre un espace dédié à la détente et aux moments conviviaux. La vue depuis le balcon donne sur [mentionnez les points d'intérêt locaux ou le paysage environnant], créant ainsi une ambiance apaisante et pittoresque. L'emplacement central de l'appartement permet un accès facile aux marchés animés, aux restaurants locaux et aux attractions culturelles..""",
-      descriptionLocation: "Situé dans le quartier animé de Gbegamey Boa, à Cotonou, en venant de l'aéroport international de Cotonou, notre emplacement stratégique permet un trajet rapide d'environ 20 minutes. De plus, la proximité avec les principales artères routières facilite les déplacements vers d'autres quartiers de la ville.",
-      nrColoc: ((60 + (5 - 1) * (index / 20)).toInt())%20,
-      imageUrl: List.generate(10, 
-      (i) => (index + i)%2 == 0 ? 'images/temp/card1.png' : 'images/temp/card2.png',
-      ),
-      // typeApartment: List<int>.generate(5, (index) => index + 1),
-      typeApartment: List<int>.generate(
-        (index % 5) + 1,
-        (i) => (i - 1 + index) % SettingsClass().typesApartments.length,
-      ),
-      nbrNeightbord: (index*123)%10,
-      caracteristiques:ApartmentCaracteristique(
-        id: index.toString(), 
-        superficieTotale: "${(60 + (5 - 1)/(40-index) * (index / 20)).toDouble()} cm2", 
-        equipements: List<ApartementEquipement>.generate(
-          20,
-          (i) => ApartementEquipement(
-            id: i.toString(),
-            type: SettingsClass().equipementsType[(index*i+1) % 10],
-          ),
-        ),
-        services: List<ServiceClosest>.generate(
-          10,
-          (i) =>  i%2 == 0 ? ServiceClosest(id:i.toString(), name: 'Marchés Locaux', description: """Explorez les marchés animés à quelques pas de votre porte, où vous pourrez découvrir des produits frais, de l'artisanat local et l'effervescence quotidienne de la vie marchande."""
-            ) : ServiceClosest(id: i.toString(), name: "Restaurants Authentiques", description: """Profitez d'une variété de restaurants locaux proposant une délicieuse cuisine béninoise, offrant une expérience culinaire authentique. """),
-        ),
-        rooms: [
-        Room(id: index.toString(), superficie: "${(60 + (5 - 1) * (index / 20)).toDouble()} cm2", type: SettingsClass().roomTypes[1]),
-        // Room(id: index+1, superficie: "${(60 + (5)/20 * (index / 20)).toDouble()} cm2", type: SettingsClass().roomTypes[0]),
-        // Room(id: index+2, superficie: "${(60 + (5 - 1)/(40-index) * (index / 20)).toDouble()} cm2", type: SettingsClass().roomTypes[0]),
-        ...List<Room>.generate(
-          (index + 20) % 5 == 0 ? 1 : (index + 20) % 5,
-          (indextype) => Room(id: indextype.toString(), superficie: "${(60 + (5 - 1) * (index / 20)).toDouble()} cm2", type: SettingsClass().roomTypes[0])
-        )
-      ],
-      ),
-    )
-  );
-
-  late List<JournalCard> journalCards;
+late List<JournalCard> journalCards = [];
 
   late List<ApartmentCard> apartmentsFiltered;
   late List<JournalCard> journalCardFiltered;
@@ -122,21 +73,24 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
   void initState() {
     super.initState();
     evoluatingWidth = 0.0;
-    apartmentsFiltered = apartments;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      journalCards =List<JournalCard>.generate(
-      40,
-      (index) => JournalCard(
-        index: index + 1,
-        status: (index % 4),
-        date: DateFormat('dd MMM yyyy', 'fr_FR').format(DateTime.now().add(Duration(days: (1 + (200 - 11) * (index / 20)).toInt()))),
-        apartmentCard: apartments[(19-index)%20],
-      ));
-      activJournal = journals[0];
-      letFilterJournal();
-      letFavoriteTheApartments();
+    apartmentsFiltered = [];
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       _startProgressAnimation();
+      typesApartments = auth.typesApartments.isNotEmpty ? auth.typesApartments : SettingsClass().typesApartments;
+      _selectedType = SettingsClass().typesApartments[0];
+      print(auth.typesApartments);
+      apartments = auth.apartmentCard.isNotEmpty ? auth.apartmentCard : [];
+      if (apartments.isEmpty){
+          imLoading = true; 
+          await _loadApartments(context);
+          imLoading = false; 
+      }
     });
+  }
+
+  iJustLoadApartment () {
+    letFilterJournal();
+    letFavoriteTheApartments();
   }
 
   void _startProgressAnimation() {
@@ -169,6 +123,9 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
     super.didChangeDependencies();
     auth = AuthProviders.of(context).auth;
     homePageSee = !(auth.userAuthentificate.new_user == 1);
+    //     WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   _startProgressAnimation();
+    // });
   }
 
   @override
@@ -273,7 +230,7 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
     );
   }
 
-    Widget firstConnectionLandScap() {
+  Widget firstConnectionLandScap() {
     return Scaffold(
       body: Container(
         width: MediaQuery.of(context).size.width,
@@ -419,27 +376,19 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              padding: EdgeInsets.zero,
-              shrinkWrap: true, 
-              itemCount: apartmentsFiltered.length,
-              itemBuilder: (context, index) {
-                return Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20.0),
-                  child: InkWell(
-                    onTap: (){
-                      if (auth.userAuthentificate.coins <= apartmentsFiltered[index].crownPoints){
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Vous n'avez pas assez de pièces pour voir cet appartement. Veuillez recharger votre compte.")));
-                        return;
-                      }
-                      setState(() { auth.userAuthentificate.coins -= apartmentsFiltered[index].crownPoints; });
-                      Navigator.of(context).pushNamed(ApartementView.routeName, arguments: apartmentsFiltered[index]);
-                    },
-                    child:_buildApartmentItem(apartmentsFiltered[index]),
+            child:  imLoading
+              ? Center(
+                  child: CircularProgressIndicator(
+                    color: SettingsClass().bottunColor,
                   ),
-                );
-              },
-            ),
+                )
+              : ( apartments.isEmpty 
+                ? Center(
+                  child: Container(
+                    child: Text("Pas d'apartements disponibles, Rafraichissez la page"),
+                  ),
+                )
+                : _builderLandScapeHome(apartmentsFiltered)),
           ),
         ],
       );
@@ -470,30 +419,20 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
                   ),
                 ),
                 Expanded(
-                  child: SizedBox(
-                    child: ListView.builder(
-                      padding: EdgeInsets.zero,
-                      shrinkWrap: true, 
-                      itemCount: apartmentsFiltered.length,
-                      itemBuilder: (context, index) {
-                        return Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 20.0),
-                          child: InkWell(
-                            onTap: (){
-                              if (auth.userAuthentificate.coins <= apartmentsFiltered[index].crownPoints){
-                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Vous n'avez pas assez de pièces pour voir cet appartement. Veuillez recharger votre compte.")));
-                                return;
-                              }
-                              setState(() { auth.userAuthentificate.coins -= apartmentsFiltered[index].crownPoints; });
-                              Navigator.of(context).pushNamed(ApartementView.routeName, arguments: apartmentsFiltered[index]);
-                            },
-                            child:_buildApartmentItem(apartmentsFiltered[index]),
-                          ),
-                        );
-                      },
-                    ),
+            child:  imLoading
+              ? Center(
+                  child: CircularProgressIndicator(
+                    color: SettingsClass().bottunColor,
                   ),
-                ),
+                )
+              : ( apartments.isEmpty 
+                ? Center(
+                  child: Container(
+                    child: Text("Pas d'apartements disponibles, Rafraichissez la page"),
+                  ),
+                )
+                : _builderLandScapeHome(apartmentsFiltered)),
+          ),
               ],
             ),
           ),
@@ -511,29 +450,29 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
               children: [ Text( "Favoris", style: TextStyle(fontFamily: "Figtree", fontSize: 36, fontWeight: FontWeight.bold ),), ],
             ),
           ),
-          Expanded(
-            child: ListView.builder(
-              padding: EdgeInsets.zero,
-              shrinkWrap: true, 
-              itemCount: apartmentsFoavorite.length,
-              itemBuilder: (context, index) {
-                return Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20.0),
-                  child: InkWell(
-                    onTap: (){
-                      if (auth.userAuthentificate.coins <= apartmentsFiltered[index].crownPoints){
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Vous n'avez pas assez de pièces pour voir cet appartement. Veuillez recharger votre compte.")));
-                        return;
-                      }
-                      setState(() { auth.userAuthentificate.coins -= apartmentsFiltered[index].crownPoints; });
-                      Navigator.of(context).pushNamed(ApartementView.routeName, arguments: apartmentsFoavorite[index]);
-                    },
-                    child: _buildApartmentItem(apartmentsFoavorite[index]),
-                  ),
-                );
-              },
-            ),
-          ),
+          // Expanded(
+          //   child: ListView.builder(
+          //     padding: EdgeInsets.zero,
+          //     shrinkWrap: true, 
+          //     itemCount: apartmentsFoavorite.length,
+          //     itemBuilder: (context, index) {
+          //       return Padding(
+          //         padding: EdgeInsets.symmetric(horizontal: 20.0),
+          //         child: InkWell(
+          //           onTap: (){
+          //             if (auth.userAuthentificate.coins <= apartmentsFiltered[index].crownPoints){
+          //               ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Vous n'avez pas assez de pièces pour voir cet appartement. Veuillez recharger votre compte.")));
+          //               return;
+          //             }
+          //             setState(() { auth.userAuthentificate.coins -= apartmentsFiltered[index].crownPoints; });
+          //             Navigator.of(context).pushNamed(ApartementView.routeName, arguments: apartmentsFoavorite[index]);
+          //           },
+          //           child: _buildApartmentItem(apartmentsFoavorite[index]),
+          //         ),
+          //       );
+          //     },
+          //   ),
+          // ),
         ],
       ),
     );
@@ -551,135 +490,135 @@ Widget _buildJournal() {
                 children: [ Text( "Journal", style: TextStyle(fontFamily: "Figtree", fontSize: 36, fontWeight: FontWeight.bold ),), ],
               ),
             ),
-            Expanded(
-              flex: 1,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 15.0),
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: journals.map((journal) {
-                    return ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                        backgroundColor: journal['selected'] ? SettingsClass().bottunColor : Colors.white,
-                        foregroundColor: journal['selected'] ? Colors.white : Colors.black,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                          side: BorderSide.none,
-                        ),
-                        padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-                        ),
-                      onPressed: (){
-                        setState(() {
-                          journals.forEach((element) {
-                            element['selected'] = false;
-                            if (element['id'] == journal['id']) {element['selected'] = true;}
-                            _selectedTypeJournal = journal['type'];
-                            activJournal = journal;
-                            letFilterJournal();
-                          });
-                        });
-                      },
-                      child: Text( journal['title'], ),
-                    );
-                  }).toList(),
-                ),
-              ),
-            ),
-            Expanded(
-              flex: 8,
-              child: ListView.builder(
-                itemCount: journalCardFiltered.length,
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 15.0),
-                itemBuilder: (context, index) {
-                  var journal = journalCardFiltered[index];
-                  return  InkWell(
-                    onTap: (){
-                      Navigator.of(context).pushNamed(JournalItem.routeName, arguments: {'journal':journal, 'typeJ':activJournal});
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(vertical: 50),
-                      decoration: BoxDecoration(
-                        border: Border(bottom: BorderSide(color: Colors.grey)),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.max,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Stack(
-                            children: [
-                            ClipRRect(
-                              key: ValueKey("${journal.index}-${journal.date}"),
-                                borderRadius: BorderRadius.circular(8),
-                                child: Image.asset(
-                                  journal.apartmentCard.imageUrl[0],
-                                  height: 93,
-                                  width: 93,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                              Positioned(
-                                bottom: 0,
-                                child: Container(
-                                  width: 93,
-                                  padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 5),
-                                  decoration: BoxDecoration(
-                                    color: _selectedTypeJournal == 0 ? Color.fromARGB (138, 255, 30, 23) : ( _selectedTypeJournal == 1 ? Color.fromARGB(137, 255, 193, 23) : Color.fromARGB(137, 23, 255, 185) ),
-                                    borderRadius: BorderRadius.only(bottomLeft: Radius.circular(8), bottomRight: Radius.circular(8)),
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                    mainAxisSize: MainAxisSize.max,
-                                    children: [
-                                      Text(
-                                        activJournal['title'],
-                                        style: TextStyle(fontFamily: "Figtree",
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(width: 20,),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(journal.apartmentCard.title, style: TextStyle(fontFamily: "Figtree",fontWeight: FontWeight.w700, fontSize: 20),),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.max,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  for(int i = 0; i < 1; i++) //journal.apartmentCard.typeApartment.length
-                                  Padding(
-                                    padding: const EdgeInsets.only(right: 8),
-                                    child: Container(
-                                        padding: const EdgeInsets.all(8),
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(8),
-                                          border: Border.all( color: Colors.transparent),
-                                          color: Color.fromARGB(255, 245, 245, 245),
-                                        ),
-                                        child: Text(typesApartments[journal.apartmentCard.typeApartment[i]].name, style: TextStyle(fontFamily: "Figtree",fontWeight: FontWeight.w500, fontSize: 14),),
-                                    ),
-                                  ),
-                                ]
-                              ),
-                              Text(journal.apartmentCard.location, style: TextStyle(fontFamily: "Figtree",fontWeight: FontWeight.w500, )),
-                              Text(journal.date, style: TextStyle(fontFamily: "Figtree",fontWeight: FontWeight.w500, color: Colors.grey)),
-                            ],
-                          )
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
+            // Expanded(
+            //   flex: 1,
+            //   child: Padding(
+            //     padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 15.0),
+            //     child: ListView(
+            //       scrollDirection: Axis.horizontal,
+            //       children: journals.map((journal) {
+            //         return ElevatedButton(
+            //             style: ElevatedButton.styleFrom(
+            //             backgroundColor: journal['selected'] ? SettingsClass().bottunColor : Colors.white,
+            //             foregroundColor: journal['selected'] ? Colors.white : Colors.black,
+            //             shape: RoundedRectangleBorder(
+            //               borderRadius: BorderRadius.circular(30),
+            //               side: BorderSide.none,
+            //             ),
+            //             padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+            //             ),
+            //           onPressed: (){
+            //             setState(() {
+            //               journals.forEach((element) {
+            //                 element['selected'] = false;
+            //                 if (element['id'] == journal['id']) {element['selected'] = true;}
+            //                 _selectedTypeJournal = journal['type'];
+            //                 activJournal = journal;
+            //                 letFilterJournal();
+            //               });
+            //             });
+            //           },
+            //           child: Text( journal['title'], ),
+            //         );
+            //       }).toList(),
+            //     ),
+            //   ),
+            // ),
+            // Expanded(
+            //   flex: 8,
+            //   child: ListView.builder(
+            //     itemCount: journalCardFiltered.length,
+            //     padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 15.0),
+            //     itemBuilder: (context, index) {
+            //       var journal = journalCardFiltered[index];
+            //       return  InkWell(
+            //         onTap: (){
+            //           Navigator.of(context).pushNamed(JournalItem.routeName, arguments: {'journal':journal, 'typeJ':activJournal});
+            //         },
+            //         child: Container(
+            //           padding: EdgeInsets.symmetric(vertical: 50),
+            //           decoration: BoxDecoration(
+            //             border: Border(bottom: BorderSide(color: Colors.grey)),
+            //           ),
+            //           child: Row(
+            //             mainAxisSize: MainAxisSize.max,
+            //             crossAxisAlignment: CrossAxisAlignment.start,
+            //             children: [
+            //               Stack(
+            //                 children: [
+            //                 ClipRRect(
+            //                   key: ValueKey("${journal.index}-${journal.date}"),
+            //                     borderRadius: BorderRadius.circular(8),
+            //                     child: Image.asset(
+            //                       journal.apartmentCard.imageUrl[0],
+            //                       height: 93,
+            //                       width: 93,
+            //                       fit: BoxFit.cover,
+            //                     ),
+            //                   ),
+            //                   Positioned(
+            //                     bottom: 0,
+            //                     child: Container(
+            //                       width: 93,
+            //                       padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 5),
+            //                       decoration: BoxDecoration(
+            //                         color: _selectedTypeJournal == 0 ? Color.fromARGB (138, 255, 30, 23) : ( _selectedTypeJournal == 1 ? Color.fromARGB(137, 255, 193, 23) : Color.fromARGB(137, 23, 255, 185) ),
+            //                         borderRadius: BorderRadius.only(bottomLeft: Radius.circular(8), bottomRight: Radius.circular(8)),
+            //                       ),
+            //                       child: Row(
+            //                         mainAxisAlignment: MainAxisAlignment.spaceAround,
+            //                         mainAxisSize: MainAxisSize.max,
+            //                         children: [
+            //                           Text(
+            //                             activJournal['title'],
+            //                             style: TextStyle(fontFamily: "Figtree",
+            //                               fontWeight: FontWeight.w500,
+            //                               color: Colors.white,
+            //                             ),
+            //                           ),
+            //                         ],
+            //                       ),
+            //                     ),
+            //                   ),
+            //                 ],
+            //               ),
+            //               SizedBox(width: 20,),
+            //               Column(
+            //                 mainAxisAlignment: MainAxisAlignment.start,
+            //                 crossAxisAlignment: CrossAxisAlignment.start,
+            //                 children: [
+            //                   Text(journal.apartmentCard.title, style: TextStyle(fontFamily: "Figtree",fontWeight: FontWeight.w700, fontSize: 20),),
+            //                   Row(
+            //                     mainAxisAlignment: MainAxisAlignment.start,
+            //                     mainAxisSize: MainAxisSize.max,
+            //                     crossAxisAlignment: CrossAxisAlignment.start,
+            //                     children: [
+            //                       for(int i = 0; i < 1; i++) //journal.apartmentCard.typeApartment.length
+            //                       Padding(
+            //                         padding: const EdgeInsets.only(right: 8),
+            //                         child: Container(
+            //                             padding: const EdgeInsets.all(8),
+            //                             decoration: BoxDecoration(
+            //                               borderRadius: BorderRadius.circular(8),
+            //                               border: Border.all( color: Colors.transparent),
+            //                               color: Color.fromARGB(255, 245, 245, 245),
+            //                             ),
+            //                             child: Text(typesApartments[journal.apartmentCard.typeApartment[i]].name, style: TextStyle(fontFamily: "Figtree",fontWeight: FontWeight.w500, fontSize: 14),),
+            //                         ),
+            //                       ),
+            //                     ]
+            //                   ),
+            //                   Text(journal.apartmentCard.location, style: TextStyle(fontFamily: "Figtree",fontWeight: FontWeight.w500, )),
+            //                   Text(journal.date, style: TextStyle(fontFamily: "Figtree",fontWeight: FontWeight.w500, color: Colors.grey)),
+            //                 ],
+            //               )
+            //             ],
+            //           ),
+            //         ),
+            //       );
+            //     },
+            //   ),
+            // ),
           ],
         ),
       ),
@@ -1102,7 +1041,7 @@ Widget _buildItemList (ProfilMenu profil) {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(25),
-              child: Image.asset(
+              child: Image.network(
                 itemApartment.imageUrl[0],
                 height: 267,
                 width: double.infinity,
@@ -1143,7 +1082,15 @@ Widget _buildItemList (ProfilMenu profil) {
                 child: IconButton(
                   icon: Icon(Icons.favorite, color: !itemApartment.isFavourite ? Colors.white : Colors.red,),
                   onPressed: () {
-                    setState(() { apartments[itemApartment.index].isFavourite = !itemApartment.isFavourite; letFavoriteTheApartments(); });
+                    setState(() { 
+                      for (int i=0; i < apartments.length; i++){
+                        if ( apartments[i].index == itemApartment.index){
+                          apartments[i].isFavourite  =  !itemApartment.isFavourite;
+                          letFavoriteTheApartments();
+                          break;
+                        }
+                      }
+                    });
                   },
                 ),
               ),
@@ -1177,40 +1124,65 @@ Widget _buildItemList (ProfilMenu profil) {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    itemApartment.location,
-                    style: TextStyle(fontFamily: "Figtree",
-                      color: Colors.grey[600],
-                      fontSize: 12,
-                    ),
+                  Row(
+                    children: [
+                      Icon(Icons.location_on_outlined, color: SettingsClass().bottunColor, size:12),
+                      const SizedBox(width: 4),
+                      Text(
+                        itemApartment.location,
+                        style: TextStyle(fontFamily: "Figtree",
+                          color: Colors.grey[600],
+                          fontSize: 12,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                   ),
-                  Text(
-                    "Jusqu'au ${itemApartment.date}",
-                    style: TextStyle(fontFamily: "Figtree",
-                      color: Colors.grey[600],
-                      fontSize: 12,
-                    ),
+                  Row(
+                    children: [
+                      Icon(Icons.calendar_month_outlined, color: SettingsClass().bottunColor, size:12),
+                      const SizedBox(width: 4),
+                      Text(
+                        "Jusqu'au ${_formatDate(itemApartment.date)}",
+                        style: TextStyle(fontFamily: "Figtree",
+                          color: Colors.grey[600],
+                          fontSize: 12,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                   ),
                 ],
               ),
               const SizedBox(height: 8),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text(
-                    "${itemApartment.price.toString()} ${itemApartment.devise} / ${itemApartment.perPeriod}",
-                    style: const TextStyle(fontFamily: "Figtree",
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(   NumberFormat.currency(locale: 'fr_FR', symbol: itemApartment.devise, decimalDigits: 0).format(itemApartment.price),
+                        style: const TextStyle(fontFamily: "Figtree",
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      // Text( itemApartment.perPeriod,
+                      //   style: const TextStyle(fontFamily: "Figtree",
+                      //     fontSize: 10,
+                      //   ),
+                      //   overflow: TextOverflow.ellipsis,
+                      // ),
+                    ],
                   ),
                   Row(
                     children: [
-                      Icon(Icons.star, color: SettingsClass().color, size: 16),
-                      const SizedBox(width: 4),
                       Text(
-                        itemApartment.rating.toString(),
-                        style: const TextStyle(fontFamily: "Figtree",fontSize: 14),
+                        itemApartment.rating.toStringAsFixed(1),
+                        style: const TextStyle(fontFamily: "Figtree",fontSize: 12),
+                        overflow: TextOverflow.ellipsis,
                       ),
                       Text(
                         ' (${itemApartment.reviews.toString()} avis)',
@@ -1218,7 +1190,10 @@ Widget _buildItemList (ProfilMenu profil) {
                           color: Colors.grey[600],
                           fontSize: 12,
                         ),
+                        overflow: TextOverflow.ellipsis,
                       ),
+                      const SizedBox(width: 4),
+                      Icon(Icons.star_outline, color: SettingsClass().color, size: 14),
                     ],
                   ),
                 ],
@@ -1270,8 +1245,9 @@ Widget _buildItemList (ProfilMenu profil) {
 
   letFilterTheApartments () {
     setState(() {
+      apartmentsFiltered = apartments;
       apartmentsFiltered = _selectedType.id == 0 ? apartments 
-      : apartments.where((element) => element.typeApartment.contains(_selectedType.id)).toList();
+      : apartments.where((element) => element.typeApartment!.any((type) => type.id == _selectedType.id)).toList();
     });
   }
   letFavoriteTheApartments () {
@@ -1284,4 +1260,111 @@ Widget _buildItemList (ProfilMenu profil) {
       journalCardFiltered = journalCards.where( (journal) => journal.status == _selectedTypeJournal).toList();
     });
   }
+
+    Future<void> _loadApartments (BuildContext context) async {
+      try {
+        ApiController api = ApiController();
+        final user = FirebaseAuth.instance.currentUser;
+        var datas = {
+          'uid': user?.uid ?? '',
+            if (apartments.isNotEmpty) 'without': apartments.map((element) => element.index).toList(),
+        };
+
+        dynamic response = await api.post('apartments/get-apartments', datas.cast<String, dynamic>());
+
+        if (response == null) {
+          _handleAuthError(context);
+        }
+
+        if (response['error'] != null && response['error'] != 0) {
+          SnackBar(content: Text(response['message'] ?? 'Une erreur est survenue. Veuillez reesayer !'));
+        }
+
+        if (response['user'] == null) { _handleAuthError(context); }
+        setState(() { auth.userAuthentificate = UserAuthentificate.fromJson(response['user']); });
+        if (response['posts'] != null) {
+          if (response['posts'] != null && response['posts'] is List) {
+            List<ApartmentCard> apartmentsGot = []; 
+            for (var elmt in response['posts']){ apartmentsGot.add(ApartmentCard.fromJson(elmt)); } 
+            setState(() {
+              apartments = apartmentsGot + apartments;
+              auth.apartmentCard = apartments;
+              apartmentsFiltered = apartments;
+            });
+            iJustLoadApartment();
+          }
+        }
+        if (response['typesApartments'] != null && response['typesApartments'] is List) {
+          List<TypeApartment> types = []; 
+          for (var elmt in response['typesApartments']){ types.add(TypeApartment.fromJson(elmt)); } 
+          setState(() {
+            typesApartments = types;
+            auth.typesApartments = typesApartments;
+          });
+        }
+      SnackBar(content: Text('Réponse inattendue du serveur.'));
+    } catch (e) { 
+      // _handleAuthError(context);
+      print("Erreur lors du chargement des appartements : $e");
+    } 
+    finally {}
+  }
+
+  void _handleAuthError(BuildContext context) async {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Une erreur est survenue. Veuillez vous reconnecter.')),
+    );
+    final auth = AuthProviders.of(context).auth;
+    await auth.signOut(); // Déconnexion de Firebase
+    Navigator.of(context).pushReplacementNamed(RoutePage.routeName);
+  }
+  
+Widget _builderLandScapeHome(List<ApartmentCard> filteredApartment) {
+  return RefreshIndicator(
+    onRefresh: () async {
+      await _loadApartments(context);
+    },
+    color: SettingsClass().bottunColor,
+    child: ListView.builder(
+      padding: EdgeInsets.zero,
+      shrinkWrap: true,
+      physics: AlwaysScrollableScrollPhysics(), // Permet le tirage même si la liste est petite
+      itemCount: filteredApartment.length,
+      itemBuilder: (context, index) {
+        return Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20.0),
+          child: InkWell(
+            onTap: () {
+              if (auth.userAuthentificate.coins <= filteredApartment[index].crownPoints) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("Vous n'avez pas assez de pièces pour voir cet appartement. Veuillez recharger votre compte.")),
+                );
+                return;
+              }
+              setState(() {
+                auth.userAuthentificate.coins -= filteredApartment[index].crownPoints;
+              });
+              Navigator.of(context).pushNamed(ApartementView.routeName, arguments: filteredApartment[index]);
+            },
+            child: _buildApartmentItem(filteredApartment[index]),
+          ),
+        );
+      },
+    ),
+  );
+}
+
+  String _formatDate(String dateStr) {
+    try {
+      List<String> parts = dateStr.split(' ');
+      if (parts.length < 5) return dateStr;
+      String formattedDateStr = "${parts[1]} ${parts[2]} ${parts[3]}";
+      DateTime parsedDate = DateFormat("MMM d y", "en_US").parse(formattedDateStr);
+      return DateFormat("d MMMM y", "fr_FR").format(parsedDate);
+    } catch (e) {
+      print("Erreur lors du parsing de la date : $e");
+      return dateStr;
+    }
+}
+
 }

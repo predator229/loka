@@ -83,6 +83,7 @@ class _AddCoinViewState extends State<AddCoinView> {
 
   @override
   void initState() {
+    super.initState();
     _nbrChambreController.text = "100";
       evoluatingWidth = 0.0;
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -125,13 +126,12 @@ class _AddCoinViewState extends State<AddCoinView> {
   }
 
   Widget whoIhaveToReturn () {
-    var toReturn = Container();
     switch (currentStep)  {
       case 1:
       case 2:
         return firstConnection();
     }
-    return NotPaidYet();
+    return notPaidYet();
   }
 
     Widget firstConnection() {
@@ -231,7 +231,7 @@ class _AddCoinViewState extends State<AddCoinView> {
   }
 
 
-  Scaffold NotPaidYet (){
+  Scaffold notPaidYet (){
     return Scaffold(
       appBar: AppBar(
         leading: Container(
@@ -241,7 +241,7 @@ class _AddCoinViewState extends State<AddCoinView> {
             borderRadius: BorderRadius.circular(10),
           ),
           child: IconButton(
-            onPressed: (){ Navigator.of(context).pop(); },
+            onPressed: (){Navigator.of(context).pop(); },
             icon: Icon(Icons.cancel, color: Colors.grey, size: 41),
           ),
         ),
@@ -542,9 +542,7 @@ class _AddCoinViewState extends State<AddCoinView> {
 
                                                   ],
                                                 ),
-                                                onTap: () { setState(() {
-                                                  // isOpenedOptionsPayment[i] = !isOpenedOptionsPayment[i];
-                                                }); 
+                                                onTap: () { 
                                               },
                                               ),
                                           ],
@@ -559,9 +557,11 @@ class _AddCoinViewState extends State<AddCoinView> {
                                           children: [
                                             ElevatedButton(
                                               onPressed: () {
-                                                Navigator.pop(context);
-                                                Navigator.of(context).pushNamed(PayementMethodView.routeName);
-                                              },
+                                                  if (mounted) {
+                                                    Navigator.pop(context);
+                                                    Navigator.of(context).pushNamed(PayementMethodView.routeName);
+                                                 }
+                                                },
                                                 style: ElevatedButton.styleFrom(
                                                   backgroundColor: SettingsClass().bottunColor,
                                                   foregroundColor: Colors.white,
@@ -779,8 +779,8 @@ class _AddCoinViewState extends State<AddCoinView> {
       const SnackBar(content: Text('Une erreur est survenue. Veuillez vous reconnecter.')),
     );
     final auth = AuthProviders.of(context).auth;
-    await auth.signOut(); // Déconnexion de Firebase
+    await auth.signOut();
     Navigator.of(context).pushReplacementNamed(RoutePage.routeName);
   }
-  }
+}
 

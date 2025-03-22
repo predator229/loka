@@ -13,28 +13,32 @@ abstract class BaseAuth {
   Future<void> attemptLoginAndSendBackErrorMessage(BuildContext context, dynamic credential);
   Future<User?> currentUser();
   Future<void> signOut();
-  bool get isNewUser;
   UserAuthentificate get userAuthentificate;
+  List<TypeApartment> get typesApartments;
+  List<ApartmentCard> get apartmentCard;
+  set apartmentCard(List<ApartmentCard> auth);
+  set typesApartments(List<TypeApartment> auth);
   set userAuthentificate(UserAuthentificate auth);
 }
 
 class Auth implements BaseAuth {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   UserAuthentificate _userAuthentificate = UserAuthentificate(id:'2', coins:3500, typeUser: SettingsClass().typeUser[2], name: "notgooduser", email: "notgooduser@gmail.com",  new_user: 0, phoneNumber: null, imgPath: "images/damien.jpeg");
+  List<TypeApartment> _typesApartments = SettingsClass().typesApartments;
+  List<ApartmentCard> _apartmentCard = [];
 
   @override
-  bool get isNewUser {
-    return false; //ici a retourner avec l'api
-  }
+  List<ApartmentCard> get apartmentCard { return _apartmentCard; }
+  set apartmentCard(List<ApartmentCard> value) { _apartmentCard = value; }
+
+@override
+  List<TypeApartment> get typesApartments { return _typesApartments; }
+  set typesApartments(List<TypeApartment> value) { _typesApartments = value; }
+
 
   @override
-  UserAuthentificate get userAuthentificate {
-    return _userAuthentificate; //ici a retourner avec l'api
-  }
-
-  set userAuthentificate(UserAuthentificate user) {
-    _userAuthentificate = user;
-  }
+  UserAuthentificate get userAuthentificate { return _userAuthentificate; }
+  set userAuthentificate(UserAuthentificate user) { _userAuthentificate = user; }
 
   @override
   Stream<User?> get onAuthStatusChanged {
@@ -116,4 +120,5 @@ class Auth implements BaseAuth {
       }
     }
   }
+  
 }

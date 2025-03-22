@@ -469,7 +469,6 @@ void loadComboBoc() async {
       child: CircularProgressIndicator(),
     );
   }
-
   return 
     Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -479,7 +478,7 @@ void loadComboBoc() async {
           flex: 1,
           child: Center(
             child: DropdownButton<Country>(
-              value: selectedCountry, //damien
+              value: selectedCountry,
               onChanged: (Country? newValue) {
                 setState(() {
                   selectedCountry = newValue!;
@@ -517,18 +516,38 @@ void loadComboBoc() async {
           child: IntrinsicHeight(
             child: TextFormField(
               controller: _phoneNumber,
-              keyboardType: TextInputType.phone,
+              keyboardType: TextInputType.number,
+              inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+              LengthLimitingTextInputFormatter(16),
+              TextInputFormatter.withFunction(
+                (oldValue, newValue) {
+                  final text = newValue.text;
+                  final newText = StringBuffer();
+                  for (int i = 0; i < text.length; i++) {
+                    if (i %3 == 0 && i != 0) {
+                    newText.write(' ');
+                    }
+                    newText.write(text[i]);
+                  }
+                  return TextEditingValue(
+                    text: newText.toString(),
+                    selection: TextSelection.collapsed(offset: newText.length),
+                  );
+                  },
+                ),
+              ],
               decoration: InputDecoration(
                 labelText: "Telephone",
-                hintText: '7000000',
+                hintText: '9000000',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
+                
               ),
               validator: (value) {
-                if (value!.isEmpty) {
-                  return 'Entrer votre numero de telephone';
-                }
+                if (value!.isEmpty) { return 'Entrer votre numero de telephone'; }
+                if (value.length <10) { return 'Le nr. de telephone doit contenir au moins 8 chiffres.'; }
                 return null;
               },
             ),

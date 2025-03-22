@@ -77,7 +77,7 @@ class JournalCard {
 }
 
 class ApartmentCard {
-  int index;
+  String index;
   List<String> imageUrl;
   String title;
   String description;
@@ -91,10 +91,10 @@ class ApartmentCard {
   String devise;
   String perPeriod;
   bool isFavourite;
-  List<int> typeApartment;
+  List<TypeApartment>? typeApartment;
   int nrColoc;
   int nbrNeightbord;
-  ApartmentCaracteristique caracteristiques;
+  ApartmentCaracteristique? caracteristiques;
 
   ApartmentCard({
     required this.index,
@@ -111,11 +111,60 @@ class ApartmentCard {
     required this.devise,
     required this.perPeriod,
     required this.isFavourite,
-    required this.typeApartment,
+    this.typeApartment,
     required this.nrColoc,
     required this.nbrNeightbord,
-    required this.caracteristiques,
+    this.caracteristiques,
   });
+
+  factory ApartmentCard.fromJson(Map<String, dynamic> json) {
+    return ApartmentCard(
+      index: json['_id'].toString(),
+      imageUrl: List<String>.from(json['imageUrl']),
+      title: json['title'],
+      description: json['description'],
+      location: json['location'],
+      descriptionLocation: json['descriptionLocation'],
+      date: json['date'],
+      price: json['price'].toDouble(),
+      rating: json['rating'].toDouble(),
+      reviews: json['reviews'],
+      crownPoints: json['crownPoints'],
+      devise: json['devise'],
+      perPeriod: json['perPeriod'],
+      isFavourite: json['isFavourite'],
+      typeApartment: json['typeApartment'] != null && (json['typeApartment'] as List).isNotEmpty  ? (json['typeApartment'] as List).map((i) => TypeApartment.fromJson(i)).toList()  : [], 
+      nrColoc: json['nrColoc'],
+      nbrNeightbord: json['nbrNeightbord'],
+      caracteristiques: (json['caracteristiques'] != null &&
+              json['caracteristiques'] is Map)
+          ? ApartmentCaracteristique.fromJson(json['caracteristiques'])
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'index': index,
+      'imageUrl': imageUrl,
+      'title': title,
+      'description': description,
+      'location': location,
+      'descriptionLocation': descriptionLocation,
+      'date': date,
+      'price': price,
+      'rating': rating,
+      'reviews': reviews,
+      'crownPoints': crownPoints,
+      'devise': devise,
+      'perPeriod': perPeriod,
+      'isFavourite': isFavourite,
+      'typeApartment': typeApartment,
+      'nrColoc': nrColoc,
+      'nbrNeightbord': nbrNeightbord,
+      'caracteristiques': caracteristiques,
+    };
+  }
 }
 
 class TypeApartment {
@@ -128,6 +177,29 @@ class TypeApartment {
     required this.name,
     required this.icone,
   });
+
+  factory TypeApartment.fromJson(Map<String, dynamic> json) {
+    return TypeApartment(
+      id: json['_id'],
+      name: json['name'],
+      icone: getIconFromString(json['icone']),
+    );
+  }
+
+  static IconData getIconFromString(String iconName) {
+    return IconData(
+      int.tryParse(iconName) ?? 0xe88a,
+      fontFamily: 'MaterialIcons',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'icone': icone.codePoint,
+    };
+  }
 }
 
 class Room {
@@ -135,7 +207,26 @@ class Room {
   String? moreinformation;
   String superficie;
   RoomType type;
+
   Room({required this.id, this.moreinformation, required this.superficie, required this.type});
+
+  factory Room.fromJson(Map<String, dynamic> json) {
+    return Room(
+      id: json['_id'],
+      moreinformation: json['moreinformation'],
+      superficie: json['superficie'],
+      type: RoomType.fromJson(json['type']),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'moreinformation': moreinformation,
+      'superficie': superficie,
+      'type': type.toJson(),
+    };
+  }
 }
 
 class RoomType {
@@ -143,7 +234,26 @@ class RoomType {
   String name;
   String? description;
   IconData? icon;
+
   RoomType({required this.id, this.description, required this.name, this.icon});
+
+  factory RoomType.fromJson(Map<String, dynamic> json) {
+    return RoomType(
+      id: json['_id'],
+      name: json['name'],
+      description: json['description'],
+      icon: json['icon'] != null ? IconData(json['icon'], fontFamily: 'MaterialIcons') : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'description': description,
+      'icon': icon?.codePoint,
+    };
+  }
 }
 
 class ApartmentCaracteristique {
@@ -152,23 +262,88 @@ class ApartmentCaracteristique {
   String superficieTotale;
   List<ApartementEquipement>? equipements;
   List<ServiceClosest> services;
-  ApartmentCaracteristique ({ required this.id, required this.rooms, required this.superficieTotale, this.equipements, required this.services});
+
+  ApartmentCaracteristique({
+    required this.id,
+    required this.rooms,
+    required this.superficieTotale,
+    this.equipements,
+    required this.services,
+  });
+
+  factory ApartmentCaracteristique.fromJson(Map<String, dynamic> json) {
+    return ApartmentCaracteristique(
+      id: json['_id'],
+      rooms: (json['rooms'] != null && json['rooms'] is List)
+          ? (json['rooms'] as List).map((room) => Room.fromJson(room)).toList()
+          : [],
+      superficieTotale: json['superficieTotale'] ?? '',
+      equipements: json['equipements'] != null
+          ? (json['equipements'] as List)
+              .map((e) => ApartementEquipement.fromJson(e))
+              .toList()
+          : [],
+      services: json['services'] != null
+          ? (json['services'] as List)
+              .map((s) => ServiceClosest.fromJson(s))
+              .toList()
+          : [],
+    );
+  }
 }
 
-class ApartementEquipement{
+class ApartementEquipement {
   String id;
   String? moreinformation;
   String? superficie;
   EquimentType type;
+
   ApartementEquipement({required this.id, this.moreinformation, this.superficie, required this.type});
 
+  factory ApartementEquipement.fromJson(Map<String, dynamic> json) {
+    return ApartementEquipement(
+      id: json['_id'],
+      moreinformation: json['moreinformation'],
+      superficie: json['superficie'],
+      type: EquimentType.fromJson(json['type']),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'moreinformation': moreinformation,
+      'superficie': superficie,
+      'type': type.toJson(),
+    };
+  }
 }
+
 class EquimentType {
   String id;
   String name;
   String? description;
   IconData? icon;
+
   EquimentType({this.description, required this.id, this.icon, required this.name});
+
+  factory EquimentType.fromJson(Map<String, dynamic> json) {
+    return EquimentType(
+      id: json['_id'],
+      name: json['name'],
+      description: json['description'],
+      icon: json['icon'] != null ? IconData(json['icon'], fontFamily: 'MaterialIcons') : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'description': description,
+      'icon': icon?.codePoint,
+    };
+  }
 }
 
 class ServiceClosest {
@@ -177,15 +352,49 @@ class ServiceClosest {
   String description;
 
   ServiceClosest({required this.id, required this.description, required this.name});
+
+  factory ServiceClosest.fromJson(Map<String, dynamic> json) {
+    return ServiceClosest(
+      id: json['_id'],
+      name: json['name'],
+      description: json['description'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'description': description,
+    };
+  }
 }
 
-class CouvertureChambre{
+class CouvertureChambre {
   String id;
   String name;
   String? description;
   String icon;
 
-  CouvertureChambre({ required this.name, required this.id, required this.icon, this.description });
+  CouvertureChambre({required this.name, required this.id, required this.icon, this.description});
+
+  factory CouvertureChambre.fromJson(Map<String, dynamic> json) {
+    return CouvertureChambre(
+      id: json['_id'],
+      name: json['name'],
+      description: json['description'],
+      icon: json['icon'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'description': description,
+      'icon': icon,
+    };
+  }
 }
 
 class ProfilMenu {
@@ -195,7 +404,30 @@ class ProfilMenu {
   IconData? icon;
   String? routeName;
   bool? isLogout;
+
   ProfilMenu({this.icon, this.isLogout, required this.id, required this.title, this.description, this.routeName});
+
+  factory ProfilMenu.fromJson(Map<String, dynamic> json) {
+    return ProfilMenu(
+      id: json['_id'],
+      title: json['title'],
+      description: json['description'],
+      icon: json['icon'] != null ? IconData(json['icon'], fontFamily: 'MaterialIcons') : null,
+      routeName: json['routeName'],
+      isLogout: json['isLogout'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'icon': icon?.codePoint,
+      'routeName': routeName,
+      'isLogout': isLogout,
+    };
+  }
 }
 
 class UserAuthentificate {
