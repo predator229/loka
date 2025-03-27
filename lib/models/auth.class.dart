@@ -47,9 +47,10 @@ class Auth implements BaseAuth {
 
   @override
   Future<void> sendCodeAndWaitResponse(BuildContext context, String phoneNumber, Country? country, void Function(String) isCodeSentUserFromFireBase) async {
-    String fullPhoneNumber = '${country?.dialcode ?? ''}$phoneNumber';
+    String fullPhoneNumber = '${country?.dialcode ?? ''} $phoneNumber';
+    print(fullPhoneNumber);
     await FirebaseAuth.instance.verifyPhoneNumber(
-      phoneNumber:  fullPhoneNumber,
+      phoneNumber: fullPhoneNumber, //fullPhoneNumber.replaceAll(' ', '')
       verificationCompleted: (PhoneAuthCredential credential) async {
         attemptLoginAndSendBackErrorMessage(context, credential);
       },
@@ -58,6 +59,12 @@ class Auth implements BaseAuth {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Le numero de telephone est incorrect $fullPhoneNumber')),
           );
+        }else{
+          print(e.code);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Erreur de connection de merce ${e.code}')),
+          );
+
         }
       },
       codeSent: (String verificationId, int? resendToken) {

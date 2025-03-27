@@ -34,8 +34,8 @@ Future<dynamic?> _getUserAuthentificate(BuildContext context) async {
       // print('${user?.uid} : ${headers}');
 
     final response = await http.post(
-      // Uri.parse('https://backend-loka-production.up.railway.app/api/users/authentificate'),
-      Uri.parse('http://localhost:5050/api/users/authentificate'),
+      Uri.parse('https://backend-loka-production.up.railway.app/api/users/authentificate'),
+      // Uri.parse('http://localhost:5050/api/users/authentificate'),
       headers: headers,
       body: jsonEncode(datas),
     );

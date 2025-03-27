@@ -3,8 +3,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class ApiController {
-  // final String baseUrl = 'https://backend-loka-production.up.railway.app/api/';
-  final String baseUrl = 'http://localhost:5050/api/';
+  final String baseUrl = 'https://backend-loka-production.up.railway.app/api/';
+  // final String baseUrl = 'http://localhost:5050/api/';
 
   Future<dynamic> get(String endpoint) async {
     try {

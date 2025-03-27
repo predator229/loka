@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -136,8 +134,7 @@ class ApartmentCard {
       typeApartment: json['typeApartment'] != null && (json['typeApartment'] as List).isNotEmpty  ? (json['typeApartment'] as List).map((i) => TypeApartment.fromJson(i)).toList()  : [], 
       nrColoc: json['nrColoc'],
       nbrNeightbord: json['nbrNeightbord'],
-      caracteristiques: (json['caracteristiques'] != null &&
-              json['caracteristiques'] is Map)
+      caracteristiques: (json['caracteristiques'] != null)
           ? ApartmentCaracteristique.fromJson(json['caracteristiques'])
           : null,
     );
@@ -185,21 +182,29 @@ class TypeApartment {
       icone: getIconFromString(json['icone']),
     );
   }
-
-  static IconData getIconFromString(String iconName) {
-    return IconData(
-      int.tryParse(iconName) ?? 0xe88a,
-      fontFamily: 'MaterialIcons',
-    );
+  static IconData getIconFromString(String iconName) { //damien
+    const Map<String, IconData> iconsMap = {
+      'view_comfortable_outlined': Icons.view_comfortable_outlined,
+      'home_filled': Icons.home_filled,
+      'home_work': Icons.home_work,
+      "blinds_closed_outlined" : Icons.blinds_closed_outlined,
+      "local_offer_rounded" : Icons.local_offer_rounded,
+    };
+    return iconsMap[iconName] ?? Icons.error;
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
+      '_id': id,
       'name': name,
-      'icone': icone.codePoint,
+      'icone': getIconName(icone),
     };
   }
+
+  static String getIconName(IconData iconData) {
+    return iconData.codePoint.toString();
+  }
+
 }
 
 class Room {
@@ -242,8 +247,31 @@ class RoomType {
       id: json['_id'],
       name: json['name'],
       description: json['description'],
-      icon: json['icon'] != null ? IconData(json['icon'], fontFamily: 'MaterialIcons') : null,
+      icon: json['icon'] != null ?getIconFromString( json['icon']): null,
     );
+  }
+  static IconData getIconFromString(String iconName) { //damien
+    const Map<String, IconData> iconsMap = {
+      'view_comfortable_outlined': Icons.view_comfortable_outlined,
+      'home_filled': Icons.home_filled,
+      'home_work': Icons.home_work,
+      "blinds_closed_outlined" : Icons.blinds_closed_outlined,
+      "local_offer_rounded" : Icons.local_offer_rounded,
+      "tv" : Icons.tv,
+      "wallet_sharp" : Icons.wallet_sharp,
+      "waterfall_chart_sharp" : Icons.waterfall_chart_sharp,
+      "panorama_wide_angle_select_sharp" : Icons.panorama_wide_angle_select_sharp,
+      "outdoor_grill_sharp" : Icons.outdoor_grill_sharp,
+      "kitchen_sharp" : Icons.kitchen_sharp,
+      "door_back_door" : Icons.door_back_door,
+      "sanitizer_outlined" : Icons.sanitizer_outlined,
+      "self_improvement" : Icons.self_improvement,
+      "bathroom" : Icons.bathroom,
+      "bed_rounded" : Icons.bed_rounded,
+      "gradient_rounded" : Icons.gradient_rounded,
+      "chair" : Icons.chair,
+    };
+    return iconsMap[iconName] ?? Icons.error;
   }
 
   Map<String, dynamic> toJson() {
@@ -332,8 +360,32 @@ class EquimentType {
       id: json['_id'],
       name: json['name'],
       description: json['description'],
-      icon: json['icon'] != null ? IconData(json['icon'], fontFamily: 'MaterialIcons') : null,
+      icon: getIconFromString(json['icon']),
     );
+  }
+
+  static IconData getIconFromString(String iconName) { //damien
+    const Map<String, IconData> iconsMap = {
+      'view_comfortable_outlined': Icons.view_comfortable_outlined,
+      'home_filled': Icons.home_filled,
+      'home_work': Icons.home_work,
+      "blinds_closed_outlined" : Icons.blinds_closed_outlined,
+      "local_offer_rounded" : Icons.local_offer_rounded,
+      "tv" : Icons.tv,
+      "wallet_sharp" : Icons.wallet_sharp,
+      "waterfall_chart_sharp" : Icons.waterfall_chart_sharp,
+      "panorama_wide_angle_select_sharp" : Icons.panorama_wide_angle_select_sharp,
+      "outdoor_grill_sharp" : Icons.outdoor_grill_sharp,
+      "kitchen_sharp" : Icons.kitchen_sharp,
+      "door_back_door" : Icons.door_back_door,
+      "sanitizer_outlined" : Icons.sanitizer_outlined,
+      "self_improvement" : Icons.self_improvement,
+      "bathroom" : Icons.bathroom,
+      "bed_rounded" : Icons.bed_rounded,
+      "gradient_rounded" : Icons.gradient_rounded,
+      "chair" : Icons.chair,
+    };
+    return iconsMap[iconName] ?? Icons.error;
   }
 
   Map<String, dynamic> toJson() {
@@ -457,7 +509,7 @@ factory UserAuthentificate.fromJson(Map<String, dynamic> json) {
     surname: json['surname'].toString(),
     imgPath: json['imgPath'].toString() ?? 'https://ui-avatars.com/api/?size=500&background=green&name=${json['name']}',
     typeUser: json['role'] == 'admin' ? SettingsClass().typeUser[2] : (json['role'] == 'sealler' ? SettingsClass().typeUser[0] : SettingsClass().typeUser[1]) ,
-    coins: json['coins']?.toDouble() ?? 0.0,  // Gestion de la valeur nulle avec un fallback
+    coins: json['coins']?.toDouble() ?? 0.0,
     selectedPayementMethod: json['selectedPayementMethod'] != null 
         ? SelectedPayement.fromJson(json['selectedPayementMethod']) 
         : null,

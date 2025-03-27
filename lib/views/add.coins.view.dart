@@ -98,7 +98,7 @@ class _AddCoinViewState extends State<AddCoinView> {
     final maxSize = MediaQuery.of(context).size.width - 50;
     const increment = 20.0;
     const duration = Duration(milliseconds: 500);
-
+    bool redirect = false;
     _timer = Timer.periodic(duration, (timer) {
       setState(() {
         evoluatingWidth += increment;
@@ -106,11 +106,12 @@ class _AddCoinViewState extends State<AddCoinView> {
           evoluatingWidth = maxSize;
           if (currentStep == 2){
             _timer.cancel();
-            Navigator.of(context).pushReplacementNamed(HomeView.routeName);
+            redirect = true;
           }
           evoluatingWidth = 0.0;
         }
       });
+      if (redirect){Navigator.of(context).pushReplacementNamed(HomeView.routeName); }
     });
   }
 

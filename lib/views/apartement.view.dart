@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:loka/controllers/auth.provider.controller.dart';
 import 'package:loka/models/auth.class.dart';
 import 'package:loka/models/settings.class.dart';
@@ -68,7 +69,7 @@ if (apartentCard.caracteristiques?.rooms != null) {
       else{ nbrEquipRigth +=1;  }
     }
 
-    List<ServiceClosest> servicess = showMoreServices ? (apartentCard.caracteristiques!.services.length > 2 ? apartentCard.caracteristiques!.services.sublist(1, 2) : apartentCard.caracteristiques!.services)  : apartentCard.caracteristiques!.services;
+    List<ServiceClosest> servicess = apartentCard.caracteristiques != null ? ( showMoreServices ? (apartentCard.caracteristiques!.services.length > 2 ? apartentCard.caracteristiques!.services.sublist(1, 2) : apartentCard.caracteristiques!.services)  : apartentCard.caracteristiques!.services) : [];
 
     return Scaffold(
       body: 
@@ -91,7 +92,7 @@ if (apartentCard.caracteristiques?.rooms != null) {
                             ClipRRect(
                               key: ValueKey("${apartentCard.index}-${apartentCard.date}"),
                               borderRadius: BorderRadius.circular(15),
-                              child: Image.asset(
+                              child: Image.network(
                                 apartentCard.imageUrl[currentImgIndex],
                                 height: 270,
                                 width: double.infinity,
@@ -200,7 +201,7 @@ if (apartentCard.caracteristiques?.rooms != null) {
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8),
-                child: Image.asset(apartentCard.imageUrl[i], fit: BoxFit.cover),
+                child: Image.network(apartentCard.imageUrl[i], fit: BoxFit.cover),
               ),
             ),
           ),
@@ -267,7 +268,7 @@ if (displayAllPicture)
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(8),
-                      child: Image.asset(apartentCard.imageUrl[i], fit: BoxFit.cover),
+                      child: Image.network(apartentCard.imageUrl[i], fit: BoxFit.cover),
                     ),
                   ),
                 ),
@@ -362,6 +363,7 @@ if (displayAllPicture)
                                               crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
                                                 Text("${nr_room[i]} ${SettingsClass().roomTypes[i].name}"),
+                                                if(apartentCard.caracteristiques != null)
                                                 for (var j = 0; j < apartentCard.caracteristiques!.rooms.length; j++) 
                                                 if (apartentCard.caracteristiques!.rooms[j].type.id == SettingsClass().roomTypes[i].id) 
                                                 Padding(
@@ -406,7 +408,7 @@ if (displayAllPicture)
                                                   decoration: BoxDecoration(
                                                     color: const Color.fromARGB(23, 8, 131, 120)
                                                   ),
-                                                  child: Text(apartentCard.caracteristiques!.superficieTotale, style: TextStyle(fontFamily: "Figtree",fontSize: 12, fontWeight: FontWeight.w400, color: SettingsClass().bottunColor),),
+                                                  child: Text(apartentCard.caracteristiques != null ? apartentCard.caracteristiques!.superficieTotale : '', style: TextStyle(fontFamily: "Figtree",fontSize: 12, fontWeight: FontWeight.w400, color: SettingsClass().bottunColor),),
                                                 ),
                                               ],
                                             ),
@@ -679,29 +681,30 @@ if (displayAllPicture)
                             children: [
                               Text("Services à proximité", style: TextStyle(fontFamily: "Figtree",fontSize: 20, color: Colors.black, fontWeight:FontWeight.w600),),
                               SizedBox(height: 10),
-                              for (int i=0; i < (apartentCard.caracteristiques!.services.length > 2 && !showMoreServices ? 2 : apartentCard.caracteristiques!.services.length ) ; i++ )
-                              Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 10.0),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "${apartentCard.caracteristiques!.services[i].name} : ",
-                                      style: const TextStyle(fontFamily: "Figtree",fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600,),
-                                    ),
-                                    Text(
-                                      apartentCard.caracteristiques!.services[i].description,
-                                      softWrap: true,
-                                      style: TextStyle(fontFamily: "Figtree",
-                                        fontSize: 15,
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.w400,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
+                              // if (apartentCard.caracteristiques != null)
+                              // for (int i=0; i < (apartentCard.caracteristiques!.services.length > 2 && !showMoreServices ? 2 : apartentCard.caracteristiques!.services.length ) ; i++ )
+                              // Padding(
+                              //   padding: const EdgeInsets.symmetric(vertical: 10.0),
+                              //   child: Column(
+                              //     mainAxisAlignment: MainAxisAlignment.start,
+                              //     crossAxisAlignment: CrossAxisAlignment.start,
+                              //     children: [
+                              //       Text(
+                              //         "${apartentCard.caracteristiques!.services[i].name} : ",
+                              //         style: const TextStyle(fontFamily: "Figtree",fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600,),
+                              //       ),
+                              //       Text(
+                              //         apartentCard.caracteristiques!.services[i].description,
+                              //         softWrap: true,
+                              //         style: TextStyle(fontFamily: "Figtree",
+                              //           fontSize: 15,
+                              //           color: Colors.black,
+                              //           fontWeight: FontWeight.w400,
+                              //         ),
+                              //       ),
+                              //     ],
+                              //   ),
+                              // ),
                             ],
                           ),
                           SizedBox(height: 20,),
@@ -918,7 +921,7 @@ if (displayAllPicture)
                         ),
                       ),
                       Text(
-                      "Jusqu'au ${apartentCard.date}",
+                        "Jusqu'au ${_formatDate(apartentCard.date)}",
                       style: TextStyle(fontFamily: "Figtree",
                         color: Colors.grey[600],
                         fontSize: 12,
@@ -943,5 +946,17 @@ if (displayAllPicture)
         ),
     );
   }
+  String _formatDate(String dateStr) {
+    try {
+      List<String> parts = dateStr.split(' ');
+      if (parts.length < 5) return dateStr;
+      String formattedDateStr = "${parts[1]} ${parts[2]} ${parts[3]}";
+      DateTime parsedDate = DateFormat("MMM d y", "en_US").parse(formattedDateStr);
+      return DateFormat("d MMMM y", "fr_FR").format(parsedDate);
+    } catch (e) {
+      print("Erreur lors du parsing de la date : $e");
+      return dateStr;
+    }
+}
 
 }

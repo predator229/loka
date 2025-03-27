@@ -56,7 +56,7 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
   late List<TypeApartment> typesApartments =[];
 
   late TypeApartment _selectedType;
-  int _selectedTypeJournal = 0;
+  String _selectedTypeJournal ='';
   late dynamic activJournal;
 
   late List<ApartmentCard> apartments = [];
@@ -78,13 +78,15 @@ late List<JournalCard> journalCards = [];
       _startProgressAnimation();
       typesApartments = auth.typesApartments.isNotEmpty ? auth.typesApartments : SettingsClass().typesApartments;
       _selectedType = SettingsClass().typesApartments[0];
-      print(auth.typesApartments);
       apartments = auth.apartmentCard.isNotEmpty ? auth.apartmentCard : [];
       if (apartments.isEmpty){
           imLoading = true; 
           await _loadApartments(context);
           imLoading = false; 
+          _selectedType = typesApartments[0];
+            iJustLoadApartment;
       }
+      apartmentsFiltered = apartments;
     });
   }
 
@@ -1300,6 +1302,7 @@ Widget _buildItemList (ProfilMenu profil) {
           setState(() {
             typesApartments = types;
             auth.typesApartments = typesApartments;
+            letFilterTheApartments(); 
           });
         }
       SnackBar(content: Text('Réponse inattendue du serveur.'));
