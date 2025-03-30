@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:loka/controllers/auth.provider.controller.dart';
 import 'package:loka/models/auth.class.dart';
 import 'package:loka/models/settings.class.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ApartementView extends StatefulWidget {
   static const String routeName = '/apartment-item';
@@ -22,6 +23,9 @@ class _ApartementViewState extends State<ApartementView> with SingleTickerProvid
   bool showMoreServices = false;
   bool _isExpanded = true;
 
+  late List<int> nrRoom;
+  late List<int> nrAmenagements;
+
   late BaseAuth auth;
 
   bool displayAllPicture = false;
@@ -35,37 +39,37 @@ class _ApartementViewState extends State<ApartementView> with SingleTickerProvid
   void didChangeDependencies() {
     super.didChangeDependencies();
     auth = AuthProviders.of(context).auth;
+    nrRoom = List<int>.filled(auth.roomsType.length, 0);
+    nrAmenagements = List.filled(auth.equipementsType.length, 0);
   }
 
   @override
   Widget build(BuildContext context) {
     ApartmentCard apartentCard = ModalRoute.of(context)!.settings.arguments as ApartmentCard;
-    List<int> nr_room = List<int>.filled(SettingsClass().roomTypes.length, 0, growable: false);
-    List<int> nr_amenagements = List<int>.filled(SettingsClass().equipementsType.length, 0, growable: false);
 
-if (apartentCard.caracteristiques?.rooms != null) {
-    for (int i = 0; i< SettingsClass().roomTypes.length; i++) {
-      for (var j = 0; j < apartentCard.caracteristiques!.rooms.length; j++) {
-        if (apartentCard.caracteristiques!.rooms[j].type.id == SettingsClass().roomTypes[i].id) {
-          nr_room[i] += 1;
+    if (apartentCard.caracteristiques?.rooms != null) {
+        for (int i = 0; i< auth.roomsType.length; i++) {
+          for (var j = 0; j < apartentCard.caracteristiques!.rooms.length; j++) {
+            if (apartentCard.caracteristiques!.rooms[j].type.id == auth.roomsType[i].id) {
+              nrRoom[i] += 1;
+            }
+          }
         }
       }
-    }
-  }
 
 
     int nbrEquipLeft = 0;
     int nbrEquipRigth = 0;
 
-    for (int i = 0; i< SettingsClass().equipementsType.length; i++) {
+    for (int i = 0; i< auth.equipementsType.length; i++) {
       if (apartentCard.caracteristiques?.equipements != null){
         for (var j = 0; j < apartentCard.caracteristiques!.equipements!.length; j++) {
-          if (apartentCard.caracteristiques!.equipements![j].type.id == SettingsClass().equipementsType[i].id) {
-            nr_amenagements[i] += 1;
+          if (apartentCard.caracteristiques!.equipements![j].type.id == auth.equipementsType[i].id) {
+            nrAmenagements[i] += 1;
           }
         }
       }
-      if(nr_amenagements[i] >0 && i%2 == 0){ nbrEquipLeft += 1;}
+      if(nrAmenagements[i] >0 && i%2 == 0){ nbrEquipLeft += 1;}
       else{ nbrEquipRigth +=1;  }
     }
 
@@ -347,25 +351,25 @@ if (displayAllPicture)
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    for (int i = 0; i< SettingsClass().roomTypes.length; i++)
-                                    if(nr_room[i] >0)
+                                    for (int i = 0; i< auth.roomsType.length; i++)
+                                    if(nrRoom[i] >0)
                                     Padding(
                                       padding: const EdgeInsets.only(right: 10),
                                       child: Row(
                                         mainAxisAlignment: MainAxisAlignment.start,
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          Icon(SettingsClass().roomTypes[i].icon, color: Colors.black),
+                                          Icon(auth.roomsType[i].icon, color: Colors.black),
                                           Padding(
                                             padding: const EdgeInsets.symmetric(horizontal: 20),
                                             child: Column(
                                               mainAxisAlignment: MainAxisAlignment.start,
                                               crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
-                                                Text("${nr_room[i]} ${SettingsClass().roomTypes[i].name}"),
+                                                Text("${nrRoom[i]} ${auth.roomsType[i].name}"),
                                                 if(apartentCard.caracteristiques != null)
                                                 for (var j = 0; j < apartentCard.caracteristiques!.rooms.length; j++) 
-                                                if (apartentCard.caracteristiques!.rooms[j].type.id == SettingsClass().roomTypes[i].id) 
+                                                if (apartentCard.caracteristiques!.rooms[j].type.id == auth.roomsType[i].id) 
                                                 Padding(
                                                   padding: const EdgeInsets.symmetric(vertical:2.0),
                                                   child: Container(
@@ -481,17 +485,17 @@ if (displayAllPicture)
                                       mainAxisAlignment: MainAxisAlignment.start,
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        for (int i = 0; i < SettingsClass().equipementsType.length; i++)
-                                        if(nr_amenagements[i] >0 && i%2 == 0) //(showMoreEchipment && i)
+                                        for (int i = 0; i < auth.equipementsType.length; i++)
+                                        if(nrAmenagements[i] >0 && i%2 == 0) //(showMoreEchipment && i)
                                           Padding(
                                             padding: const EdgeInsets.only(right: 40),
                                             child: Row(
                                               mainAxisAlignment: MainAxisAlignment.start,
                                               children: [
-                                                Icon(SettingsClass().equipementsType[i].icon, color: Colors.black),
+                                                Icon(auth.equipementsType[i].icon, color: Colors.black),
                                                 Padding(
                                                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                                                  child: Text(SettingsClass().equipementsType[i].name,),
+                                                  child: Text(auth.equipementsType[i].name,),
                                                 ),
                                               ],
                                             ),
@@ -503,17 +507,17 @@ if (displayAllPicture)
                                       mainAxisAlignment: MainAxisAlignment.start,
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        for (int i = 0; i < SettingsClass().equipementsType.length; i++)
-                                        if(nr_amenagements[i] >0  && i%2 != 0)
+                                        for (int i = 0; i < auth.equipementsType.length; i++)
+                                        if(nrAmenagements[i] >0  && i%2 != 0)
                                           Padding(
                                             padding: const EdgeInsets.only(right: 40),
                                             child: Row(
                                               mainAxisAlignment: MainAxisAlignment.start,
                                               children: [
-                                                Icon(SettingsClass().equipementsType[i].icon, color: Colors.black),
+                                                Icon(auth.equipementsType[i].icon, color: Colors.black),
                                                 Padding(
                                                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                                                  child: Text(SettingsClass().equipementsType[i].name,),
+                                                  child: Text(auth.equipementsType[i].name,),
                                                 ),
                                               ],
                                             ),
@@ -523,15 +527,15 @@ if (displayAllPicture)
                                     ],
                                 ),
                               ),
-                              InkWell(
-                                onTap: (){ setState(() { showMoreEchipment = !showMoreEchipment; });},
-                                child: Row(
-                                  children: [
-                                    Text( !showMoreEchipment ? "Voir toutes les aménagements " :  "Voir  moins ...", style: TextStyle(fontFamily: "Figtree",color: SettingsClass().bottunColor, decoration: TextDecoration.underline, decorationColor: SettingsClass().bottunColor, fontSize: 15, fontWeight: FontWeight.w600),),
-                                    Icon(!showMoreEchipment ? Icons.arrow_forward : Icons.arrow_back, color: SettingsClass().bottunColor, size: 30,)
-                                  ],
-                                ),
-                                ),
+                              // InkWell(
+                              //   onTap: (){ setState(() { showMoreEchipment = !showMoreEchipment; });},
+                              //   child: Row(
+                              //     children: [
+                              //       Text( !showMoreEchipment ? "Voir tous les aménagements " :  "Voir  moins ...", style: TextStyle(fontFamily: "Figtree",color: SettingsClass().bottunColor, decoration: TextDecoration.underline, decorationColor: SettingsClass().bottunColor, fontSize: 15, fontWeight: FontWeight.w600),),
+                              //       Icon(!showMoreEchipment ? Icons.arrow_forward : Icons.arrow_back, color: SettingsClass().bottunColor, size: 30,)
+                              //     ],
+                              //   ),
+                              //   ),
                             ],
                           ),
                           SizedBox(height: 20,),
@@ -598,7 +602,7 @@ if (displayAllPicture)
                                     fontWeight: FontWeight.w400,
                                   ),
                                 ),
-                                if (apartentCard.descriptionLocation!.isNotEmpty && !showMoreDescriptionLocation)
+                                if (false && apartentCard.descriptionLocation!.isNotEmpty && !showMoreDescriptionLocation)
                                 Padding(
                                   padding: const EdgeInsets.only(top: 8.0),
                                   child: InkWell(
@@ -620,13 +624,30 @@ if (displayAllPicture)
                             ),
                             child: Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text("Voir l’itinéraire", style: TextStyle(fontFamily: "Figtree",color: Color.fromARGB(255,8, 131, 120),),),
-                                  Icon(Icons.location_on_sharp, color: SettingsClass().bottunColor, size: 30,),
-                                ],
-                              ),
+                              child: 
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () => _openMap(apartentCard.maplocation),
+                                      child: Text(
+                                        "Voir l’itinéraire",
+                                        style: TextStyle(
+                                          fontFamily: "Figtree",
+                                          color: Color.fromARGB(255, 8, 131, 120),
+                                        ),
+                                      ),
+                                    ),
+                                    GestureDetector(
+                                      onTap: () => _openMap(apartentCard.maplocation),
+                                      child: Icon(
+                                        Icons.location_on_sharp,
+                                        color: SettingsClass().bottunColor,
+                                        size: 30,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                             ),
                           ),
                           SizedBox(height: 20,),
@@ -957,6 +978,15 @@ if (displayAllPicture)
       print("Erreur lors du parsing de la date : $e");
       return dateStr;
     }
+}
+
+void _openMap(String location) async {
+  final Uri googleMapsUrl = Uri.parse("https://www.google.com/maps/dir/?api=1&destination=$location");
+  
+  if (await canLaunchUrl(googleMapsUrl)) { await launchUrl(googleMapsUrl, mode: LaunchMode.externalApplication);
+  } else {
+    throw 'Impossible d’ouvrir Google Maps';
+  }
 }
 
 }

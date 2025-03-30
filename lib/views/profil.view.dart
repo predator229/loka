@@ -43,7 +43,18 @@ class _ProfilViewState extends State<ProfilView> with SingleTickerProviderStateM
       _nameController.text = auth.userAuthentificate.name ?? "";
       _surnameController.text = auth.userAuthentificate.surname ?? "";
       _emailController.text = auth.userAuthentificate.email ?? "";
-      _phoneNumber.text = (auth.userAuthentificate.phoneNumber != null ? auth.userAuthentificate.phoneNumber?.digits :  "")!;
+                  
+
+      _phoneNumber.text = (auth.userAuthentificate.phoneNumber != null ? auth.userAuthentificate.phoneNumber?.digits :  "")!; //damien
+      final text = _phoneNumber.text;
+      final newText = StringBuffer();
+      for (int i = 0; i < text.length; i++) {
+        if (i %3 == 0 && i != 0) {
+        if(text[i] !=' '){ newText.write(' ');}
+        }
+        newText.write(text[i]);
+      }
+      _phoneNumber.text = newText.toString();
       imstachhere = auth.userAuthentificate.phoneNumber == null;
     });
   }
@@ -574,8 +585,6 @@ void loadComboBoc() async {
 
 
     setState(() { imLoadingDatas = false ; });
-
-
     if (response == null) {
       _handleAuthError(context);
       return;

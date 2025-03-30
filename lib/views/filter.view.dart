@@ -1,6 +1,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:loka/controllers/auth.provider.controller.dart';
+import 'package:loka/models/auth.class.dart';
 import 'package:loka/models/settings.class.dart';
 
 class FilterView extends StatefulWidget {
@@ -11,7 +13,10 @@ class FilterView extends StatefulWidget {
   State<FilterView> createState() => _FilterViewState();
 }
 
-class _FilterViewState extends State<FilterView> {
+class _FilterViewState extends State<FilterView>with SingleTickerProviderStateMixin{
+
+  late BaseAuth auth;
+
   final inMinPrice = 0.0;
   final inMaxPrice = 2000000.0;
 
@@ -23,7 +28,7 @@ class _FilterViewState extends State<FilterView> {
 
 
   List<int> _currentCouverture = [];
-  List<bool> _currentEquipemts = List<bool>.filled(SettingsClass().equipementsType.length, false);
+  late List<bool> _currentEquipemts=[];
 
   final TextEditingController _minBudgetController = TextEditingController();
   final TextEditingController _maxBudgetController = TextEditingController();
@@ -48,6 +53,11 @@ class _FilterViewState extends State<FilterView> {
 
   @override
   void initState() {
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      auth = AuthProviders.of(context).auth;
+      _currentEquipemts = List<bool>.filled(auth.equipementsType.length, false);
+      });
     _minBudgetController.text = inMinPrice.toString();
     _maxBudgetController.text = inMaxPrice.toString();
 
@@ -58,6 +68,22 @@ class _FilterViewState extends State<FilterView> {
 
     super.initState();
   }
+
+@override
+void didChangeDependencies() {
+  super.didChangeDependencies();
+  
+  auth = AuthProviders.of(context).auth;
+  _currentEquipemts = List<bool>.filled(auth.equipementsType.length, false);
+
+  _minBudgetController.text = inMinPrice.toString();
+  _maxBudgetController.text = inMaxPrice.toString();
+
+  _minAreaController.text = inMinArea.toString();
+  _maxAreaController.text = inMaxArea.toString();
+
+  _currentZoneController.text = "100";
+}
 
   @override
   Widget build(BuildContext context) {
@@ -485,7 +511,7 @@ inputFormatters: [ FilteringTextInputFormatter.digitsOnly, ],
                                   runSpacing: 20.0,
                                   alignment: WrapAlignment.start,
                                   children: [
-                                    for (int i = 0; i < SettingsClass().couvertureChambres.length; i++)
+                                    for (int i = 0; i < auth.couverturesChambres.length; i++)
                                     Container(
                                       padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20),
                                       decoration: BoxDecoration(
@@ -506,8 +532,8 @@ inputFormatters: [ FilteringTextInputFormatter.digitsOnly, ],
                                           spacing: 10.0,
                                           crossAxisAlignment: WrapCrossAlignment.center,
                                           children: [
-                                            Image.asset(SettingsClass().couvertureChambres[i].icon, width: 40, color: _currentCouverture.contains(i) ? SettingsClass().bottunColor : Colors.black ,),
-                                            Text(SettingsClass().couvertureChambres[i].name, style: TextStyle(fontFamily: "Figtree", color: _currentCouverture.contains(i) ? SettingsClass().bottunColor : Colors.black),),
+                                            Image.asset(auth.couverturesChambres[i].icon, width: 40, color: _currentCouverture.contains(i) ? SettingsClass().bottunColor : Colors.black ,),
+                                            Text(auth.couverturesChambres[i].name, style: TextStyle(fontFamily: "Figtree", color: _currentCouverture.contains(i) ? SettingsClass().bottunColor : Colors.black),),
                                           ],
                                         ),
                                       ),
@@ -696,12 +722,12 @@ inputFormatters: [ FilteringTextInputFormatter.digitsOnly, ],
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
-                                    for (int i = 0; i < (SettingsClass().equipementsType.length> 4 && showSomeOnly ? 4 : SettingsClass().equipementsType.length); i++)
+                                    for (int i = 0; i < (auth.equipementsType.length> 4 && showSomeOnly ? 4 : auth.equipementsType.length); i++)
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       crossAxisAlignment: CrossAxisAlignment.center,
                                       children: [
-                                        Text(SettingsClass().equipementsType[i].name, style: TextStyle(fontFamily: "Figtree", color: _currentCouverture.contains(i) ? SettingsClass().bottunColor : Colors.black, fontSize: 16, fontWeight: FontWeight.w500),),
+                                        Text(auth.equipementsType[i].name, style: TextStyle(fontFamily: "Figtree", color: _currentCouverture.contains(i) ? SettingsClass().bottunColor : Colors.black, fontSize: 16, fontWeight: FontWeight.w500),),
                                         Checkbox(
                                           value: _currentEquipemts[i],
                                           onChanged: (bool? value) {
@@ -826,9 +852,7 @@ inputFormatters: [ FilteringTextInputFormatter.digitsOnly, ],
                                                   }
                                                 },
                                                 keyboardType: TextInputType.number,
- 
-inputFormatters: [ FilteringTextInputFormatter.digitsOnly, ],
-
+                                                inputFormatters: [ FilteringTextInputFormatter.digitsOnly, ],
                                                 decoration: InputDecoration(
                                                   contentPadding: EdgeInsets.all(10),
                                                   border: OutlineInputBorder(

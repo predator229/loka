@@ -19,7 +19,7 @@ class RoutePage extends StatefulWidget {
   State<RoutePage> createState() => _RoutePageState();
 }
 
-Future<dynamic?> _getUserAuthentificate(BuildContext context) async {
+Future<dynamic> getUserAuthentificate(BuildContext context) async {
   final user = FirebaseAuth.instance.currentUser;
   try {
     final token = await FirebaseAuth.instance.currentUser?.getIdToken(true);
@@ -30,21 +30,14 @@ Future<dynamic?> _getUserAuthentificate(BuildContext context) async {
     final datas = {
       'uid': user?.uid ?? '',
     };
-
-      // print('${user?.uid} : ${headers}');
-
     final response = await http.post(
-      Uri.parse('https://backend-loka-production.up.railway.app/api/users/authentificate'),
-      // Uri.parse('http://localhost:5050/api/users/authentificate'),
+      // Uri.parse('https://backend-loka-production.up.railway.app/api/users/authentificate'),
+      Uri.parse('http://localhost:5050/api/users/authentificate'),
       headers: headers,
       body: jsonEncode(datas),
     );
-      // print('headers : ${headers}');
-      // print('datas : ${datas}');
 
     if (response.statusCode == 200) {
-      // print('answer : ${response.body}');
-
       final data = jsonDecode(response.body);
       if (data['user'] != null) {
         return {
@@ -55,7 +48,44 @@ Future<dynamic?> _getUserAuthentificate(BuildContext context) async {
     }
     return null;
   } catch (e) {
-    // print('Error occurred: $e');
+    _handleAuthError(context);
+    return null;
+  }
+}
+
+Future<dynamic> getDefaultParams(BuildContext context) async {
+  final user = FirebaseAuth.instance.currentUser;
+  try {
+    final token = await FirebaseAuth.instance.currentUser?.getIdToken(true);
+    final headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+    final datas = {
+      'uid': user?.uid ?? '',
+    };
+    final response = await http.post(
+      // Uri.parse('https://backend-loka-production.up.railway.app/api/settings/get-default-params'),
+      Uri.parse('http://localhost:5050/api/settings/get-default-params'),
+      headers: headers,
+      body: jsonEncode(datas),
+    );
+      print('headers : ${headers}');
+      print('datas : ${datas}');
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (data['user'] != null) {
+        return {
+          "roomsTypes": data['roomsTypes'] != null && (data['roomsTypes'] as List).isNotEmpty ? (data['roomsTypes'] as List).map((i) => RoomType.fromJson(i)).toList() : [], 
+          "equipementsType": data['equipementsType'] != null && (data['equipementsType'] as List).isNotEmpty ? (data['equipementsType'] as List).map((i) => EquimentType.fromJson(i)).toList() : [], 
+          "typesApartments": data['typesApartments'] != null && (data['typesApartments'] as List).isNotEmpty ? (data['typesApartments'] as List).map((i) => TypeApartment.fromJson(i)).toList() : [], 
+          "couverturesChambre": data['couverturesChambre'] != null && (data['couverturesChambre'] as List).isNotEmpty ? (data['couverturesChambre'] as List).map((i) => CouvertureChambre.fromJson(i)).toList() : [], 
+        };
+      }
+    }
+    return null;
+  } catch (e) {
     _handleAuthError(context);
     return null;
   }
@@ -83,8 +113,8 @@ class _RoutePageState extends State<RoutePage> {
       builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
         if (snapshot.connectionState == ConnectionState.active) {
           if (snapshot.hasData) {
-            return FutureBuilder<dynamic?>(
-              future: _getUserAuthentificate(context),
+            return FutureBuilder<dynamic>(
+              future: getUserAuthentificate(context),
               builder: (context, authSnapshot) {
                 if (authSnapshot.connectionState == ConnectionState.waiting) {
                   return _buildWaitingScreen(context);
@@ -93,11 +123,37 @@ class _RoutePageState extends State<RoutePage> {
                   return _buildWaitingScreen(context);
                 } else {
                   auth.userAuthentificate = authSnapshot.data!["user"];
-                  if (authSnapshot.data!["typesApartments"] !=null && (authSnapshot.data!["typesApartments"] as List).isNotEmpty) {
-                    auth.typesApartments = authSnapshot.data!["typesApartments"];
-                    print('jeloleglifbasiko');
-                  }else{
-                    print('jelolo');
+                  if (auth.userAuthentificate != null){
+                    return StreamBuilder<User?>(
+                      stream: auth.onAuthStatusChanged,
+                      builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
+                        if (snapshot.connectionState == ConnectionState.active) {
+                          if (snapshot.hasData) {
+                            return FutureBuilder<dynamic>(
+                              future: getDefaultParams(context),
+                              builder: (context, settingsSnapshot) {
+                                if (settingsSnapshot.connectionState == ConnectionState.waiting) {
+                                  return _buildWaitingScreen(context);
+                                } else if (settingsSnapshot.hasError || settingsSnapshot.data == null) {
+                                  // _handleAuthError(context);
+                                  print("problem");
+                                  return _buildWaitingScreen(context);
+                                } else {
+                                  auth.couverturesChambres = settingsSnapshot.data!["couverturesChambre"];
+                                  auth.equipementsType = settingsSnapshot.data!["equipementsType"];
+                                  auth.typesApartments = settingsSnapshot.data!["typesApartments"];
+                                  auth.roomsType = settingsSnapshot.data!["roomsTypes"];
+                                  
+                                  return auth.userAuthentificate.phoneNumber != null ? HomeView() : ProfilView();
+                                }
+                              },
+                            );
+                          }
+                          return WelcomeView();
+                        }
+                        return _buildWaitingScreen(context);
+                      },
+                    );
                   }
                   return auth.userAuthentificate.phoneNumber != null ? HomeView() : ProfilView();
                 }

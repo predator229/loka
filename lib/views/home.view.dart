@@ -1294,17 +1294,17 @@ Widget _buildItemList (ProfilMenu profil) {
               apartmentsFiltered = apartments;
             });
             iJustLoadApartment();
+            letFilterTheApartments(); 
           }
         }
-        if (response['typesApartments'] != null && response['typesApartments'] is List) {
-          List<TypeApartment> types = []; 
-          for (var elmt in response['typesApartments']){ types.add(TypeApartment.fromJson(elmt)); } 
-          setState(() {
-            typesApartments = types;
-            auth.typesApartments = typesApartments;
-            letFilterTheApartments(); 
-          });
-        }
+        // if (response['typesApartments'] != null && response['typesApartments'] is List) {
+        //   List<TypeApartment> types = []; 
+        //   for (var elmt in response['typesApartments']){ types.add(TypeApartment.fromJson(elmt)); } 
+        //   setState(() {
+        //     typesApartments = types;
+        //     auth.typesApartments = typesApartments;
+        //   });
+        // }
       SnackBar(content: Text('Réponse inattendue du serveur.'));
     } catch (e) { 
       // _handleAuthError(context);

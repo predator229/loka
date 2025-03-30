@@ -81,6 +81,7 @@ class ApartmentCard {
   String description;
   String? descriptionLocation;
   String location;
+  String maplocation;
   String date;
   double price;
   double rating;
@@ -100,6 +101,7 @@ class ApartmentCard {
     required this.title,
     required this.description,
     required this.location,
+    required this.maplocation,
     this.descriptionLocation,
     required this.date,
     required this.price,
@@ -122,6 +124,7 @@ class ApartmentCard {
       title: json['title'],
       description: json['description'],
       location: json['location'],
+      maplocation: json['maplocation'],
       descriptionLocation: json['descriptionLocation'],
       date: json['date'],
       price: json['price'].toDouble(),
@@ -182,17 +185,6 @@ class TypeApartment {
       icone: getIconFromString(json['icone']),
     );
   }
-  static IconData getIconFromString(String iconName) { //damien
-    const Map<String, IconData> iconsMap = {
-      'view_comfortable_outlined': Icons.view_comfortable_outlined,
-      'home_filled': Icons.home_filled,
-      'home_work': Icons.home_work,
-      "blinds_closed_outlined" : Icons.blinds_closed_outlined,
-      "local_offer_rounded" : Icons.local_offer_rounded,
-    };
-    return iconsMap[iconName] ?? Icons.error;
-  }
-
   Map<String, dynamic> toJson() {
     return {
       '_id': id,
@@ -250,30 +242,6 @@ class RoomType {
       icon: json['icon'] != null ?getIconFromString( json['icon']): null,
     );
   }
-  static IconData getIconFromString(String iconName) { //damien
-    const Map<String, IconData> iconsMap = {
-      'view_comfortable_outlined': Icons.view_comfortable_outlined,
-      'home_filled': Icons.home_filled,
-      'home_work': Icons.home_work,
-      "blinds_closed_outlined" : Icons.blinds_closed_outlined,
-      "local_offer_rounded" : Icons.local_offer_rounded,
-      "tv" : Icons.tv,
-      "wallet_sharp" : Icons.wallet_sharp,
-      "waterfall_chart_sharp" : Icons.waterfall_chart_sharp,
-      "panorama_wide_angle_select_sharp" : Icons.panorama_wide_angle_select_sharp,
-      "outdoor_grill_sharp" : Icons.outdoor_grill_sharp,
-      "kitchen_sharp" : Icons.kitchen_sharp,
-      "door_back_door" : Icons.door_back_door,
-      "sanitizer_outlined" : Icons.sanitizer_outlined,
-      "self_improvement" : Icons.self_improvement,
-      "bathroom" : Icons.bathroom,
-      "bed_rounded" : Icons.bed_rounded,
-      "gradient_rounded" : Icons.gradient_rounded,
-      "chair" : Icons.chair,
-    };
-    return iconsMap[iconName] ?? Icons.error;
-  }
-
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -464,7 +432,7 @@ class ProfilMenu {
       id: json['_id'],
       title: json['title'],
       description: json['description'],
-      icon: json['icon'] != null ? IconData(json['icon'], fontFamily: 'MaterialIcons') : null,
+      icon: json['icon'] != null ? getIconFromString( json['icon']): null,
       routeName: json['routeName'],
       isLogout: json['isLogout'],
     );
@@ -647,4 +615,28 @@ class SelectedPayement{
       'card': card?.toJson(),
     };
   }
+}
+
+IconData getIconFromString(String iconName) { //damien
+  const Map<String, IconData> iconsMap = {
+    'view_comfortable_outlined': Icons.view_comfortable_outlined,
+    'home_filled': Icons.home_filled,
+    'home_work': Icons.home_work,
+    "blinds_closed_outlined" : Icons.blinds_closed_outlined,
+    "local_offer_rounded" : Icons.local_offer_rounded,
+    "tv" : Icons.tv,
+    "wallet_sharp" : Icons.wallet_sharp,
+    "waterfall_chart_sharp" : Icons.waterfall_chart_sharp,
+    "panorama_wide_angle_select_sharp" : Icons.panorama_wide_angle_select_sharp,
+    "outdoor_grill_sharp" : Icons.outdoor_grill_sharp,
+    "kitchen_sharp" : Icons.kitchen_sharp,
+    "door_back_door" : Icons.door_back_door,
+    "sanitizer_outlined" : Icons.sanitizer_outlined,
+    "self_improvement" : Icons.self_improvement,
+    "bathroom" : Icons.bathroom,
+    "bed_rounded" : Icons.bed_rounded,
+    "gradient_rounded" : Icons.gradient_rounded,
+    "chair" : Icons.chair,
+  };
+  return iconsMap[iconName] ?? Icons.error;
 }

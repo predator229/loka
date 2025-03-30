@@ -81,4 +81,10 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 </dict>
+<key>LSApplicationQueriesSchemes</key>
+<array>
+    <string>googlechrome</string>
+    <string>https</string>
+    <string>http</string>
+</array>
 </plist>
